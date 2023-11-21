@@ -4,35 +4,15 @@ import java.util.Random;
 
 import com.sillypantscoder.spcgames.http.HttpResponse;
 
-public abstract class Game {
+public class Game {
+	public GameType type;
 	public Subprocess process;
 	public String id;
-	public Game() {
-		process = null;
-		id = getView().getID() + new Random().nextInt(Integer.MAX_VALUE);
+	public Game(GameType type) {
+		this.type = type;
+		process = type.getProcess();
+		id = type.getID() + new Random().nextInt(Integer.MAX_VALUE);
 	}
-	public void start() {
-		process = getProcess();
-	}
-	// public static View getView1() {
-	// 	return new View() {
-	// 		public String getName() {
-	// 			return "<error>";
-	// 		}
-	// 		public String getID() {
-	// 			return "blank_game";
-	// 		}
-	// 		public Game create() {
-	// 			return new Game() {
-	// 				public Subprocess getProcess() {
-	// 					return new Subprocess(new String[] { "bash", "-c", "echo \"error\" >&2" }, ".");
-	// 				}
-	// 			};
-	// 		}
-	// 	};
-	// }
-	public abstract View getView();
-	public abstract Subprocess getProcess();
 	public HttpResponse communicate(String message) {
 		process.writeStdin(message);
 		// System.out.println("before");
@@ -59,10 +39,5 @@ public abstract class Game {
 	}
 	public HttpResponse post(String path, String body) {
 		return communicate("{\"method\":\"POST\",\"path\":\"" + path + "\",\"body\":\"" + body + "\"}\n");
-	}
-	public static abstract class View {
-		public abstract String getName();
-		public abstract String getID();
-		public abstract Game create();
 	}
 }

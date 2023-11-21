@@ -2,6 +2,7 @@ package com.sillypantscoder.spcgames;
 
 import java.util.ArrayList;
 
+import com.sillypantscoder.spcgames.games.ColtSuperExpress;
 import com.sillypantscoder.spcgames.http.HttpResponse;
 import com.sillypantscoder.spcgames.http.RequestHandler;
 
@@ -10,10 +11,6 @@ public class GameHandler extends RequestHandler {
 	public GameHandler() {
 		this.games = new ArrayList<Game>();
 	}
-	// @FunctionalInterface
-	// public static interface GameTypeProvider {
-	// 	public abstract Game.View getView();
-	// }
 	public HttpResponse get(String path) {
 		if (path.equals("/")) return new HttpResponse().setStatus(200).setBody("Hiiiiiiii");
 		else if (path.startsWith("/game/")) {
@@ -26,14 +23,12 @@ public class GameHandler extends RequestHandler {
 			}
 		} else if (path.startsWith("/create_game/")) {
 			String type = path.split("/")[2];
-			for (Game info : new Game[] {
-				new GameColtSuperExpress()
+			for (GameType info : new GameType[] {
+				new ColtSuperExpress()
 			}) {
-				Game.View view = info.getView();
-				if (view.getID().equals(type)) {
+				if (info.getID().equals(type)) {
 					// Create a new game of this type
-					Game newGame = view.create();
-					newGame.start();
+					Game newGame = new Game(info);
 					this.games.add(newGame);
 					return new HttpResponse().setStatus(200).addHeader("Content-Type", "text/plain").setBody(newGame.id);
 				}
