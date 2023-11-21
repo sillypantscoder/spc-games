@@ -106,9 +106,8 @@ def get(path: str, query: URLQuery) -> HttpResponse:
 \t\t\t"content": ""
 \t\t}
 
-def post(path: str, body: bytes) -> HttpResponse:
-\tbodydata = body.decode("UTF-8").split("\
-")
+def post(path: str, body: str) -> HttpResponse:
+\tbodydata = body.split("\\n")
 \tif path == "/join_game":
 \t\tgame.addPlayer(Player(bodydata[0]))
 \t\treturn {
@@ -192,4 +191,29 @@ if __name__ == "__main__":
 \t\t\trunning = False
 \tprint("Server stopped", file=sys.stderr)
 ''')
+f.close()
+
+f = open("coltsuperexpress/public_files/script.js", "r")
+t = f.read().split("\n")
+f.close()
+
+t[38] = r'		x.send(body.replaceAll("\n", "\\n"))'
+
+f = open("coltsuperexpress/public_files/script.js", "w")
+f.write("\n".join(t))
+f.close()
+
+f = open("coltsuperexpress/game.py", "r")
+t = f.read().split("\n")
+f.close()
+
+t.pop(342)
+t.pop(342)
+t.pop(342)
+t.pop(342)
+t.pop(343)
+t.pop(343)
+
+f = open("coltsuperexpress/game.py", "w")
+f.write("\n".join(t))
 f.close()
