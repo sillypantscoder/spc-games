@@ -11,6 +11,6 @@ public class ColtSuperExpress extends GameType {
 		return "coltsuperexpress";
 	}
 	public Subprocess getProcess() {
-		return new Subprocess(new String[] {"python3", "main.py"}, "../coltsuperexpress");
+		return new Subprocess(new String[] {"python3", "fakeserver.py"}, "../coltsuperexpress");
 	}
 }
