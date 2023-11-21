@@ -198,6 +198,13 @@ t = f.read().split("\n")
 f.close()
 
 t[38] = r'		x.send(body.replaceAll("\n", "\\n"))'
+t[302] = r'	var d = await request("./status")'
+t[502] = r'				if (! playerData.ready) post("./ready", playername)'
+t[653] = r'	post("./join_game", newname).then((e) => {'
+t[654] = r'		if (query.bot == "true") location.replace("./?name=" + newname + "&bot=true")'
+t[655] = r'		else location.replace("./?name=" + newname)'
+t[660] = r'	post("./ready", playername)'
+t[693] = r'	post("./submit_plan", `${playername}\n${plan.join("\n")}`)'
 
 f = open("coltsuperexpress/public_files/script.js", "w")
 f.write("\n".join(t))

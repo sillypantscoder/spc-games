@@ -1,11 +1,15 @@
 package com.sillypantscoder.spcgames;
 
+// import java.util.Random;
+
 import com.sillypantscoder.spcgames.http.HttpResponse;
 
 public abstract class Game {
 	public Subprocess process;
+	public String id;
 	public Game() {
 		process = new Subprocess(new String[] {"python3", "main.py"}, "../coltsuperexpress");
+		id = "coltsuperexpress";// + new Random().nextInt(Integer.MAX_VALUE);
 	}
 	public HttpResponse communicate(String message) {
 		process.writeStdin(message);
