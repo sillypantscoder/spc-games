@@ -32,7 +32,7 @@ public class Game {
 		return res;
 	}
 	public HttpResponse get(String path) {
-		return communicate("{\"method\":\"GET\",\"path\":\"" + path + "\"}\n");
+		return communicate("{\"method\":\"GET\",\"path\":\"" + path + "\",\"body\":\"\"}\n");
 	}
 	public HttpResponse post(String path, String body) {
 		return communicate("{\"method\":\"POST\",\"path\":\"" + path + "\",\"body\":\"" + body + "\"}\n");

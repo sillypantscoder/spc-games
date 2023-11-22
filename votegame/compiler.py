@@ -37,7 +37,7 @@ Main-Class: Main
 
 """)
 f.close()
-subprocess.run(["jar", "-c", "-v", "-f", "compiled.jar", "-m", "compiled_output/manifest", "-C", "compiled_output/", "."])
+subprocess.run(["bash", "-c", "jar -c -v -f compiled.jar -m compiled_output/manifest -C compiled_output/ . > /dev/null"])
 subprocess.run(["rm", "-r", "compiled_output"])
 
 subprocess.run(["java", "-jar", "compiled.jar"])

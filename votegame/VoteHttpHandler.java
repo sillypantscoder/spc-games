@@ -1,43 +1,34 @@
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 
 import java.util.ArrayList;
 
-public class VoteHttpHandler implements HttpHandler {
+public class VoteHttpHandler {
 	public Game game;
 	public static ArrayList<QueuedEvent> queue = new ArrayList<QueuedEvent>();
 	public VoteHttpHandler(Game game) {
 		super();
 		this.game = game;
 	}
-	@Override
-	public void handle(HttpExchange httpExchange) {
+	public void handle(String method, String path, String body) {
 		try {
-			if (httpExchange.getRequestMethod().equals("GET")) {
-				handleGetRequest(httpExchange);
+			if (method.equals("GET")) {
+				handleGetRequest(path);
 			}
-			if (httpExchange.getRequestMethod().equals("POST")) {
-				handlePostRequest(httpExchange);
+			if (method.equals("POST")) {
+				handlePostRequest(path, body);
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 		handleQueue();
 	}
-	private void handleGetRequest(HttpExchange httpExchange) throws IOException {
-		String path = httpExchange.getRequestURI().toString();
+	private void handleGetRequest(String path) throws IOException {
 		HttpResponse response = game.get(path);
-		response.send(httpExchange);
+		response.send();
 	}
-	private void handlePostRequest(HttpExchange httpExchange) throws IOException {
-		String path = httpExchange.getRequestURI().toString();
-		byte[] body = httpExchange.getRequestBody().readAllBytes();
-		String bodys = new String(body, StandardCharsets.UTF_8);
-		HttpResponse response = game.post(path, bodys);
-		response.send(httpExchange);
+	private void handlePostRequest(String path, String body) throws IOException {
+		HttpResponse response = game.post(path, body);
+		response.send();
 	}
 	public static void queue(int time, Player targetPlayer, String eventString) {
 		queue.add(new QueuedEvent(time, targetPlayer, eventString));

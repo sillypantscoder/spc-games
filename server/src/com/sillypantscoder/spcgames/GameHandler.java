@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 import com.sillypantscoder.spcgames.games.ColtSuperExpress;
+import com.sillypantscoder.spcgames.games.VotingGame;
 import com.sillypantscoder.spcgames.http.HttpResponse;
 import com.sillypantscoder.spcgames.http.RequestHandler;
 
@@ -53,6 +54,7 @@ public class GameHandler extends RequestHandler {
 			String name = path.split("/")[3];
 			for (int i = 0; i < games.size(); i++) {
 				if (games.get(i).id.equals(name)) {
+					games.get(i).process.process.destroy();
 					games.remove(i);
 					return new HttpResponse().setStatus(200);
 				}
@@ -79,7 +81,8 @@ public class GameHandler extends RequestHandler {
 			String type = path.split("\\?")[0].split("/")[2];
 			String newname = URLDecoder.decode(path.split("\\?")[1], StandardCharsets.UTF_8);
 			for (GameType info : new GameType[] {
-				new ColtSuperExpress()
+				new ColtSuperExpress(),
+				new VotingGame()
 			}) {
 				if (info.getID().equals(type)) {
 					// Create a new game of this type

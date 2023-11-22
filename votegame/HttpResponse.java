@@ -1,9 +1,4 @@
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
-
-import com.sun.net.httpserver.Headers;
-import com.sun.net.httpserver.HttpExchange;
 
 public class HttpResponse {
 	public int status;
@@ -35,20 +30,32 @@ public class HttpResponse {
 		headerValues.add(value);
 		return this;
 	}
-	public void send(HttpExchange exchange) throws IOException {
-		OutputStream outputStream = exchange.getResponseBody();
-		// Set headers
-		Headers h = exchange.getResponseHeaders();
+	public void send() {
+	// 	s: list[bytes] = [
+	// 		str(res["status"]).encode("UTF-8"),
+	// 		",".join([f"{a}:{b}" for a, b in res["headers"].items()]).encode("UTF-8"),
+	// 		res["content"]
+	// 	]
+	// 	for data in s:
+	// 		self.send_packet(data)
+	// 		# time.sleep(0.3)
+	// def send_packet(self, info: bytes):
+	// 	sys.stdout.buffer.write(str(len(info)).encode("UTF-8"))
+	// 	sys.stdout.buffer.write(b".")
+	// 	sys.stdout.buffer.write(info)
+	// 	sys.stdout.buffer.flush()
+		send_packet(String.valueOf(status));
+		String[] finalHeaders = new String[headerNames.size()];
 		for (int i = 0; i < headerNames.size(); i++) {
-			h.add(headerNames.get(i), headerValues.get(i));
+			finalHeaders[i] = headerNames.get(i) + ":" + headerValues.get(i);
 		}
-		// Send headers then data
-		byte[] bytes = body.getBytes();
-		exchange.sendResponseHeaders(status, bytes.length);
-		outputStream.write(bytes);
-		// Finish
-		outputStream.flush();
-		outputStream.close();
+		send_packet(String.join(",", finalHeaders));
+		send_packet(body);
+	}
+	public void send_packet(String data) {
+		System.out.print(String.valueOf(data.length()));
+		System.out.print(".");
+		System.out.print(data);
 	}
 	public void printInfo() {
 		System.out.println("[HTTP RESPONSE : " + status + "]\n(" + body.length() + ")>>>" + body + "<<<");
