@@ -4,4 +4,5 @@ public abstract class GameType {
 	public abstract String getName();
 	public abstract String getID();
 	public abstract Subprocess getProcess();
+	public abstract String getStatus(Game game);
 }

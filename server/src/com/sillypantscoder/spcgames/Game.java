@@ -7,10 +7,12 @@ import com.sillypantscoder.spcgames.http.HttpResponse;
 public class Game {
 	public GameType type;
 	public Subprocess process;
+	public String name;
 	public String id;
-	public Game(GameType type) {
+	public Game(GameType type, String name) {
 		this.type = type;
 		process = type.getProcess();
+		this.name = name;
 		id = type.getID() + new Random().nextInt(Integer.MAX_VALUE);
 	}
 	public HttpResponse communicate(String message) {
@@ -34,5 +36,8 @@ public class Game {
 	}
 	public HttpResponse post(String path, String body) {
 		return communicate("{\"method\":\"POST\",\"path\":\"" + path + "\",\"body\":\"" + body + "\"}\n");
+	}
+	public String getStatus() {
+		return this.type.getStatus(this);
 	}
 }
