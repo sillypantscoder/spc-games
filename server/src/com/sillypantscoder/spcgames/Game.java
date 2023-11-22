@@ -40,4 +40,7 @@ public class Game {
 	public String getStatus() {
 		return this.type.getStatus(this);
 	}
+	public String getModStatus() {
+		return this.type.getModStatus(this);
+	}
 }

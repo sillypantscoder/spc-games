@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+a {
+	color: rgb(0, 0, 200) !important;
+}
+		</style>
+	</head>
+	<body>
+		<h3>Host XXGAMENAME (XXGAMETYPENAME)</h3>
+		<p><button onclick="deleteGame()">Delete Game</button></p>
+		<p id="contents"></p>
+		<script>
+var game_id = location.pathname.split("/")[3]
+function deleteGame() {
+	var x = new XMLHttpRequest()
+	x.open("GET", `../delete/${game_id}`)
+	x.addEventListener("loadend", (e) => {
+		location.assign("../..")
+	})
+	x.send()
+}
+function updateContents() {
+	var x = new XMLHttpRequest()
+	x.open("GET", `../data/${game_id}`)
+	x.addEventListener("loadend", (e) => {
+		document.querySelector("#contents").innerHTML = e.target.responseText
+		setTimeout(updateContents, 1000)
+	})
+	x.send()
+}
+updateContents()
+function sendServerMsg(data) {
+	var x = new XMLHttpRequest()
+	x.open("POST", `../../game/${game_id}/mod`)
+	x.send(data)
+}
+		</script>
+	</body>
+</html>

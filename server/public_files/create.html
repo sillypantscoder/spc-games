@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+a {
+	color: rgb(0, 0, 200) !important;
+}
+		</style>
+	</head>
+	<body>
+		<h5><a href=".">Back</a></h5>
+		<h3>Create new game:</h3>
+		<p>Game type: <select id="gametype">
+			<option value="coltsuperexpress">Colt Super Express</option>
+		</select></p>
+		<p>Game name: <input type="text" id="name" placeholder="Enter a name for your game..."></p>
+		<p><button onclick="submit()">Create!</button></p>
+		<script>
+function submit() {
+	var type = document.querySelector("#gametype").value
+	var name = document.querySelector("#name").value
+	var x = new XMLHttpRequest()
+	x.open("GET", `./create_game/${type}?${encodeURIComponent(name)}`)
+	x.addEventListener("loadend", (e) => {
+		/** @type {string} */
+		var t = e.target.responseText;
+		location.assign("/host/main/" + t)
+	})
+	x.send()
+}
+		</script>
+	</body>
+</html>

@@ -14,7 +14,7 @@ public class GameHandler extends RequestHandler {
 		this.games = new ArrayList<Game>();
 	}
 	public HttpResponse get(String path) {
-		if (path.equals("/")) return new HttpResponse().setStatus(200).setBody(Utils.readFile("public_files/index.html"));
+		if (path.equals("/")) return new HttpResponse().setStatus(200).addHeader("Content-Type", "text/html").setBody(Utils.readFile("public_files/index.html"));
 		else if (path.equals("/gamelist")) {
 			ArrayList<String[]> info = new ArrayList<String[]>();
 			for (int i = 0; i < games.size(); i++) {
@@ -31,7 +31,42 @@ public class GameHandler extends RequestHandler {
 				if (i != 0) body += "\n";
 				body += String.join("|||", info.get(i));
 			}
-			return new HttpResponse().setStatus(200).setBody(body);
+			return new HttpResponse().setStatus(200).addHeader("Content-Type", "text/plain").setBody(body);
+		} else if (path.equals("/create")) {
+			return new HttpResponse().setStatus(200).addHeader("Content-Type", "text/html").setBody(Utils.readFile("public_files/create.html"));
+		} else if (path.startsWith("/host/main/")) {
+			String name = path.split("/")[3];
+			for (int i = 0; i < games.size(); i++) {
+				Game g = games.get(i);
+				if (g.id.equals(name)) {
+					return new HttpResponse()
+						.setStatus(200)
+						.addHeader("Content-Type", "text/html")
+						.setBody(
+							Utils.readFile("public_files/host.html")
+								.replaceAll("XXGAMENAME", g.name)
+								.replaceAll("XXGAMETYPENAME", g.type.getName())
+						);
+				}
+			}
+		} else if (path.startsWith("/host/delete/")) {
+			String name = path.split("/")[3];
+			for (int i = 0; i < games.size(); i++) {
+				if (games.get(i).id.equals(name)) {
+					games.remove(i);
+					return new HttpResponse().setStatus(200);
+				}
+			}
+		} else if (path.startsWith("/host/data/")) {
+			String name = path.split("/")[3];
+			for (int i = 0; i < games.size(); i++) {
+				if (games.get(i).id.equals(name)) {
+					return new HttpResponse()
+						.setStatus(200)
+						.addHeader("Content-Type", "text/html")
+						.setBody(games.get(i).getModStatus());
+				}
+			}
 		} else if (path.startsWith("/game/")) {
 			String name = path.split("/")[2];
 			String gamePath = path.substring(6 + name.length());

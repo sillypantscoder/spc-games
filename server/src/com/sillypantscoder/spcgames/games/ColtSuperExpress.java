@@ -31,4 +31,7 @@ public class ColtSuperExpress extends GameType {
 			return "???";
 		}
 	}
+	public String getModStatus(Game game) {
+		return game.get("/status_mod").body;
+	}
 }
