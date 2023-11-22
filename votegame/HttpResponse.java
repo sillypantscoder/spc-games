@@ -1,4 +1,3 @@
-package com.sillypantscoder.spcgames.http;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -53,9 +52,5 @@ public class HttpResponse {
 	}
 	public void printInfo() {
 		System.out.println("[HTTP RESPONSE : " + status + "]\n(" + body.length() + ")>>>" + body + "<<<");
-	}
-	@Override
-	public String toString() {
-		return "[HTTP RESPONSE : " + status + "]\n(" + body.length() + ")>>>" + body + "<<<";
 	}
 }

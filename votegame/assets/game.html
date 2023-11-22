@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+html {
+	height: 100%;
+}
+body {
+	margin: 0;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	font-family: sans-serif;
+}
+body > * {
+	padding: 1em;
+}
+#content {
+	border-top: 1px solid black;
+	border-bottom: 1px solid black;
+	flex-grow: 1;
+}
+
+table {
+	border-spacing: 1em;
+}
+td {
+	background: #AAF;
+	border-radius: 1em;
+	padding: 1em;
+	position: relative;
+}
+td[onclick] {
+	background: #AFA;
+}
+td.selected {
+	background: #5A5;
+}
+td.notselected {
+	background: #555;
+	color: white;
+}
+.option-info {
+	position: absolute;
+	top: -1em;
+	left: -0.5em;
+	margin: 0.5em;
+	background: green;
+	color: white;
+	border-radius: 1em;
+	padding: 0 0.5em;
+	text-align: center;
+	display: inline-block;
+}
+
+button {
+	background: #55F;
+	color: white;
+	padding: 1em;
+	margin: 1em;
+	border: none;
+	border-radius: 1em;
+	font-size: 1rem;
+}
+*[onclick] {
+	cursor: pointer;
+}
+.effect {
+	padding: 1em;
+	margin: 1em;
+	border: 1px solid #00F;
+	border-radius: 1em;
+	position: relative;
+}
+.icon {
+	position: absolute;
+	top: -1em;
+	left: -0.5em;
+	margin: 0.5em;
+	background: green;
+	color: white;
+	border-radius: 1em;
+	padding: 0 0.5em;
+	text-align: center;
+	display: inline-block;
+}
+
+.users {
+	display: flex;
+	flex-direction: row;
+	padding-left: 0;
+	flex-wrap: wrap;
+}
+.users > div {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	border-right: 1px solid black;
+	position: relative;
+	padding: 0 1em;
+}
+.users > div > div + div {
+	flex-grow: 1;
+	margin: 1em;
+	padding: 1em;
+	border: 1px solid black;
+	border-radius: 1em;
+}
+.score-annotation {
+	position: absolute;
+	bottom: 0.5em;
+	padding: 0 0.1em;
+	background: white;
+	text-align: center;
+	display: inline-block;
+}
+#userlist .users > div.finished::after {
+	content: "\2713";
+	position: absolute;
+	bottom: 0em;
+	margin: 0.5em;
+	background: green;
+	color: white;
+	border-radius: 50%;
+	width: 1em;
+	text-align: center;
+}
+
+.dialog {
+	position: absolute;
+	top: 0;
+	left: 0;
+	background: #000A;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 2;
+	padding: 0;
+}
+.dialog.inactive {
+	display: none;
+	z-index: -2;
+}
+.dialog > div {
+	border-radius: 1em;
+	padding: 1em;
+	margin: 0.5em;
+	background: white;
+}
+@media (max-width: 35em) {
+	.dialog > div {
+		margin: 0;
+		width: 100%;
+		min-height: calc(100% - 2em);
+		border-radius: 0;
+	}
+}
+		</style>
+	</head>
+	<body>
+		<div><h1 style="display: inline-block;">The Voting Game</h1> <button onclick="document.querySelector('#settings').classList.remove('inactive')">Settings</button></div>
+		<div id="settings" class="dialog inactive"><div>
+			<div><button onclick="document.querySelector('#settings').classList.add('inactive')">Close</button></div>
+			<h1>Settings</h1>
+			<div>Text size: <input type="range" min="0.5" max="2" step="0.5" value="1" oninput="document.body.parentNode.setAttribute('style', 'font-size: ' + String(this.value) + 'em;')"></div>
+			<!-- <div>Bot mode: <input type="checkbox" oninput="window.bot_mode = this.checked"></div> -->
+			<div><button style="background: red;" onclick="leave()">Leave Game</button></div>
+		</div></div>
+		<div id="broken" class="dialog inactive"><div>
+			<h1>Error</h1>
+			<div>Lost connection with the server!</div>
+			<!-- <div>Bot mode: <input type="checkbox" oninput="window.bot_mode = this.checked"></div> -->
+			<div><button onclick="location.reload()">Reload the page</button></div>
+		</div></div>
+		<div id="content">
+			<div id="header"></div>
+			<div id="voting"></div>
+			<div id="desc"></div>
+			<h2>Rules</h2>
+			<ul id="rules"></ul>
+		</div>
+		<div id="userlist"></div>
+		<script>window.addEventListener("error", (e) => alert(`${e.message} @:${e.lineno}`))</script>
+		<script>
+;(function messageChecker() {
+	var x = new XMLHttpRequest()
+	x.open("GET", "/messages" + location.search)
+	x.addEventListener("loadend", (e) => {
+		try {
+			var messages = e.target.responseText.split("\n")
+			for (var i = 0; i < messages.length - 1; i++) {
+				info = JSON.parse(messages[i])
+				switch (info.type) {
+					case "votingscreen":
+						showVotingScreen(info.voteinfo)
+						break;
+					case "playerupdate":
+						updateUsers(info.users)
+						break;
+					case "votingfinished":
+						updateUsers(info.users)
+						showResults(info.info)
+				}
+			}
+			setTimeout(messageChecker, 100)
+		} catch (e) {
+			document.querySelector('#broken').classList.remove('inactive')
+			console.error(e)
+		}
+	})
+	x.send()
+})();function sendMessage(msg) {
+	var x = new XMLHttpRequest()
+	x.open("POST", "/sendmessage")
+	x.send(location.search.substr("?user=".length) + "\n" + msg)
+};
+// expects: { users, choices: string[], choicesTypes: string[] }
+function showVotingScreen(info) {
+	updateUsers(info.users)
+	// UPDATE THE HEADERS
+	document.querySelector("#header").innerHTML = "<h2>Voting</h2>"
+	document.querySelector("#voting").innerText = ""
+	document.querySelector("#desc").innerText = ""
+	// GET THE OPTION LIST
+	var choices = info.choices
+	var m = document.createElement("table")
+	m.appendChild(document.createElement("tbody"))
+	for (var i = 0; i < choices.length; i++) {
+		// SHOW THE OPTIONS
+		var r = document.createElement("tr")
+		r.appendChild(document.createElement("td"))
+		r.children[0].innerText = "Vote"
+		r.children[0].setAttribute("onclick", `vote(${i})`)
+		r.appendChild(document.createElement("td"))
+		r.children[1].innerHTML = ({
+			"action": "",
+			"rule-accept": "<div class='option-info' style='background: blue;'>New rule</div>",
+			"rule-repeal": "<div class='option-info' style='background: red;'>Repeal a rule</div>"
+		}[info.choiceTypes[i]]) + choices[i]
+		m.children[0].appendChild(r)
+	}
+	document.querySelector("#voting").appendChild(m)
+}
+function vote(n) {
+	// CHANGE BUTTON TEXT TO VOTED
+	document.querySelector(`#voting table tr:nth-child(${n + 1}) td[onclick]`).innerText = "Voted!"
+	// SET SELECTED BUTTON
+	document.querySelector(`#voting table tr:nth-child(${n + 1}) td[onclick]`).classList.add("selected")
+	// SET NOT SELECTED BUTTONS
+	document.querySelectorAll(`#voting table tr:not(:nth-child(${n + 1})) td[onclick]`).forEach((e) => e.classList.add("notselected"))
+	// REMOVE CLICK HANDLERS
+	document.querySelectorAll(`#voting table tr td[onclick]`).forEach((e) => e.removeAttribute("onclick"))
+	// CREATE THE WAITING TEXT
+	var e = document.createElement("div")
+	e.innerHTML = `<div>Waiting for other players to vote...</div>`
+	document.querySelector("#desc").appendChild(e)
+	// TELL THE SERVER THAT WE VOTED
+	sendMessage("v" + String(n))
+}
+// expects: {votes: int[], effects: string[], effectTypes: string[], rules, playerDatas: <users>[]}
+function showResults(info) {
+	// UPDATE THE HEADER
+	document.querySelector("#header").innerText = ""
+	var h = document.createElement("h2")
+	h.innerText = "Results"
+	document.querySelector("#header").appendChild(h)
+	// SHOW THE NUMBER OF VOTES FOR EACH OPTION
+	for (var i = 0; i < info.votes.length; i++) {
+		document.querySelector(`#voting table tr:nth-child(${i + 1}) td:first-child`).innerText = `${info.votes[i]} vote${info.votes[i]==1 ? '' : 's'}`
+	}
+	// SHOW THE LIST OF EFFECTS
+	var infoElm = document.querySelector("#desc > div")
+	infoElm.innerHTML = ""
+	for (var i = 0; i < info.effects.length; i++) {
+		infoElm.appendChild(createUserElm(i != 0 ? info.playerDatas[i - 1] : null, info.playerDatas[i]))
+		var c = document.createElement("div")
+		c.setAttribute("class", "effect")
+		c.innerHTML = ({
+			"voted-for": "<div class='icon' style='background: darkgreen;'>&#x2714; Voted for</div>",
+			"zero-votes": "<div class='icon' style='background: cyan; color: black;'>&#x1F6AB; Zero votes</div>",
+			"random": "<div class='icon' style='background: purple;'>&#x2684; Randomly selected</div>",
+			"last-place-bonus": "<div class='icon' style='background: blue;'>&#x2913; Lowest score bonus</div>",
+			"first-place-penalty": "<div class='icon' style='background: red;'>&#x21A5; Highest score penalty</div>",
+			"random-penalty": "<div class='icon' style='background: bisque;'>&#x21BB; Random penalty</div>"
+		}[info.effectSources[i]]) + ({
+			"action": "",
+			"rule-accept": "<b style='color: blue;'>New rule: </b>",
+			"rule-repeal": "<b style='color: red;'>Repealed a rule: </b>"
+		}[info.effectTypes[i]]) + info.effects[i]
+		infoElm.appendChild(c)
+	}
+	infoElm.appendChild(createUserElm(info.playerDatas[i - 1], info.playerDatas[i]))
+	// ADD THE CONTINUE BUTTON
+	var c = document.createElement("div")
+	c.innerHTML = `<button onclick="ready(this.parentNode)">Continue</button>`
+	infoElm.appendChild(c)
+	// UPDATE THE RULE LIST
+	updateRules(info.rules)
+}
+// expects: btn parent
+function ready(e) {
+	e.setAttribute("style", "margin-top: 1em;")
+	e.innerText = "Waiting for other players to finish..."
+	sendMessage("r")
+}
+// expects: [rules...]
+function updateRules(info) {
+	var ruleElm = document.querySelector("#rules")
+	ruleElm.innerHTML = ""
+	for (var i = 0; i < info.length; i++) {
+		var c = document.createElement("li")
+		c.innerText = info[i]
+		ruleElm.appendChild(c)
+	}
+}
+// expects: [
+//     {name, score, hasVoted}...
+// ]
+function updateUsers(info) {
+	var t = document.querySelector("#userlist")
+	t.innerText = ""
+	t.appendChild(createUserElm(null, info))
+}
+function createUserElm(prev, info) {
+	var t = document.createElement("div")
+	t.classList.add("users")
+	for (var i = 0; i < info.length; i++) {
+		var e = document.createElement("div")
+		e.innerHTML = `<div>${info[i].name}</div><div>${info[i].score}</div>`
+		if (info[i].hasVoted) e.classList.add("finished")
+		if (prev && prev[i].score != info[i].score) {
+			var x = document.createElement("span")
+			x.classList.add("score-annotation")
+			if (prev[i].score < info[i].score) {
+				x.innerText = "+" + (info[i].score - prev[i].score)
+				x.setAttribute("style", "color: green;")
+			}
+			if (prev[i].score > info[i].score) {
+				x.innerText = "-" + (prev[i].score - info[i].score)
+				x.setAttribute("style", "color: red;")
+			}
+			e.appendChild(x)
+		}
+		t.appendChild(e)
+	}
+	return t
+}
+function leave() {}
+		</script>
+	</body>
+</html>
