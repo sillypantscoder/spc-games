@@ -186,7 +186,7 @@ button {
 		<script>
 ;(function messageChecker() {
 	var x = new XMLHttpRequest()
-	x.open("GET", "/messages" + location.search)
+	x.open("GET", "./messages" + location.search)
 	x.addEventListener("loadend", (e) => {
 		try {
 			var messages = e.target.responseText.split("\n")
@@ -213,9 +213,18 @@ button {
 	x.send()
 })();function sendMessage(msg) {
 	var x = new XMLHttpRequest()
-	x.open("POST", "/sendmessage")
-	x.send(location.search.substr("?user=".length) + "\n" + msg)
+	x.open("POST", "./sendmessage")
+	x.send(location.search.substr("?user=".length) + "MESSAGESEPARATOR" + msg)
 };
+var thisPlayerName = ""
+;(() => {
+	var x = new XMLHttpRequest()
+	x.open("GET", "./whoami" + location.search)
+	x.addEventListener("loadend", (e) => {
+		window.thisPlayerName = e.target.responseText
+	})
+	x.send()
+})();
 // expects: { users, choices: string[], choicesTypes: string[] }
 function showVotingScreen(info) {
 	updateUsers(info.users)
@@ -329,6 +338,7 @@ function createUserElm(prev, info) {
 	for (var i = 0; i < info.length; i++) {
 		var e = document.createElement("div")
 		e.innerHTML = `<div>${info[i].name}</div><div>${info[i].score}</div>`
+		if (thisPlayerName == info[i].name) e.children[0].appendChild(document.createElement("b")).innerText = " (You)"
 		if (info[i].hasVoted) e.classList.add("finished")
 		if (prev && prev[i].score != info[i].score) {
 			var x = document.createElement("span")

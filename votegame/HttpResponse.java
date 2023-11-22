@@ -58,6 +58,6 @@ public class HttpResponse {
 		System.out.print(data);
 	}
 	public void printInfo() {
-		System.out.println("[HTTP RESPONSE : " + status + "]\n(" + body.length() + ")>>>" + body + "<<<");
+		System.err.println("[HTTP RESPONSE : " + status + "]\n(" + body.length() + ")>>>" + body + "<<<");
 	}
 }

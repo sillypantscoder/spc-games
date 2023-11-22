@@ -2,12 +2,13 @@
 <html>
 	<head></head>
 	<body>
-		<h1>Login</h1>
+		<h1>Voting Game</h1>
+		<h3>Login</h3>
 		<div>Enter your name: <input type="text" id="name"></div>
 		<div><button onclick="submit()">Submit</button></div>
 		<script>
 function submit() {
-	location.replace(`/createuser?name=${document.querySelector("#name").value}`)
+	location.replace(`./createuser?name=${document.querySelector("#name").value}`)
 }
 		</script>
 	</body>

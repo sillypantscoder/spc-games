@@ -100,12 +100,25 @@ public class Game {
 		} else if (path.startsWith("/createuser")) {
 			// Create a new player
 			String name = path.substring("/createuser?name=".length());
-			Player newPlayer = new Player(Utils.decodeURIComponent(name)); 
+			Player newPlayer = new Player(Utils.decodeURIComponent(name));
 			players.add(newPlayer);
-			System.out.println("Added new player - " + name);
+			System.err.println("[voting-game] Added new player - " + name);
 			return new HttpResponse()
 				.addHeader("Content-Type", "text/html")
-				.setBody("<script>location.replace('/game?user=" + newPlayer.hashCode() + "')</script>");
+				.setBody("<script>location.replace('./game?user=" + newPlayer.hashCode() + "')</script>");
+		} else if (path.startsWith("/whoami")) {
+			// Create a new player
+			String hashString = path.substring("/whoami?user=".length());
+			int hashCode = Integer.parseInt(hashString);
+			// Make sure the player isn't null
+			Player thisPlayer = findPlayer(hashCode);
+			if (thisPlayer == null) return new HttpResponse()
+				.setStatus(404)
+				.setBody("???");
+			// Return the name
+			return new HttpResponse()
+				.setStatus(404)
+				.setBody(thisPlayer.name);
 		} else if (path.startsWith("/game")) {
 			if (options.length == 0 && players.size() > 1) newVote();
 			// Main game
@@ -129,7 +142,7 @@ public class Game {
 								JsonEncoder.stringList(options),
 								getChoiceTypes()
 							}
-						) 
+						)
 					}
 				)).encode());
 			}
@@ -159,14 +172,14 @@ public class Game {
 		if (path.equals("/sendmessage")) {
 			// Message!
 			// Figure out which player is sending it
-			String hashString = body.split("\n")[0];
+			String hashString = body.split("MESSAGESEPARATOR")[0];
 			int hashCode = Integer.parseInt(hashString);
 			Player thisPlayer = findPlayer(hashCode);
 			if (thisPlayer == null) return new HttpResponse()
 				.setStatus(404)
 				.setBody("404");
 			// Figure out what the message says
-			String message = body.split("\n")[1];
+			String message = body.split("MESSAGESEPARATOR")[1];
 			if (message.substring(0, 1).equals("v")) {
 				// The player has voted!
 				// - Validate the vote
@@ -242,7 +255,7 @@ public class Game {
 							JsonEncoder.stringList(options),
 							getChoiceTypes()
 						}
-					) 
+					)
 				}
 			)).encode());
 		}

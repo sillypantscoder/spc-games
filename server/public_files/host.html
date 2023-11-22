@@ -9,7 +9,7 @@ a {
 	</head>
 	<body>
 		<h3>Host XXGAMENAME (XXGAMETYPENAME)</h3>
-		<p><button onclick="deleteGame()">Delete Game</button></p>
+		<p><button onclick="deleteGame()">Delete Game</button><button onclick="window.open('../../game/'+game_id+'/')">Open game in new window</button></p>
 		<p id="contents"></p>
 		<script>
 var game_id = location.pathname.split("/")[3]
