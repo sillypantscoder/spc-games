@@ -10,9 +10,11 @@ import java.io.OutputStream;
 
 public class Subprocess {
 	public Process process;
+	public BufferedReader stdoutReader;
 	public Subprocess(String[] args, String cwd) {
 		try {
 			process = new ProcessBuilder(args).redirectError(ProcessBuilder.Redirect.INHERIT).directory(new File(cwd)).start();
+			stdoutReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 		} catch (IOException e) {
 			System.out.println("Error starting process");
 			process = null;
@@ -35,25 +37,21 @@ public class Subprocess {
 			e.printStackTrace();
 		}
 	}
-	public String readStdoutLine() {
+	public String readPacket() {
 		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			// StringBuilder builder = new StringBuilder();
-			// String line = null;
-			// while ((line = reader.readLine()) != null) {
-			// 	builder.append(line);
-			// 	builder.append(System.getProperty("line.separator"));
-			// }
-			return reader.readLine();
-			// String result = builder.toString();
-			// InputStream stream = process.getInputStream();
-			// String s = "";
-			// String lastChar = "";
-			// while (! lastChar.equals("\n")) {
-			// 	s += lastChar;
-			// 	lastChar = new String(stream.readNBytes(1), StandardCharsets.UTF_8);
-			// }
-			// return s;
+			String sizeStr = "";
+			char lastChar = 0;
+			while (lastChar != '.') {
+				lastChar = (char)(stdoutReader.read());
+				sizeStr += lastChar;
+			}
+			sizeStr = sizeStr.substring(0, sizeStr.length() - 1);
+			int packetSize = Integer.parseInt(sizeStr);
+			String resultStr = "";
+			for (int i = 0; i < packetSize; i++) {
+				resultStr += (char)(stdoutReader.read());
+			}
+			return resultStr;
 		} catch (IOException e) {
 			e.printStackTrace();
 			return "";
