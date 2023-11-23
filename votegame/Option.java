@@ -134,7 +134,7 @@ public abstract class Option {
 				if (max == null) return "Every player is below -100 points!";
 				float amt = 6 * game.rulePointMultiplier;
 				max.score -= amt;
-				return "Took " + amt + " points from the player in last place (" + max.name + ")";
+				return "Took " + amt + " points from the player in first place (" + max.name + ")";
 			}
 		}
 	}

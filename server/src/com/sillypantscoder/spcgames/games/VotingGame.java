@@ -18,6 +18,6 @@ public class VotingGame extends GameType {
 		return "???";
 	}
 	public String getModStatus(Game game) {
-		return "???";
+		return "There are no options available for this game";
 	}
 }

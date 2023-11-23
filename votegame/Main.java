@@ -13,7 +13,7 @@ public class Main {
 				lastChar = (char)(System.in.read());
 				in += lastChar;
 			}
-			String regex = "\\{\"method\":\"([A-Z]+)\",\"path\":\"([a-zA-Z0-9\\/\\?\\=]*)\",\"body\":\"([a-zA-Z0-9\\n]*)\"}\\n";
+			String regex = "\\{\"method\":\"([A-Z]+)\",\"path\":\"([a-zA-Z0-9\\/\\?\\=%]*)\",\"body\":\"([a-zA-Z0-9\\n]*)\"}\\n";
 			Matcher matcher = Pattern.compile(regex).matcher(in);
 			if (matcher.find()) {
 				String method = matcher.group(1);
