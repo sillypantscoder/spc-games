@@ -172,7 +172,8 @@ button {
 			<h1>Error</h1>
 			<div>Lost connection with the server!</div>
 			<!-- <div>Bot mode: <input type="checkbox" oninput="window.bot_mode = this.checked"></div> -->
-			<div><button onclick="location.reload()">Reload the page</button></div>
+			<!-- <div><button onclick="location.reload()">Reload the page</button></div> -->
+			<div><button onclick="location.assign('/')">Exit the game</button></div>
 		</div></div>
 		<div id="content">
 			<div id="header"></div>
@@ -189,6 +190,7 @@ button {
 	x.open("GET", "./messages" + location.search)
 	x.addEventListener("loadend", (e) => {
 		try {
+			if (e.target.status != 200) throw new Error()
 			var messages = e.target.responseText.split("\n")
 			for (var i = 0; i < messages.length - 1; i++) {
 				info = JSON.parse(messages[i])
@@ -204,11 +206,17 @@ button {
 						showResults(info.info)
 				}
 			}
-			setTimeout(messageChecker, 100)
+			if (! messageChecker.broken) setTimeout(messageChecker, 400)
 		} catch (e) {
+			messageChecker.broken = true
 			document.querySelector('#broken').classList.remove('inactive')
 			console.error(e)
 		}
+	})
+	x.addEventListener("error", () => {
+		messageChecker.broken = true
+		document.querySelector('#broken').classList.remove('inactive')
+		console.error(e)
 	})
 	x.send()
 })();function sendMessage(msg) {
@@ -357,7 +365,9 @@ function createUserElm(prev, info) {
 	}
 	return t
 }
-function leave() {}
+function leave() {
+	location.assign("/")
+}
 		</script>
 	</body>
 </html>
