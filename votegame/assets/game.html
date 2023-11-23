@@ -366,7 +366,12 @@ function createUserElm(prev, info) {
 	return t
 }
 function leave() {
-	location.assign("/")
+	var x = new XMLHttpRequest()
+	x.open("POST", "/leave")
+	x.addEventListener("loadend", () => {
+		location.assign("/")
+	})
+	x.send(location.search.substr(1))
 }
 		</script>
 	</body>

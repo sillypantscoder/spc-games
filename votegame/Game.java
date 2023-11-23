@@ -230,6 +230,22 @@ public class Game {
 			}
 			// Finish
 			return new HttpResponse().setStatus(400).setBody("That is not a valid message type!");
+		} else if (path.equals("/leave")) {
+			// Figure out which player is sending it
+			int hashCode = Integer.parseInt(body);
+			Player thisPlayer = findPlayer(hashCode);
+			if (thisPlayer == null) return new HttpResponse()
+				.setStatus(404)
+				.setBody("404");
+			// Remove the player
+			this.players.remove(thisPlayer);
+			// Check if everyone is ready now
+			for (int i = 0; i < players.size(); i++) {
+				if (players.get(i).vote == -1) return new HttpResponse();
+			}
+			if (voteFinished) newVote();
+			else finishVote();
+			return new HttpResponse();
 		} else {
 			// 404!
 			return new HttpResponse()
