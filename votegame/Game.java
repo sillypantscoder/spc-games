@@ -10,6 +10,7 @@ public class Game {
 	public Game() {
 		players = new ArrayList<Player>();
 		rules = new ArrayList<Option.Rule>();
+		rules.add(new ModuleMain(this)); // The main module
 		voteFinished = false;
 		options = new Option[] {};
 		// Rules
@@ -83,9 +84,15 @@ public class Game {
 		for (int i = 0; i < options.length; i++) {
 			String type = "action";
 			if (options[i] instanceof Option.Rule) {
-				type = "rule-";
-				if (rules.contains(options[i])) type += "repeal";
-				else type += "accept";
+				if (options[i] instanceof Module) {
+					type = "module-";
+					if (rules.contains(options[i])) type += "remove";
+					else type += "add";
+				} else {
+					type = "rule-";
+					if (rules.contains(options[i])) type += "repeal";
+					else type += "accept";
+				}
 			}
 			datas[i] = new JsonEncoder.StringValue(type);
 		}
@@ -311,7 +318,7 @@ public class Game {
 		// }
 		// 3. Execute all the accepted options
 		ArrayList<String> effects = new ArrayList<String>();
-		//		Effect types: The bold text to display before the effect. One of "rule" "rule-accept" "rule-repeal"
+		//		Effect types: The bold text to display before the effect. One of "rule" "rule-accept" "rule-repeal" "module-add" "module-remove"
 		ArrayList<String> effectTypes = new ArrayList<String>();
 		ArrayList<JsonEncoder.ArrayValue> playerDatas = new ArrayList<JsonEncoder.ArrayValue>();
 		playerDatas.add(getPlayerData());
@@ -324,11 +331,13 @@ public class Game {
 				if (rules.contains(ruleItem)) {
 					ruleItem.repeal();
 					rules.remove(ruleItem);
-					effectTypes.add("rule-repeal");
+					if (item instanceof Module) effectTypes.add("module-remove");
+					else effectTypes.add("rule-repeal");
 				} else {
 					ruleItem.accept();
 					rules.add(ruleItem);
-					effectTypes.add("rule-accept");
+					if (item instanceof Module) effectTypes.add("module-add");
+					else effectTypes.add("rule-accept");
 				}
 				effects.add(ruleItem.getName());
 			}

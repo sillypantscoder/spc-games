@@ -254,8 +254,11 @@ function showVotingScreen(info) {
 		r.children[1].innerHTML = ({
 			"action": "",
 			"rule-accept": "<div class='option-info' style='background: blue;'>New rule</div>",
-			"rule-repeal": "<div class='option-info' style='background: red;'>Repeal a rule</div>"
+			"rule-repeal": "<div class='option-info' style='background: red;'>Repeal a rule</div>",
+			"module-add": "<div class='option-info' style='background: purple;'>Add to the game</div>",
+			"module-remove": "<div class='option-info' style='background: magenta;'>Remove from the game</div>"
 		}[info.choiceTypes[i]]) + choices[i]
+		console.log(info.choiceTypes[i])
 		m.children[0].appendChild(r)
 	}
 	document.querySelector("#voting").appendChild(m)
@@ -304,7 +307,9 @@ function showResults(info) {
 		}[info.effectSources[i]]) + ({
 			"action": "",
 			"rule-accept": "<b style='color: blue;'>New rule: </b>",
-			"rule-repeal": "<b style='color: red;'>Repealed a rule: </b>"
+			"rule-repeal": "<b style='color: red;'>Repealed a rule: </b>",
+			"module-add": "<b style='color: purple;'>Added: </b>",
+			"module-remove": "<b style='color: magenta;'>Removed: </b>"
 		}[info.effectTypes[i]]) + info.effects[i]
 		infoElm.appendChild(c)
 	}
