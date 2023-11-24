@@ -9,7 +9,7 @@ public abstract class Module extends Option.Rule {
 	public abstract String getModuleName();
 	public void accept() {}
 	public void repeal() {
-		Option.Rule[] rules = getRules(game);
+		Option[] rules = getOptions(game);
 		for (int i = 0; i < game.rules.size(); i++) {
 			for (int a = 0; a < rules.length; a++) {
 				if (game.rules.get(i).getClass().equals(rules[a].getClass())) {
@@ -20,6 +20,5 @@ public abstract class Module extends Option.Rule {
 			}
 		}
 	}
-	public abstract Option.Action[] getActions(Game game);
-	public abstract Option.Rule[] getRules(Game game);
+	public abstract Option[] getOptions(Game game);
 }

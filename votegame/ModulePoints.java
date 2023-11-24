@@ -18,6 +18,9 @@ public class ModulePoints extends Module {
 			p.score = 0;
 		}
 	}
+	public Option[] getOptions(Game game) {
+		return Option.combineOptionLists(getActions(game), getActions(game));
+	}
 	public Option.Action[] getActions(Game game) {
 		return new Option.Action[] {
 			GivePoints.create(game),

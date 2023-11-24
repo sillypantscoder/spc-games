@@ -5,15 +5,11 @@ public class ModuleMain extends Module {
 	public String getModuleName() {
 		return "Basic Actions";
 	}
-	public Option.Action[] getActions(Game game) {
-		return new Option.Action[] {
-		};
-	};
-	public Option.Rule[] getRules(Game game) {
-		return new Option.Rule[] {
+	public Option[] getOptions(Game game) {
+		return new Option[] {
 			AcceptZeroVotes.create(game)
 		};
-	};
+	}
 	// === RULES ===
 	public static class AcceptZeroVotes extends Option.Rule {
 		public Game target;

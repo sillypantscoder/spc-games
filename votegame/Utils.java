@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.net.URLDecoder;
 
@@ -31,5 +32,15 @@ public class Utils {
 			e.printStackTrace();
 			return in;
 		}
+	}
+	public static String humanJoinList(ArrayList<String> list) {
+		String result = "";
+		for (int i = 0; i < list.size(); i++) {
+			if (i == list.size() - 1) result += ", and ";
+			else if (i == 0) result += "";
+			else result += ", ";
+			result += list.get(i);
+		}
+		return result;
 	}
 }
