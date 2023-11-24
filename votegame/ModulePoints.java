@@ -5,6 +5,19 @@ public class ModulePoints extends Module {
 	public String getModuleName() {
 		return "Points";
 	}
+	public void accept() {
+		for (int i = 0; i < game.players.size(); i++) {
+			Player p = game.players.get(i);
+			p.score = 0;
+		}
+	}
+	public void repeal() {
+		super.repeal();
+		for (int i = 0; i < game.players.size(); i++) {
+			Player p = game.players.get(i);
+			p.score = 0;
+		}
+	}
 	public Option.Action[] getActions(Game game) {
 		return new Option.Action[] {
 			GivePoints.create(game),
@@ -14,7 +27,7 @@ public class ModulePoints extends Module {
 			LowestBonus.create(game),
 			HighestPenalty.create(game)
 		};
-	};
+	}
 	public Option.Rule[] getRules(Game game) {
 		return new Option.Rule[] {
 			InvertPointChanges.create(game),
@@ -22,7 +35,7 @@ public class ModulePoints extends Module {
 			RepeatedLowestBonus.create(game),
 			RepeatedHighestPenalty.create(game)
 		};
-	};
+	}
 	// === ACTIONS ===
 	public static class GivePoints extends Option.Action {
 		public Player target;

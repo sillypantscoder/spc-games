@@ -144,11 +144,12 @@ public class Game {
 					new JsonEncoder.Value[] {
 						new JsonEncoder.StringValue("votingscreen"),
 						new JsonEncoder.ObjectValue(
-							new String[] { "users", "choices", "choiceTypes" },
+							new String[] { "users", "choices", "choiceTypes", "rules" },
 							new JsonEncoder.Value[] {
 								getPlayerData(),
 								JsonEncoder.stringList(options),
-								getChoiceTypes()
+								getChoiceTypes(),
+								JsonEncoder.stringList(rules)
 							}
 						)
 					}
@@ -273,11 +274,12 @@ public class Game {
 				new JsonEncoder.Value[] {
 					new JsonEncoder.StringValue("votingscreen"),
 					new JsonEncoder.ObjectValue(
-						new String[] { "users", "choices", "choiceTypes" },
+						new String[] { "users", "choices", "choiceTypes", "rules" },
 						new JsonEncoder.Value[] {
 							getPlayerData(),
 							JsonEncoder.stringList(options),
-							getChoiceTypes()
+							getChoiceTypes(),
+							JsonEncoder.stringList(rules)
 						}
 					)
 				}
@@ -323,6 +325,8 @@ public class Game {
 		ArrayList<String> effectTypes = new ArrayList<String>();
 		ArrayList<JsonEncoder.ArrayValue> playerDatas = new ArrayList<JsonEncoder.ArrayValue>();
 		playerDatas.add(getPlayerData());
+		ArrayList<JsonEncoder.ArrayValue> rulesets = new ArrayList<JsonEncoder.ArrayValue>();
+		rulesets.add(JsonEncoder.stringList(rules));
 		for (int i = 0; i < accepted.size(); i++) {
 			Option item = accepted.get(i);
 			if (item instanceof Option.Action actionItem) {
@@ -343,6 +347,7 @@ public class Game {
 				effects.add(ruleItem.getName());
 			}
 			playerDatas.add(getPlayerData());
+			rulesets.add(JsonEncoder.stringList(rules));
 		}
 		// 4. Execute any rules
 		for (int i = 0; i < rules.size(); i++) {
@@ -351,6 +356,7 @@ public class Game {
 				effectSources.add(r.getSource());
 				effectTypes.add("action");
 				playerDatas.add(getPlayerData());
+				rulesets.add(JsonEncoder.stringList(rules));
 			}
 		}
 		// if (ruleRandomPenalty) {
@@ -374,14 +380,15 @@ public class Game {
 					new JsonEncoder.StringValue("votingfinished"),
 					getPlayerData(),
 					new JsonEncoder.ObjectValue(
-						new String[] { "votes", "effects", "effectTypes", "effectSources", "rules", "playerDatas" },
+						new String[] { "votes", "effects", "effectTypes", "effectSources", "rules", "playerDatas", "rulesets" },
 						new JsonEncoder.Value[] {
 							JsonEncoder.intList(votes),
 							JsonEncoder.stringList(effects),
 							JsonEncoder.stringList(effectTypes),
 							JsonEncoder.stringList(effectSources),
 							JsonEncoder.stringList(rules),
-							JsonEncoder.objectList(playerDatas)
+							JsonEncoder.objectList(playerDatas),
+							JsonEncoder.objectList(rulesets)
 						}
 					)
 				}

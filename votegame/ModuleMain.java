@@ -3,7 +3,7 @@ public class ModuleMain extends Module {
 		super(game);
 	}
 	public String getModuleName() {
-		return "Basic actions";
+		return "Basic Actions";
 	}
 	public Option.Action[] getActions(Game game) {
 		return new Option.Action[] {

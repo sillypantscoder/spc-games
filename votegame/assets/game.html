@@ -202,8 +202,8 @@ button {
 						updateUsers(info.users)
 						break;
 					case "votingfinished":
-						updateUsers(info.users)
 						showResults(info.info)
+						updateUsers(info.users)
 				}
 			}
 			if (! messageChecker.broken) setTimeout(messageChecker, 400)
@@ -225,6 +225,7 @@ button {
 	x.send(location.search.substr("?user=".length) + "MESSAGESEPARATOR" + msg)
 };
 var thisPlayerName = ""
+var player_rules = []
 ;(() => {
 	var x = new XMLHttpRequest()
 	x.open("GET", "./whoami" + location.search)
@@ -233,8 +234,9 @@ var thisPlayerName = ""
 	})
 	x.send()
 })();
-// expects: { users, choices: string[], choicesTypes: string[] }
+// expects: { users, choices: string[], choicesTypes: string[], rules: string[] }
 function showVotingScreen(info) {
+	player_rules = info.rules
 	updateUsers(info.users)
 	// UPDATE THE HEADERS
 	document.querySelector("#header").innerHTML = "<h2>Voting</h2>"
@@ -258,7 +260,6 @@ function showVotingScreen(info) {
 			"module-add": "<div class='option-info' style='background: purple;'>Add to the game</div>",
 			"module-remove": "<div class='option-info' style='background: magenta;'>Remove from the game</div>"
 		}[info.choiceTypes[i]]) + choices[i]
-		console.log(info.choiceTypes[i])
 		m.children[0].appendChild(r)
 	}
 	document.querySelector("#voting").appendChild(m)
@@ -279,7 +280,7 @@ function vote(n) {
 	// TELL THE SERVER THAT WE VOTED
 	sendMessage("v" + String(n))
 }
-// expects: {votes: int[], effects: string[], effectTypes: string[], rules, playerDatas: <users>[]}
+// expects: {votes: int[], effects: string[], effectTypes: string[], rules, playerDatas: <users>[], rulesets: string[][]}
 function showResults(info) {
 	// UPDATE THE HEADER
 	document.querySelector("#header").innerText = ""
@@ -311,8 +312,10 @@ function showResults(info) {
 			"module-add": "<b style='color: purple;'>Added: </b>",
 			"module-remove": "<b style='color: magenta;'>Removed: </b>"
 		}[info.effectTypes[i]]) + info.effects[i]
+		player_rules = info.rulesets[i]
 		infoElm.appendChild(c)
 	}
+	player_rules = info.rules
 	infoElm.appendChild(createUserElm(info.playerDatas[i - 1], info.playerDatas[i]))
 	// ADD THE CONTINUE BUTTON
 	var c = document.createElement("div")
@@ -332,6 +335,7 @@ function updateRules(info) {
 	var ruleElm = document.querySelector("#rules")
 	ruleElm.innerHTML = ""
 	for (var i = 0; i < info.length; i++) {
+		if (info[i] == "Add Basic Actions to the game") continue
 		var c = document.createElement("li")
 		c.innerText = info[i]
 		ruleElm.appendChild(c)
@@ -340,31 +344,40 @@ function updateRules(info) {
 // expects: [
 //     {name, score, hasVoted}...
 // ]
-function updateUsers(info) {
+function updateUsers(info, rules) {
 	var t = document.querySelector("#userlist")
 	t.innerText = ""
-	t.appendChild(createUserElm(null, info))
+	t.appendChild(createUserElm(null, info, rules))
 }
 function createUserElm(prev, info) {
 	var t = document.createElement("div")
 	t.classList.add("users")
+	if (player_rules == undefined) return t
 	for (var i = 0; i < info.length; i++) {
 		var e = document.createElement("div")
-		e.innerHTML = `<div>${info[i].name}</div><div>${info[i].score}</div>`
+		// Skeleton structure
+		e.innerHTML = `<div>${info[i].name}</div><div></div>`
+		// (You) marker
 		if (thisPlayerName == info[i].name) e.children[0].appendChild(document.createElement("b")).innerText = " (You)"
+		// Checkmark finished icon
 		if (info[i].hasVoted) e.classList.add("finished")
-		if (prev && prev[i].score != info[i].score) {
-			var x = document.createElement("span")
-			x.classList.add("score-annotation")
-			if (prev[i].score < info[i].score) {
-				x.innerText = "+" + (info[i].score - prev[i].score)
-				x.setAttribute("style", "color: green;")
+		// Score code
+		if (player_rules.includes("Add Points to the game")) {
+			e.children[1].appendChild(document.createElement("span")).innerText = info[i].score
+			// Annotation showing how scores have changed
+			if (prev && prev[i].score != info[i].score) {
+				var x = document.createElement("span")
+				x.classList.add("score-annotation")
+				if (prev[i].score < info[i].score) {
+					x.innerText = "+" + (info[i].score - prev[i].score)
+					x.setAttribute("style", "color: green;")
+				}
+				if (prev[i].score > info[i].score) {
+					x.innerText = "-" + (prev[i].score - info[i].score)
+					x.setAttribute("style", "color: red;")
+				}
+				e.appendChild(x)
 			}
-			if (prev[i].score > info[i].score) {
-				x.innerText = "-" + (prev[i].score - info[i].score)
-				x.setAttribute("style", "color: red;")
-			}
-			e.appendChild(x)
 		}
 		t.appendChild(e)
 	}
