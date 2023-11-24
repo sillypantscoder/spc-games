@@ -7,6 +7,7 @@ public class Game {
 	public ArrayList<Option.Rule> rules;
 	public float rulePointMultiplier;
 	public boolean ruleZeroVotes;
+	public JsonEncoder.Value joinEvent;
 	public Game() {
 		players = new ArrayList<Player>();
 		rules = new ArrayList<Option.Rule>();
@@ -70,10 +71,11 @@ public class Game {
 		JsonEncoder.Value[] datas = new JsonEncoder.Value[players.size()];
 		for (int i = 0; i < players.size(); i++) {
 			datas[i] = new JsonEncoder.ObjectValue(
-				new String[] { "name", "score", "hasVoted" },
+				new String[] { "name", "score", "hasStar", "hasVoted" },
 				new JsonEncoder.Value[] {
 					new JsonEncoder.StringValue(players.get(i).name),
 					new JsonEncoder.IntValue(players.get(i).score),
+					new JsonEncoder.BooleanValue(players.get(i).hasStar),
 					new JsonEncoder.BooleanValue(players.get(i).vote != -1)
 				}
 			);
@@ -125,7 +127,7 @@ public class Game {
 				.setBody("???");
 			// Return the name
 			return new HttpResponse()
-				.setStatus(404)
+				.setStatus(200)
 				.setBody(thisPlayer.name);
 		} else if (path.startsWith("/game")) {
 			if (options.length == 0 && players.size() > 1) newVote();
@@ -154,6 +156,8 @@ public class Game {
 						)
 					}
 				)).encode());
+			} else {
+				VoteHttpHandler.queue(3, thisPlayer, joinEvent.encode());
 			}
 			// Send the game
 			return new HttpResponse()
@@ -373,26 +377,27 @@ public class Game {
 		}
 		voteFinished = true;
 		// 5. Notify all the players about the voting results
+		joinEvent = new JsonEncoder.ObjectValue(
+			new String[] { "type", "users", "info" },
+			new JsonEncoder.Value[] {
+				new JsonEncoder.StringValue("votingfinished"),
+				getPlayerData(),
+				new JsonEncoder.ObjectValue(
+					new String[] { "votes", "effects", "effectTypes", "effectSources", "rules", "playerDatas", "rulesets" },
+					new JsonEncoder.Value[] {
+						JsonEncoder.intList(votes),
+						JsonEncoder.stringList(effects),
+						JsonEncoder.stringList(effectTypes),
+						JsonEncoder.stringList(effectSources),
+						JsonEncoder.stringList(rules),
+						JsonEncoder.objectList(playerDatas),
+						JsonEncoder.objectList(rulesets)
+					}
+				)
+			}
+		);
 		for (int i = 0; i < players.size(); i++) {
-			players.get(i).fire((new JsonEncoder.ObjectValue(
-				new String[] { "type", "users", "info" },
-				new JsonEncoder.Value[] {
-					new JsonEncoder.StringValue("votingfinished"),
-					getPlayerData(),
-					new JsonEncoder.ObjectValue(
-						new String[] { "votes", "effects", "effectTypes", "effectSources", "rules", "playerDatas", "rulesets" },
-						new JsonEncoder.Value[] {
-							JsonEncoder.intList(votes),
-							JsonEncoder.stringList(effects),
-							JsonEncoder.stringList(effectTypes),
-							JsonEncoder.stringList(effectSources),
-							JsonEncoder.stringList(rules),
-							JsonEncoder.objectList(playerDatas),
-							JsonEncoder.objectList(rulesets)
-						}
-					)
-				}
-			)).encode());
+			players.get(i).fire(joinEvent.encode());
 		}
 	}
 }

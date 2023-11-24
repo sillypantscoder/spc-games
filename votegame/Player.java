@@ -3,11 +3,13 @@ import java.util.ArrayList;
 public class Player {
 	public String name;
 	public float score;
+	public boolean hasStar;
 	public ArrayList<String> events;
 	public int vote;
 	public Player(String name) {
 		this.name = name;
 		this.score = 0;
+		this.hasStar = false;
 		this.events = new ArrayList<String>();
 		this.vote = -1;
 	}

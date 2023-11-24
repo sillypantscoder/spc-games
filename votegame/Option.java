@@ -73,7 +73,9 @@ public abstract class Option {
 		}
 		// Add in the modules
 		optionList = combineOptionLists(optionList, new Module[] {
-			new ModulePoints(game)
+			new ModulePoints(game),
+			new ModuleStars(game),
+			new ModuleStars(game)
 		});
 		// Choose an option
 		Option selectedOption = random.choice(optionList);

@@ -289,10 +289,13 @@ function showResults(info) {
 	document.querySelector("#header").appendChild(h)
 	// SHOW THE NUMBER OF VOTES FOR EACH OPTION
 	for (var i = 0; i < info.votes.length; i++) {
-		document.querySelector(`#voting table tr:nth-child(${i + 1}) td:first-child`).innerText = `${info.votes[i]} vote${info.votes[i]==1 ? '' : 's'}`
+		var target = document.querySelector(`#voting table tr:nth-child(${i + 1}) td:first-child`)
+		if (target == null) target = document.querySelector("#voting").appendChild(document.createElement("div"))
+		target.innerText = `${info.votes[i]} vote${info.votes[i]==1 ? '' : 's'}`
 	}
 	// SHOW THE LIST OF EFFECTS
 	var infoElm = document.querySelector("#desc > div")
+	if (infoElm == null) infoElm = document.querySelector("#desc").appendChild(document.createElement("div"))
 	infoElm.innerHTML = ""
 	for (var i = 0; i < info.effects.length; i++) {
 		infoElm.appendChild(createUserElm(i != 0 ? info.playerDatas[i - 1] : null, info.playerDatas[i]))
@@ -379,6 +382,13 @@ function createUserElm(prev, info) {
 				e.appendChild(x)
 			}
 		}
+		// Star code
+		if (player_rules.includes("Add Stars to the game")) {
+			if (info[i].hasStar) e.children[1].appendChild(document.createElement("span")).innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" style="width: 1em; height: 1em;" viewBox="0 0 48 45"><path d="M 24 0 L 30 17 H 48 L 34 28 L 39 45 L 24 35 L 9 45 L 14 28 L 0 17 H 18 Z" stroke="red" fill="yellow" /></svg>`
+							else e.children[1].appendChild(document.createElement("span")).innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" style="width: 1em; height: 1em;" viewBox="0 0 48 45"><path d="M 24 0 L 30 17 H 48 L 34 28 L 39 45 L 24 35 L 9 45 L 14 28 L 0 17 H 18 Z" stroke="black" fill="none" /></svg>`
+			if (player_rules.includes("Add Points to the game")) e.children[1].children[1].setAttribute("style", `width: 1em; height: 1em; margin-left: 0.5em;`)
+		}
+		// Finish
 		t.appendChild(e)
 	}
 	return t
