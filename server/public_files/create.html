@@ -10,15 +10,27 @@ a {
 	<body>
 		<h5><a href=".">Back</a></h5>
 		<h3>Create new game:</h3>
-		<p>Game type: <select id="gametype">
-			<option value="coltsuperexpress">Colt Super Express</option>
-			<option value="votegame">The Voting Game</option>
-		</select></p>
+		<div id="gametype">
+			<div>Game type:</div>
+		</div>
 		<p>Game name: <input type="text" id="name" placeholder="Enter a name for your game..." autocomplete="off"></p>
 		<p><button onclick="submit()">Create!</button></p>
 		<script>
+(function createOptions() {
+	var types = [
+		["coltsuperexpress", "Colt Super Express"],
+		["votegame", "The Voting Game"]
+	]
+	for (var i = 0; i < types.length; i++) {
+		var e = document.createElement("div")
+		e.innerHTML = `<input type="radio" name="gametype" value="${types[i][0]}"> ${types[i][1]} <a href="/info/${types[i][0]}" style="margin-left: 0.5em; font-size: 0.7em; font-weight: bold;">How to play</a>`
+		document.querySelector("#gametype").appendChild(e)
+	}
+})();
 function submit() {
-	var type = document.querySelector("#gametype").value
+	var selected = document.querySelector("input[type=radio][name=gametype]:checked")
+	if (selected == null) return alert("Please select a game type")
+	var type = selected.value
 	var name = document.querySelector("#name").value
 	var x = new XMLHttpRequest()
 	x.open("GET", `./create_game/${type}?${encodeURIComponent(name)}`)

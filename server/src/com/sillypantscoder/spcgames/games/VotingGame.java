@@ -8,6 +8,9 @@ public class VotingGame extends GameType {
 	public String getName() {
 		return "The Voting Game";
 	}
+	public String getDescription() {
+		return "Everyone starts with 0 points. There are a bunch of confusing options to vote for, such as \"Take -2 points from <player>\". Once everyone has voted, the options with the most votes get applied. In addition, the rules to the game are not static, and many of the options you can vote for are about adding or removing rules to the game.";
+	}
 	public String getID() {
 		return "votegame";
 	}
