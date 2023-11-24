@@ -10,7 +10,8 @@ public class Game {
 	public Game() {
 		players = new ArrayList<Player>();
 		rules = new ArrayList<Option.Rule>();
-		rules.add(new ModuleMain(this)); // The main module
+		rules.add(new ModuleMain(this)); // Basic actions
+		rules.add(new ModulePoints(this)); // Give players points
 		voteFinished = false;
 		options = new Option[] {};
 		// Rules

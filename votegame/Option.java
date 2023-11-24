@@ -68,9 +68,14 @@ public abstract class Option {
 			if (rule instanceof Module mod) {
 				optionList = combineOptionLists(optionList, mod.getActions(game));
 				optionList = combineOptionLists(optionList, mod.getActions(game));
-				optionList = combineOptionLists(optionList, mod.getRules(game), new Rule[] { mod });
+				optionList = combineOptionLists(optionList, mod.getRules(game));
 			}
 		}
+		// Add in the modules
+		optionList = combineOptionLists(optionList, new Module[] {
+			new ModulePoints(game)
+		});
+		// Choose an option
 		Option selectedOption = random.choice(optionList);
 		if (selectedOption == null) return null;
 		if (selectedOption instanceof Rule ruleOption) return Rule.checkFor(game, ruleOption);
