@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.function.Consumer;
+
 public abstract class Module extends Option.Rule {
 	public Game game;
 	public Module(Game game) {
@@ -20,5 +23,12 @@ public abstract class Module extends Option.Rule {
 			}
 		}
 	}
-	public abstract Option[] getOptions(Game game);
+	public Option[] getOptions(Game game) {
+		ArrayList<Option> options = new ArrayList<Option>();
+		getOptions(game, (x) -> options.add(x));
+		Option[] result = new Option[options.size()];
+		for (int i = 0; i < result.length; i++) result[i] = options.get(i);
+		return result;
+	}
+	public abstract void getOptions(Game game, Consumer<Option> list);
 }

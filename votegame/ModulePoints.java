@@ -1,3 +1,5 @@
+import java.util.function.Consumer;
+
 public class ModulePoints extends Module {
 	public ModulePoints(Game game) {
 		super(game);
@@ -18,26 +20,28 @@ public class ModulePoints extends Module {
 			p.score = 0;
 		}
 	}
-	public Option[] getOptions(Game game) {
-		return Option.combineOptionLists(getActions(game), getActions(game));
-	}
-	public Option.Action[] getActions(Game game) {
-		return new Option.Action[] {
-			GivePoints.create(game),
-			MultiplyPoints.create(game),
-			MovePoints.create(game),
-			InvertAllScores.create(game),
-			LowestBonus.create(game),
-			HighestPenalty.create(game)
-		};
-	}
-	public Option.Rule[] getRules(Game game) {
-		return new Option.Rule[] {
-			InvertPointChanges.create(game),
-			MultiplyPointChanges.create(game),
-			RepeatedLowestBonus.create(game),
-			RepeatedHighestPenalty.create(game)
-		};
+	public void getOptions(Game game, Consumer<Option> list) {
+		// Actions
+		list.accept(GivePoints.create(game));
+		list.accept(MultiplyPoints.create(game));
+		list.accept(MovePoints.create(game));
+		list.accept(InvertAllScores.create(game));
+		list.accept(LowestBonus.create(game));
+		list.accept(HighestPenalty.create(game));
+		// Rules
+		list.accept(InvertPointChanges.create(game));
+		list.accept(MultiplyPointChanges.create(game));
+		list.accept(RepeatedLowestBonus.create(game));
+		list.accept(RepeatedHighestPenalty.create(game));
+		list.accept(RepeatedScoreWrap.create(game));
+		list.accept(RepeatedScoreWrap.create(game));
+		list.accept(RepeatedScoreWrap.create(game));
+		list.accept(RepeatedScoreWrap.create(game));
+		list.accept(RepeatedScoreWrap.create(game));
+		list.accept(RepeatedScoreWrap.create(game));
+		list.accept(RepeatedScoreWrap.create(game));
+		list.accept(RepeatedScoreWrap.create(game));
+		list.accept(RepeatedScoreWrap.create(game));
 	}
 	// === ACTIONS ===
 	public static class GivePoints extends Option.Action {
@@ -218,5 +222,44 @@ public class ModulePoints extends Module {
 			return new RepeatedHighestPenalty(game);
 		}
 		public String getSource() { return "first-place-penalty"; }
+	}
+	public static class RepeatedScoreWrap extends Option.Rule.RepeatRule {
+		public int amt;
+		public RepeatedScoreWrap(Game game, int amt) {
+			super(game, new ScoreWrapAction(game, amt));
+			this.amt = amt;
+		}
+		public static class ScoreWrapAction extends Option.Action {
+			public Game game;
+			public int amt;
+			public ScoreWrapAction(Game game, int amt) {
+				this.game = game;
+				this.amt = amt;
+			}
+			public String getName() {
+				return "Scores wrap around at " + amt;
+			}
+			public String execute() {
+				for (int i = 0; i < game.players.size(); i++) {
+					Player p = game.players.get(i);
+					while (p.score > amt - 1) {
+						p.score -= amt * 2;
+					}
+					while (p.score < -amt) {
+						p.score += amt * 2;
+					}
+				}
+				return "Wrapped scores at " + amt;
+			}
+		}
+		public static RepeatedScoreWrap create(Game game) {
+			int amount = random.choice(new Integer[] { 16, 16, 16, 32, 32, 64 });
+			return new RepeatedScoreWrap(game, amount);
+		}
+		@Override
+		public String getName() {
+			return "Scores wrap around at " + amt;
+		}
+		public String getSource() { return "score-wrap"; }
 	}
 }

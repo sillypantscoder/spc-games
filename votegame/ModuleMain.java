@@ -1,3 +1,5 @@
+import java.util.function.Consumer;
+
 public class ModuleMain extends Module {
 	public ModuleMain(Game game) {
 		super(game);
@@ -5,10 +7,8 @@ public class ModuleMain extends Module {
 	public String getModuleName() {
 		return "Basic Actions";
 	}
-	public Option[] getOptions(Game game) {
-		return new Option[] {
-			AcceptZeroVotes.create(game)
-		};
+	public void getOptions(Game game, Consumer<Option> list) {
+		list.accept(AcceptZeroVotes.create(game));
 	}
 	// === RULES ===
 	public static class AcceptZeroVotes extends Option.Rule {

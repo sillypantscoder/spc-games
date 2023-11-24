@@ -101,6 +101,14 @@ public class Game {
 		}
 		return new JsonEncoder.ArrayValue(datas);
 	}
+	public boolean hasModule(Class<? extends Module> mod) {
+		for (int i = 0; i < rules.size(); i++) {
+			if (rules.get(i).getClass().equals(mod)) {
+				return true;
+			}
+		}
+		return false;
+	}
 	public HttpResponse get(String path) {
 		if (path.equals("/")) {
 			// Login page
