@@ -34,14 +34,6 @@ public class ModulePoints extends Module {
 		list.accept(RepeatedLowestBonus.create(game));
 		list.accept(RepeatedHighestPenalty.create(game));
 		list.accept(RepeatedScoreWrap.create(game));
-		list.accept(RepeatedScoreWrap.create(game));
-		list.accept(RepeatedScoreWrap.create(game));
-		list.accept(RepeatedScoreWrap.create(game));
-		list.accept(RepeatedScoreWrap.create(game));
-		list.accept(RepeatedScoreWrap.create(game));
-		list.accept(RepeatedScoreWrap.create(game));
-		list.accept(RepeatedScoreWrap.create(game));
-		list.accept(RepeatedScoreWrap.create(game));
 	}
 	// === ACTIONS ===
 	public static class GivePoints extends Option.Action {

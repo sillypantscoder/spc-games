@@ -114,18 +114,17 @@ public class ModuleStars extends Module {
 			return "Everyone with a star gets " + amount + " points";
 		}
 		public String execute() {
-			float realAmt = amount * game.rulePointMultiplier;
 			ArrayList<String> targets = new ArrayList<String>();
 			for (int i = 0; i < game.players.size(); i++) {
 				Player p = game.players.get(i);
 				if (p.hasStar) {
-					p.score += realAmt;
+					p.score += amount;
 					targets.add(p.name);
 				}
 			}
 			if (targets.size() == 0) return "Gave no one points for their stars";
-			if (targets.size() == 1) return "Gave " + targets.get(0) + " " + realAmt + " points for their star";
-			return "Gave " + Utils.humanJoinList(targets) + " " + realAmt + " points each for their stars";
+			if (targets.size() == 1) return "Gave " + targets.get(0) + " " + amount + " points for their star";
+			return "Gave " + Utils.humanJoinList(targets) + " " + amount + " points each for their stars";
 		}
 	}
 	public static class StarToPointMultiplier extends Option.Action {

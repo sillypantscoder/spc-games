@@ -1,5 +1,6 @@
 package com.sillypantscoder.spcgames;
 
+import java.util.Date;
 import java.util.Random;
 
 import com.sillypantscoder.spcgames.http.HttpResponse;
@@ -9,11 +10,13 @@ public class Game {
 	public Subprocess process;
 	public String name;
 	public String id;
+	public long deletionTime;
 	public Game(GameType type, String name) {
 		this.type = type;
 		process = type.getProcess();
 		this.name = name;
 		id = type.getID() + new Random().nextInt(Integer.MAX_VALUE);
+		this.deletionTime = 0;
 	}
 	public HttpResponse communicate(String message) {
 		process.writeStdin(message);
@@ -42,5 +45,9 @@ public class Game {
 	}
 	public String getModStatus() {
 		return this.type.getModStatus(this);
+	}
+	public boolean stillValid() {
+		if (this.deletionTime == 0) return true;
+		return this.deletionTime > new Date().getTime();
 	}
 }

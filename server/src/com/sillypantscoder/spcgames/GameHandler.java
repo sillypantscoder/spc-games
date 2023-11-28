@@ -3,6 +3,7 @@ package com.sillypantscoder.spcgames;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Date;
 
 import com.sillypantscoder.spcgames.games.ColtSuperExpress;
 import com.sillypantscoder.spcgames.games.VotingGame;
@@ -15,8 +16,17 @@ public class GameHandler extends RequestHandler {
 		this.games = new ArrayList<Game>();
 	}
 	public HttpResponse get(String path) {
-		if (path.equals("/")) return new HttpResponse().setStatus(200).addHeader("Content-Type", "text/html").setBody(Utils.readFile("public_files/index.html"));
-		else if (path.equals("/gamelist")) {
+		for (int i = 0; i < games.size(); i++) {
+			Game g = games.get(i);
+			if (! g.stillValid()) {
+				games.remove(g);
+				i -= 1;
+				continue;
+			}
+		}
+		if (path.equals("/")) {
+			return new HttpResponse().setStatus(200).addHeader("Content-Type", "text/html").setBody(Utils.readFile("public_files/index.html"));
+		} else if (path.equals("/gamelist")) {
 			ArrayList<String[]> info = new ArrayList<String[]>();
 			for (int i = 0; i < games.size(); i++) {
 				Game g = games.get(i);
@@ -24,7 +34,8 @@ public class GameHandler extends RequestHandler {
 					g.type.getName(),
 					g.name,
 					g.id,
-					g.getStatus()
+					g.getStatus(),
+					String.valueOf(g.deletionTime)
 				});
 			}
 			String body = "";
@@ -115,6 +126,15 @@ public class GameHandler extends RequestHandler {
 			for (int i = 0; i < games.size(); i++) {
 				if (games.get(i).id.equals(name)) {
 					return games.get(i).post(gamePath, body);
+				}
+			}
+		} else if (path.equals("/mark_delete")) {
+			for (int i = 0; i < games.size(); i++) {
+				Game game = games.get(i);
+				if (game.id.equals(body)) {
+					if (game.deletionTime == 0) games.get(i).deletionTime = new Date().getTime() + (30 * 60 * 1000l);
+					else game.deletionTime = 0;
+					return new HttpResponse();
 				}
 			}
 		}
