@@ -34,6 +34,7 @@ public class Utils {
 		}
 	}
 	public static String humanJoinList(ArrayList<String> list) {
+		if (list.size() == 2) return list.get(0) + " and " + list.get(1);
 		String result = "";
 		for (int i = 0; i < list.size(); i++) {
 			if (i == list.size() - 1) result += ", and ";

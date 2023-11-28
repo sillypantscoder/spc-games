@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.function.Consumer;
 
 public class ModulePoints extends Module {
@@ -117,21 +118,31 @@ public class ModulePoints extends Module {
 		public static LowestBonus create(Game game) {
 			return new LowestBonus(game);
 		}
-		public String getName() { return "Give the player in last place 6 points"; }
+		public String getName() { return "Give the player(s) in last place 6 points"; }
 		public String execute() {
-			Player min = null;
+			ArrayList<Player> min = new ArrayList<Player>();
 			float m = 100;
 			for (int i = 0; i < game.players.size(); i++) {
 				Player p = game.players.get(i);
 				if (p.score < m) {
 					m = p.score;
-					min = p;
+					min.clear();
+				}
+				if (p.score == m) {
+					min.add(p);
 				}
 			}
-			if (min == null) return "Every player is above 100 points!";
-			float amt = 6 * game.rulePointMultiplier;
-			min.score += amt;
-			return "Gave the player in last place (" + min.name + ") " + amt + " points";
+			if (min.size() == 0) return "Every player is above 100 points!";
+			else {
+				float amt = 6 * game.rulePointMultiplier;
+				ArrayList<String> targets = new ArrayList<String>();
+				for (Player target : min) {
+					target.score += amt;
+					targets.add(target.name);
+				}
+				if (targets.size() == 1) return "Gave the player in last place (" + targets.get(0) + ") " + amt + " points";
+				return "Gave the players in last place (" + Utils.humanJoinList(targets) + ") " + amt + " points each for their stars";
+			}
 		}
 	}
 	public static class HighestPenalty extends Option.Action {
@@ -144,19 +155,29 @@ public class ModulePoints extends Module {
 		}
 		public String getName() { return "Take 6 points from the player in first place"; }
 		public String execute() {
-			Player max = null;
+			ArrayList<Player> max = new ArrayList<Player>();
 			float m = -100;
 			for (int i = 0; i < game.players.size(); i++) {
 				Player p = game.players.get(i);
 				if (p.score > m) {
 					m = p.score;
-					max = p;
+					max.clear();
+				}
+				if (p.score == m) {
+					max.add(p);
 				}
 			}
-			if (max == null) return "Every player is below -100 points!";
-			float amt = 6 * game.rulePointMultiplier;
-			max.score -= amt;
-			return "Took " + amt + " points from the player in first place (" + max.name + ")";
+			if (max.size() == 0) return "Every player is below -100 points!";
+			else {
+				float amt = 6 * game.rulePointMultiplier;
+				ArrayList<String> targets = new ArrayList<String>();
+				for (Player target : max) {
+					target.score -= amt;
+					targets.add(target.name);
+				}
+				if (targets.size() == 1) return "Took " + amt + " points from the player in first place (" + targets.get(0) + ")";
+				return "Took " + amt + " points from the players in first place (" + Utils.humanJoinList(targets) + ")";
+			}
 		}
 	}
 	public static class Victory extends Option.Action {
@@ -169,18 +190,24 @@ public class ModulePoints extends Module {
 		}
 		public String getName() { return "The player with the highest score wins!"; }
 		public String execute() {
-			Player max = null;
-			float m = -100;
+			ArrayList<Player> max = new ArrayList<Player>();
+			float m = -1000;
 			for (int i = 0; i < game.players.size(); i++) {
 				Player p = game.players.get(i);
 				if (p.score > m) {
 					m = p.score;
-					max = p;
+					max.clear();
+				}
+				if (p.score == m) {
+					max.add(p);
 				}
 			}
-			if (max == null) return "Every player is below -100 points!";
-			game.winner = max;
-			return max.name + " wins!";
+			if (max.size() == 0) return "Every player is below -1000 points!";
+			else if (max.size() == 1) {
+				Player yay = max.get(0);
+				game.winner = yay;
+				return yay.name + " wins!";
+			} else return "Multiple players are tied for first place!";
 		}
 	}
 	// === RULES ===
