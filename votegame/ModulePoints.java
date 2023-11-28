@@ -28,6 +28,7 @@ public class ModulePoints extends Module {
 		list.accept(InvertAllScores.create(game));
 		list.accept(LowestBonus.create(game));
 		list.accept(HighestPenalty.create(game));
+		list.accept(Victory.create(game));
 		// Rules
 		list.accept(InvertPointChanges.create(game));
 		list.accept(MultiplyPointChanges.create(game));
@@ -156,6 +157,30 @@ public class ModulePoints extends Module {
 			float amt = 6 * game.rulePointMultiplier;
 			max.score -= amt;
 			return "Took " + amt + " points from the player in first place (" + max.name + ")";
+		}
+	}
+	public static class Victory extends Option.Action {
+		public Game game;
+		public Victory(Game game) {
+			this.game = game;
+		}
+		public static Victory create(Game game) {
+			return new Victory(game);
+		}
+		public String getName() { return "The player with the highest score wins!"; }
+		public String execute() {
+			Player max = null;
+			float m = -100;
+			for (int i = 0; i < game.players.size(); i++) {
+				Player p = game.players.get(i);
+				if (p.score > m) {
+					m = p.score;
+					max = p;
+				}
+			}
+			if (max == null) return "Every player is below -100 points!";
+			game.winner = max;
+			return max.name + " wins!";
 		}
 	}
 	// === RULES ===

@@ -125,6 +125,17 @@ button {
 	width: 1em;
 	text-align: center;
 }
+#userlist .users > div.finishicon-winner::after {
+	content: "\2605";
+	position: absolute;
+	bottom: 0em;
+	margin: 0.5em;
+	background: red;
+	color: yellow;
+	border-radius: 50%;
+	width: 1em;
+	text-align: center;
+}
 
 .dialog {
 	position: absolute;
@@ -280,7 +291,7 @@ function vote(n) {
 	// TELL THE SERVER THAT WE VOTED
 	sendMessage("v" + String(n))
 }
-// expects: {votes: int[], effects: string[], effectTypes: string[], rules, playerDatas: <users>[], rulesets: string[][]}
+// expects: {votes: int[], effects: string[], effectTypes: string[], rules, playerDatas: <users>[], rulesets: string[][], winner: string | null}
 function showResults(info) {
 	// UPDATE THE HEADER
 	document.querySelector("#header").innerText = ""
@@ -323,9 +334,17 @@ function showResults(info) {
 	player_rules = info.rules
 	infoElm.appendChild(createUserElm(info.playerDatas[i - 1], info.playerDatas[i]))
 	// ADD THE CONTINUE BUTTON
-	var c = document.createElement("div")
-	c.innerHTML = `<button onclick="ready(this.parentNode)">Continue</button>`
-	infoElm.appendChild(c)
+	if (info.winner == null) {
+		var c = document.createElement("div")
+		c.innerHTML = `<button onclick="ready(this.parentNode)">Continue</button>`
+		infoElm.appendChild(c)
+	} else {
+		var c = document.createElement("div")
+		c.innerHTML = `<b></b><span> is the winner!</span>`
+		c.setAttribute("style", "display: inline-block; margin: 2em; border: 1em solid gold; border-radius: 2em; padding: 2em; background: #fd02; box-shadow: 0 0.5em 2em 0 black;")
+		c.children[0].innerText = info.winner
+		infoElm.appendChild(c)
+	}
 	// UPDATE THE RULE LIST
 	updateRules(info.rules)
 }
@@ -364,8 +383,9 @@ function createUserElm(prev, info) {
 		e.innerHTML = `<div>${info[i].name}</div><div></div>`
 		// (You) marker
 		if (thisPlayerName == info[i].name) e.children[0].appendChild(document.createElement("b")).innerText = " (You)"
-		// Checkmark finished icon
+		// Checkmark finished icon + winner icon
 		if (info[i].hasVoted) e.classList.add("finished")
+		if (info[i].winner) e.classList.add("finishicon-winner")
 		// Score code
 		if (player_rules.includes("Add Points to the game")) {
 			e.children[1].appendChild(document.createElement("span")).innerText = info[i].score
