@@ -165,4 +165,16 @@ public class ModuleStars extends Module {
 			return "star-to-points";
 		}
 	}
+	public static class RequireStar extends Option.Rule.WinCondition {
+		public RequireStar(Game game) {
+			super(game);
+		}
+		public static RequireStar create(Game game) {
+			return new RequireStar(game);
+		}
+		public String getName() { return "Require having a star to win"; }
+		public boolean isPlayerValid(Player target) {
+			return target.hasStar;
+		}
+	}
 }

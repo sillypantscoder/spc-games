@@ -29,13 +29,13 @@ public class ModulePoints extends Module {
 		list.accept(InvertAllScores.create(game));
 		list.accept(LowestBonus.create(game));
 		list.accept(HighestPenalty.create(game));
-		list.accept(Victory.create(game));
 		// Rules
 		list.accept(InvertPointChanges.create(game));
 		list.accept(MultiplyPointChanges.create(game));
 		list.accept(RepeatedLowestBonus.create(game));
 		list.accept(RepeatedHighestPenalty.create(game));
 		list.accept(RepeatedScoreWrap.create(game));
+		list.accept(RequireHighestPoints.create(game));
 	}
 	// === ACTIONS ===
 	public static class GivePoints extends Option.Action {
@@ -180,36 +180,6 @@ public class ModulePoints extends Module {
 			}
 		}
 	}
-	public static class Victory extends Option.Action {
-		public Game game;
-		public Victory(Game game) {
-			this.game = game;
-		}
-		public static Victory create(Game game) {
-			return new Victory(game);
-		}
-		public String getName() { return "The player with the highest score wins!"; }
-		public String execute() {
-			ArrayList<Player> max = new ArrayList<Player>();
-			float m = -1000;
-			for (int i = 0; i < game.players.size(); i++) {
-				Player p = game.players.get(i);
-				if (p.score > m) {
-					m = p.score;
-					max.clear();
-				}
-				if (p.score == m) {
-					max.add(p);
-				}
-			}
-			if (max.size() == 0) return "Every player is below -1000 points!";
-			else if (max.size() == 1) {
-				Player yay = max.get(0);
-				game.winner = yay;
-				return yay.name + " wins!";
-			} else return "Multiple players are tied for first place!";
-		}
-	}
 	// === RULES ===
 	public static class InvertPointChanges extends Option.Rule {
 		public Game target;
@@ -305,5 +275,53 @@ public class ModulePoints extends Module {
 			return "Scores wrap around at " + amt;
 		}
 		public String getSource() { return "score-wrap"; }
+	}
+	public static class RequireHighestPoints extends Option.Rule.WinCondition {
+		public RequireHighestPoints(Game game) {
+			super(game);
+		}
+		public static RequireHighestPoints create(Game game) {
+			return new RequireHighestPoints(game);
+		}
+		public String getName() { return "Only the player(s) with the highest score can win"; }
+		public boolean isPlayerValid(Player target) {
+			ArrayList<Player> max = new ArrayList<Player>();
+			float m = -1000;
+			for (int i = 0; i < game.players.size(); i++) {
+				Player p = game.players.get(i);
+				if (p.score > m) {
+					m = p.score;
+					max.clear();
+				}
+				if (p.score == m) {
+					max.add(p);
+				}
+			}
+			return max.indexOf(target) != -1;
+		}
+	}
+	public static class RequireLowestPoints extends Option.Rule.WinCondition {
+		public RequireLowestPoints(Game game) {
+			super(game);
+		}
+		public static RequireLowestPoints create(Game game) {
+			return new RequireLowestPoints(game);
+		}
+		public String getName() { return "Only the player(s) with the lowest score can win"; }
+		public boolean isPlayerValid(Player target) {
+			ArrayList<Player> min = new ArrayList<Player>();
+			float m = 1000;
+			for (int i = 0; i < game.players.size(); i++) {
+				Player p = game.players.get(i);
+				if (p.score < m) {
+					m = p.score;
+					min.clear();
+				}
+				if (p.score == m) {
+					min.add(p);
+				}
+			}
+			return min.indexOf(target) != -1;
+		}
 	}
 }

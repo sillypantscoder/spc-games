@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class Game {
 	public ArrayList<Player> players;
@@ -16,6 +17,7 @@ public class Game {
 		rules = new ArrayList<Option.Rule>();
 		rules.add(new ModuleMain(this)); // Basic actions
 		rules.add(new ModulePoints(this)); // Give players points
+		rules.add(new ModulePoints.RequireHighestPoints(this)); // Require highest points to win
 		rulePointMultiplier = 1;
 		ruleZeroVotes = false;
 		joinEvent = null;
@@ -90,6 +92,14 @@ public class Game {
 			}
 		}
 		return false;
+	}
+	public Optional<Option.Rule.WinCondition> findWinInvalidations(Player p) {
+		for (int i = 0; i < rules.size(); i++) {
+			if (rules.get(i) instanceof Option.Rule.WinCondition condition) {
+				if (! condition.isPlayerValid(p)) return Optional.ofNullable(condition);
+			}
+		}
+		return Optional.empty();
 	}
 	public HttpResponse get(String path) {
 		if (path.equals("/")) {

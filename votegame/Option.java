@@ -43,6 +43,15 @@ public abstract class Option {
 			public void accept() {}
 			public void repeal() {}
 		}
+		public static abstract class WinCondition extends Rule {
+			public Game game;
+			public WinCondition(Game target) {
+				this.game = target;
+			}
+			public abstract boolean isPlayerValid(Player target);
+			public void accept() {}
+			public void repeal() {}
+		}
 	}
 	// Generate
 	public static Option[] combineOptionLists(Option[] list1, Option[] list2) {
