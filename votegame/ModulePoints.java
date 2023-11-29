@@ -29,6 +29,7 @@ public class ModulePoints extends Module {
 		list.accept(InvertAllScores.create(game));
 		list.accept(LowestBonus.create(game));
 		list.accept(HighestPenalty.create(game));
+		list.accept(SingleVoteBonus.create(game));
 		// Rules
 		list.accept(InvertPointChanges.create(game));
 		list.accept(MultiplyPointChanges.create(game));
@@ -36,6 +37,25 @@ public class ModulePoints extends Module {
 		list.accept(RepeatedHighestPenalty.create(game));
 		list.accept(RepeatedScoreWrap.create(game));
 		list.accept(RequireHighestPoints.create(game));
+	}
+	public Option[] getAllOptions() {
+		return new Option[] {
+			// Actions
+			new GivePoints(null, null, 0, false),
+			new MultiplyPoints(null, 0),
+			new MovePoints(null, null, null, 0),
+			new InvertAllScores(null),
+			new LowestBonus(null),
+			new HighestPenalty(null),
+			new SingleVoteBonus(null),
+			// Rules
+			new InvertPointChanges(null),
+			new MultiplyPointChanges(null),
+			new RepeatedLowestBonus(null),
+			new RepeatedHighestPenalty(null),
+			new RepeatedScoreWrap(null, 0),
+			new RequireHighestPoints(null)
+		};
 	}
 	// === ACTIONS ===
 	public static class GivePoints extends Option.Action {
@@ -93,7 +113,8 @@ public class ModulePoints extends Module {
 			Player playerFrom = random.choice(game.players);
 			Player playerTo = random.choice(game.players);
 			if (playerFrom == playerTo) return null;
-			float amount = random.choice(new Float[] { 1f / 2f, 2f, 0f });
+			float amount = random.choice(new Float[] { playerFrom.score / 2f, 2f });
+			if (amount == 0) return null;
 			return new MovePoints(game, playerFrom, playerTo, amount);
 		}
 		public String getName() { return "Steal " + amount + " points from " + playerFrom.name + " and give them to " + playerTo.name; }
@@ -141,7 +162,7 @@ public class ModulePoints extends Module {
 					targets.add(target.name);
 				}
 				if (targets.size() == 1) return "Gave the player in last place (" + targets.get(0) + ") " + amt + " points";
-				return "Gave the players in last place (" + Utils.humanJoinList(targets) + ") " + amt + " points each for their stars";
+				return "Gave the players in last place (" + Utils.humanJoinList(targets) + ") " + amt + " points each";
 			}
 		}
 	}
@@ -178,6 +199,34 @@ public class ModulePoints extends Module {
 				if (targets.size() == 1) return "Took " + amt + " points from the player in first place (" + targets.get(0) + ")";
 				return "Took " + amt + " points from the players in first place (" + Utils.humanJoinList(targets) + ")";
 			}
+		}
+	}
+	public static class SingleVoteBonus extends Option.Action {
+		public Game game;
+		public SingleVoteBonus(Game game) {
+			this.game = game;
+		}
+		public static SingleVoteBonus create(Game game) {
+			return new SingleVoteBonus(game);
+		}
+		public String getName() { return "Anyone who voted for an option no one else voted for gets 15 points"; }
+		public String execute() {
+			ArrayList<Player> all_targets = new ArrayList<Player>();
+			for (int o = 0; o < game.options.length; o++) {
+				ArrayList<Player> votes_for_this = new ArrayList<Player>();
+				for (int p = 0; p < game.players.size(); p++) {
+					if (game.players.get(p).vote == o) votes_for_this.add(game.players.get(p));
+				}
+				if (votes_for_this.size() == 1) all_targets.add(votes_for_this.get(0));
+			}
+			ArrayList<String> results = new ArrayList<String>();
+			for (int t = 0; t < all_targets.size(); t++) {
+				all_targets.get(t).score += 15 * game.rulePointMultiplier;
+				results.add(all_targets.get(t).name);
+			}
+			if (results.size() == 0) return "No one was creative";
+			else if (results.size() == 1) return results.get(0) + " was the only different person";
+			else return Utils.humanJoinList(results) + " got " + (15 * game.rulePointMultiplier) + " points each for creativity";
 		}
 	}
 	// === RULES ===
@@ -323,5 +372,14 @@ public class ModulePoints extends Module {
 			}
 			return min.indexOf(target) != -1;
 		}
+	}
+	public static class RepeatedSingleVoteBonus extends Option.Rule.RepeatRule {
+		public RepeatedSingleVoteBonus(Game game) {
+			super(game, SingleVoteBonus.create(game));
+		}
+		public static RepeatedSingleVoteBonus create(Game game) {
+			return new RepeatedSingleVoteBonus(game);
+		}
+		public String getSource() { return "single-vote-bonus"; }
 	}
 }

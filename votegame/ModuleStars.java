@@ -23,9 +23,10 @@ public class ModuleStars extends Module {
 	}
 	public void getOptions(Game game, Consumer<Option> list) {
 		// Actions
-		list.accept(ToggleStar.create(game));
-		list.accept(ToggleStar.create(game));
-		list.accept(ToggleStar.create(game));
+		list.accept(GiveStar.create(game));
+		list.accept(GiveStar.create(game));
+		list.accept(GiveStar.create(game));
+		list.accept(TakeStar.create(game));
 		list.accept(ToggleAllStars.create(game));
 		list.accept(RandomizeAllStars.create(game));
 		// Actions with Points
@@ -38,27 +39,56 @@ public class ModuleStars extends Module {
 			list.accept(RepeatedStarToPoints.create(game));
 		}
 	}
+	public Option[] getAllOptions() {
+		return new Option[] {
+			new GiveStar(null, null),
+			new TakeStar(null, null),
+			new ToggleAllStars(null),
+			new RandomizeAllStars(null),
+			new StarToPoints(null, 0),
+			new StarToPointMultiplier(null),
+			new RepeatedStarToPoints(null)
+		};
+	}
 	// === ACTIONS ===
-	public static class ToggleStar extends Option.Action {
+	public static class GiveStar extends Option.Action {
 		public Player target;
 		public Game game;
-		public ToggleStar(Game game, Player target) {
+		public GiveStar(Game game, Player target) {
 			this.game = game;
 			this.target = target;
 		}
-		public static ToggleStar create(Game game) {
+		public static GiveStar create(Game game) {
 			if (game.players.size() == 0) return null;
 			Player target = random.choice(game.players);
-			return new ToggleStar(game, target);
+			return new GiveStar(game, target);
 		}
 		public String getName() {
-			if (target.hasStar) return "Take " + target.name + "'s star";
-			else return "Give " + target.name + " a star";
+			return "Give " + target.name + " a star";
 		}
 		public String execute() {
-			target.hasStar = !target.hasStar;
-			if (target.hasStar) return "Gave " + target.name + " a star";
-			else return "Took " + target.name + "'s star";
+			target.hasStar = true;
+			return "Gave " + target.name + " a star";
+		}
+	}
+	public static class TakeStar extends Option.Action {
+		public Player target;
+		public Game game;
+		public TakeStar(Game game, Player target) {
+			this.game = game;
+			this.target = target;
+		}
+		public static TakeStar create(Game game) {
+			if (game.players.size() == 0) return null;
+			Player target = random.choice(game.players);
+			return new TakeStar(game, target);
+		}
+		public String getName() {
+			return "Take " + target.name + "'s star";
+		}
+		public String execute() {
+			target.hasStar = false;
+			return "Took " + target.name + "'s star";
 		}
 	}
 	public static class ToggleAllStars extends Option.Action {
@@ -111,7 +141,7 @@ public class ModuleStars extends Module {
 			return new StarToPoints(game, amount);
 		}
 		public String getName() {
-			return "Everyone with a star gets " + amount + " points";
+			return "Everyone with a star gets " + amount + " points (unconditionally)";
 		}
 		public String execute() {
 			ArrayList<String> targets = new ArrayList<String>();

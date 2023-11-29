@@ -175,7 +175,7 @@ button {
 		<div id="settings" class="dialog inactive"><div>
 			<div><button onclick="document.querySelector('#settings').classList.add('inactive')">Close</button></div>
 			<h1>Settings</h1>
-			<div>Text size: <input type="range" min="0.5" max="2" step="0.5" value="1" oninput="document.body.parentNode.setAttribute('style', 'font-size: ' + String(this.value) + 'em;')"></div>
+			<div>Text size: <input type="range" min="0.5" max="2" step="0.5" value="1" oninput="document.body.parentNode.setAttribute('style', 'font-size: ' + String(this.value) + 'em;');" id="text_size_control"></div>
 			<!-- <div>Bot mode: <input type="checkbox" oninput="window.bot_mode = this.checked"></div> -->
 			<div><button style="background: red;" onclick="leave()">Leave Game</button></div>
 		</div></div>
@@ -230,11 +230,19 @@ button {
 		console.error(e)
 	})
 	x.send()
-})();function sendMessage(msg) {
+})();
+function sendMessage(msg) {
 	var x = new XMLHttpRequest()
 	x.open("POST", "./sendmessage")
 	x.send(location.search.substr("?user=".length) + "MESSAGESEPARATOR" + msg)
-};
+}
+;(() => {
+	if (navigator.userAgentData && navigator.userAgentData.mobile) {
+		var value = 1.5
+		document.body.parentNode.setAttribute('style', 'font-size: ' + String(value) + 'em;')
+		document.querySelector("#text_size_control").value = value
+	}
+})();
 var thisPlayerName = ""
 var player_rules = []
 ;(() => {

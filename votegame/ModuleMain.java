@@ -11,10 +11,17 @@ public class ModuleMain extends Module {
 	}
 	public void getOptions(Game game, Consumer<Option> list) {
 		// Actions
-		list.accept(Victory.create(game));
-		list.accept(AloneVictory.create(game));
+		if (random.randint(0, 10) < 1) list.accept(Victory.create(game));
+		if (random.randint(0, 6) < 1) list.accept(AloneVictory.create(game));
 		// Rules
 		list.accept(AcceptZeroVotes.create(game));
+	}
+	public Option[] getAllOptions() {
+		return new Option[] {
+			new Victory(null, null),
+			new AloneVictory(null),
+			new AcceptZeroVotes(null)
+		};
 	}
 	// === ACTIONS ===
 	public static class Victory extends Option.Action {
