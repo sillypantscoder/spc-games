@@ -37,6 +37,8 @@ public class ModulePoints extends Module {
 		list.accept(RepeatedHighestPenalty.create(game));
 		list.accept(RepeatedScoreWrap.create(game));
 		list.accept(RequireHighestPoints.create(game));
+		list.accept(RequireLowestPoints.create(game));
+		list.accept(RepeatedSingleVoteBonus.create(game));
 	}
 	public Option[] getAllOptions() {
 		return new Option[] {
@@ -54,7 +56,9 @@ public class ModulePoints extends Module {
 			new RepeatedLowestBonus(null),
 			new RepeatedHighestPenalty(null),
 			new RepeatedScoreWrap(null, 0),
-			new RequireHighestPoints(null)
+			new RequireHighestPoints(null),
+			new RequireLowestPoints(null),
+			new RepeatedSingleVoteBonus(null)
 		};
 	}
 	// === ACTIONS ===

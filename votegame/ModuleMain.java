@@ -14,7 +14,7 @@ public class ModuleMain extends Module {
 		if (random.randint(0, 10) < 1) list.accept(Victory.create(game));
 		if (random.randint(0, 6) < 1) list.accept(AloneVictory.create(game));
 		// Rules
-		list.accept(AcceptZeroVotes.create(game));
+		if (game.players.size() >= 3) list.accept(AcceptZeroVotes.create(game));
 	}
 	public Option[] getAllOptions() {
 		return new Option[] {

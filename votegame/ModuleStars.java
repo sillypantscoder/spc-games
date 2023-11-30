@@ -141,7 +141,7 @@ public class ModuleStars extends Module {
 			return new StarToPoints(game, amount);
 		}
 		public String getName() {
-			return "Everyone with a star gets " + amount + " points (unconditionally)";
+			return "Everyone with a star gets " + amount + " points (ignoring 'point changes' rules)";
 		}
 		public String execute() {
 			ArrayList<String> targets = new ArrayList<String>();

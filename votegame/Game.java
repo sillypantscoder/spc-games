@@ -49,6 +49,7 @@ public class Game {
 		}
 		options = new Option[oa.size()];
 		for (int i = 0; i < options.length; i++) options[i] = oa.get(i);
+		if (options.length == 1) createOptions();
 	}
 	public JsonEncoder.ArrayValue getPlayerData() {
 		JsonEncoder.Value[] datas = new JsonEncoder.Value[players.size()];
@@ -109,8 +110,11 @@ public class Game {
 				.setBody(Utils.readFile("assets/login.html"));
 		} else if (path.startsWith("/createuser")) {
 			// Create a new player
-			String name = path.substring("/createuser?name=".length());
-			Player newPlayer = new Player(Utils.decodeURIComponent(name));
+			String name = Utils.decodeURIComponent(path.substring("/createuser?name=".length()));
+			if (name.length() >= 20) return new HttpResponse()
+				.addHeader("Content-Type", "text/html")
+				.setBody("<body><h3>Nice try!!!</h3><a href='/'>Back Home</a></body>");
+			Player newPlayer = new Player(name);
 			players.add(newPlayer);
 			System.err.println("[voting-game] Added new player - " + name);
 			return new HttpResponse()
