@@ -24,4 +24,14 @@ public class random {
 		}
 		return items;
 	}
+	public static<T> ArrayList<T> shuffle(ArrayList<T> items) {
+		for (int i = 0; i < items.size(); i++) {
+			int rand_index = randint(0, items.size() - 1);
+			T original = items.get(i);
+			T other = items.get(rand_index);
+			items.set(i, other);
+			items.set(rand_index, original);
+		}
+		return items;
+	}
 }

@@ -6,8 +6,6 @@ public class Game {
 	public Option[] options;
 	public boolean voteFinished;
 	public ArrayList<Option.Rule> rules;
-	public float rulePointMultiplier;
-	public boolean ruleZeroVotes;
 	public JsonEncoder.Value joinEvent;
 	public Player winner;
 	public Game() {
@@ -15,11 +13,11 @@ public class Game {
 		options = new Option[] {};
 		voteFinished = false;
 		rules = new ArrayList<Option.Rule>();
-		rules.add(new ModuleMain(this)); // Basic actions
-		rules.add(new ModulePoints(this)); // Give players points
-		rules.add(new ModulePoints.RequireHighestPoints(this)); // Require highest points to win
-		rulePointMultiplier = 1;
-		ruleZeroVotes = false;
+		// The three basic rules:
+		rules.add(new ModuleMain(this));
+		rules.add(new ModulePoints(this));
+		rules.add(new ModulePoints.RequireHighestPoints(this));
+		// Init
 		joinEvent = null;
 		winner = null;
 	}
@@ -86,13 +84,19 @@ public class Game {
 		}
 		return new JsonEncoder.ArrayValue(datas);
 	}
-	public boolean hasModule(Class<? extends Module> mod) {
+	public boolean hasRule(Class<? extends Option.Rule> mod) {
 		for (int i = 0; i < rules.size(); i++) {
 			if (rules.get(i).getClass().equals(mod)) {
 				return true;
 			}
 		}
 		return false;
+	}
+	public float getPointMultiplier() {
+		float result = 1;
+		if (hasRule(ModulePoints.MultiplyPointChanges.class)) result *= 2;
+		if (hasRule(ModulePoints.InvertPointChanges.class)) result *= -1;
+		return result;
 	}
 	public Optional<Option.Rule.WinCondition> findWinInvalidations(Player p) {
 		for (int i = 0; i < rules.size(); i++) {
@@ -319,7 +323,7 @@ public class Game {
 				effectSources.add("voted-for");
 			}
 		}
-		if (ruleZeroVotes) {
+		if (hasRule(ModuleMain.AcceptZeroVotes.class)) {
 			for (int i = 0; i < options.length; i++) {
 				if (votes[i] == 0) {
 					accepted.add(options[i]);

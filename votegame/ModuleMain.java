@@ -13,6 +13,7 @@ public class ModuleMain extends Module {
 		// Actions
 		if (random.randint(0, 10) < 1) list.accept(Victory.create(game));
 		if (random.randint(0, 6) < 1) list.accept(AloneVictory.create(game));
+		// list.accept(SelectRule.create(game));
 		// Rules
 		if (game.players.size() >= 3) list.accept(AcceptZeroVotes.create(game));
 	}
@@ -69,6 +70,57 @@ public class ModuleMain extends Module {
 			else return "More than one player can win!";
 		}
 	}
+	// public static class SelectRule extends Option.Action {
+	// 	public Option.Rule rule1;
+	// 	public Option.Rule rule2;
+	// 	public Game game;
+	// 	public SelectRule(Game game, Option.Rule rule1, Option.Rule rule2) {
+	// 		this.game = game;
+	// 		this.rule1 = rule1;
+	// 		this.rule2 = rule2;
+	// 	}
+	// 	public static SelectRule create(Game game) {
+	// 		ArrayList<Option.Rule> activeRules = game.rules;
+	// 		ArrayList<Option.Rule> possibleRules = new ArrayList<Option.Rule>();
+	// 		// Go through all the game's modules
+	// 		for (int i = 0; i < activeRules.size(); i++) {
+	// 			if (activeRules.get(i) instanceof Module mod) {
+	// 				// For each one...
+	// 				// Get the list of options it provides
+	// 				Option[] newOptions = mod.getOptions(game);
+	// 				// Go through the list to find rules
+	// 				for (Option o : newOptions) {
+	// 					if (o instanceof Option.Rule newRule) {
+	// 						// Don't include rules we already have
+	// 						if (activeRules.indexOf(newRule) == -1) {
+	// 							// Remember this rule
+	// 							possibleRules.add(newRule);
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 		// Select some rules (from possibleRules)
+	// 		if (possibleRules.size() < 2) return null;
+	// 		random.shuffle(possibleRules);
+	// 		return new SelectRule(game, possibleRules.get(0), possibleRules.get(1));
+	// 	}
+	// 	public String getName() { return "If there is exactly one player who can win, they win"; }
+	// 	public String execute() {
+	// 		ArrayList<Player> validWinners = new ArrayList<Player>();
+	// 		for (Player target : game.players) {
+	// 			if (game.findWinInvalidations(target).isEmpty()) {
+	// 				validWinners.add(target);
+	// 			}
+	// 		}
+	// 		if (validWinners.size() == 1) {
+	// 			Player target = validWinners.get(0);
+	// 			game.winner = target;
+	// 			return target.name + " wins!";
+	// 		} else if (validWinners.size() == 0) return "No one can win!";
+	// 		else return "More than one player can win!";
+	// 	}
+	// }
 	// === RULES ===
 	public static class AcceptZeroVotes extends Option.Rule {
 		public Game target;
@@ -81,11 +133,7 @@ public class ModuleMain extends Module {
 		public String getName() {
 			return "Also accept options with zero votes";
 		}
-		public void accept() {
-			target.ruleZeroVotes = true;
-		}
-		public void repeal() {
-			target.ruleZeroVotes = false;
-		}
+		public void accept() {}
+		public void repeal() {}
 	}
 }

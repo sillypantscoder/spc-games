@@ -83,7 +83,11 @@ public class ModulePoints extends Module {
 			return new GivePoints(game, target, amount, reverse);
 		}
 		public String getName() { return (reverse ? "Take" : "Give") + " " + amount + " points " + (reverse ? "from" : "to") + " " + target.name; }
-		public String execute() { target.score += amount * (reverse ? -1 : 1) * (game.rulePointMultiplier); return (reverse ? "Took" : "Gave") + " " + (amount * game.rulePointMultiplier) + " points " + (reverse ? "from" : "to") + " " + target.name; }
+		public String execute() {
+			float realAmt = amount * game.getPointMultiplier();
+			target.score += realAmt * (reverse ? -1 : 1);
+			return (reverse ? "Took" : "Gave") + " " + realAmt + " points " + (reverse ? "from" : "to") + " " + target.name;
+		}
 	}
 	public static class MultiplyPoints extends Option.Action {
 		public Player target;
@@ -122,7 +126,12 @@ public class ModulePoints extends Module {
 			return new MovePoints(game, playerFrom, playerTo, amount);
 		}
 		public String getName() { return "Steal " + amount + " points from " + playerFrom.name + " and give them to " + playerTo.name; }
-		public String execute() { playerFrom.score -= (amount * game.rulePointMultiplier); playerTo.score += (amount * game.rulePointMultiplier); return "Stole " + (amount * game.rulePointMultiplier) + " points from " + playerFrom.name + " and gave them to " + playerTo.name; }
+		public String execute() {
+			float realAmt = amount * game.getPointMultiplier();
+			playerFrom.score -= realAmt;
+			playerTo.score += realAmt;
+			return "Stole " + realAmt + " points from " + playerFrom.name + " and gave them to " + playerTo.name;
+		}
 	}
 	public static class InvertAllScores extends Option.Action {
 		public Game game;
@@ -159,7 +168,7 @@ public class ModulePoints extends Module {
 			}
 			if (min.size() == 0) return "Every player is above 100 points!";
 			else {
-				float amt = 6 * game.rulePointMultiplier;
+				float amt = 6 * game.getPointMultiplier();
 				ArrayList<String> targets = new ArrayList<String>();
 				for (Player target : min) {
 					target.score += amt;
@@ -194,7 +203,7 @@ public class ModulePoints extends Module {
 			}
 			if (max.size() == 0) return "Every player is below -100 points!";
 			else {
-				float amt = 6 * game.rulePointMultiplier;
+				float amt = 6 * game.getPointMultiplier();
 				ArrayList<String> targets = new ArrayList<String>();
 				for (Player target : max) {
 					target.score -= amt;
@@ -223,14 +232,15 @@ public class ModulePoints extends Module {
 				}
 				if (votes_for_this.size() == 1) all_targets.add(votes_for_this.get(0));
 			}
+			float realAmt = 15 * game.getPointMultiplier();
 			ArrayList<String> results = new ArrayList<String>();
 			for (int t = 0; t < all_targets.size(); t++) {
-				all_targets.get(t).score += 15 * game.rulePointMultiplier;
+				all_targets.get(t).score += realAmt;
 				results.add(all_targets.get(t).name);
 			}
 			if (results.size() == 0) return "No one was creative";
 			else if (results.size() == 1) return results.get(0) + " was the only different person";
-			else return Utils.humanJoinList(results) + " got " + (15 * game.rulePointMultiplier) + " points each for creativity";
+			else return Utils.humanJoinList(results) + " got " + realAmt + " points each for creativity";
 		}
 	}
 	// === RULES ===
@@ -245,12 +255,8 @@ public class ModulePoints extends Module {
 		public String getName() {
 			return "Reverse all point changes";
 		}
-		public void accept() {
-			target.rulePointMultiplier *= -1;
-		}
-		public void repeal() {
-			target.rulePointMultiplier *= -1;
-		}
+		public void accept() {}
+		public void repeal() {}
 	}
 	public static class MultiplyPointChanges extends Option.Rule {
 		public Game target;
@@ -263,12 +269,8 @@ public class ModulePoints extends Module {
 		public String getName() {
 			return "Double all point changes";
 		}
-		public void accept() {
-			target.rulePointMultiplier *= 2;
-		}
-		public void repeal() {
-			target.rulePointMultiplier /= 2;
-		}
+		public void accept() {}
+		public void repeal() {}
 	}
 	public static class RepeatedLowestBonus extends Option.Rule.RepeatRule {
 		public RepeatedLowestBonus(Game game) {

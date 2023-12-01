@@ -32,5 +32,9 @@ public abstract class Module extends Option.Rule {
 		return result;
 	}
 	public abstract void getOptions(Game game, Consumer<Option> list);
+	/**
+	 * Get a list of all the options this module contains, initialized with null.
+	 * @return A list of all the options this module contains.
+	 */
 	public abstract Option[] getAllOptions();
 }

@@ -29,13 +29,14 @@ public class ModuleStars extends Module {
 		list.accept(TakeStar.create(game));
 		list.accept(ToggleAllStars.create(game));
 		list.accept(RandomizeAllStars.create(game));
+		list.accept(RequireStar.create(game));
 		// Actions with Points
-		if (game.hasModule(ModulePoints.class)) {
+		if (game.hasRule(ModulePoints.class)) {
 			list.accept(StarToPoints.create(game));
 			list.accept(StarToPointMultiplier.create(game));
 		}
 		// Rules with Points
-		if (game.hasModule(ModulePoints.class)) {
+		if (game.hasRule(ModulePoints.class)) {
 			list.accept(RepeatedStarToPoints.create(game));
 		}
 	}
@@ -61,6 +62,7 @@ public class ModuleStars extends Module {
 		public static GiveStar create(Game game) {
 			if (game.players.size() == 0) return null;
 			Player target = random.choice(game.players);
+			if (target.hasStar) return null;
 			return new GiveStar(game, target);
 		}
 		public String getName() {
@@ -81,6 +83,7 @@ public class ModuleStars extends Module {
 		public static TakeStar create(Game game) {
 			if (game.players.size() == 0) return null;
 			Player target = random.choice(game.players);
+			if (! target.hasStar) return null;
 			return new TakeStar(game, target);
 		}
 		public String getName() {
