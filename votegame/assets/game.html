@@ -256,6 +256,7 @@ var player_rules = []
 // expects: { users, choices: string[], choicesTypes: string[], rules: string[] }
 function showVotingScreen(info) {
 	player_rules = info.rules
+	updateRules(player_rules)
 	updateUsers(info.users)
 	// UPDATE THE HEADERS
 	document.querySelector("#header").innerHTML = "<h2>Voting</h2>"
@@ -317,6 +318,7 @@ function showResults(info) {
 	if (infoElm == null) infoElm = document.querySelector("#desc").appendChild(document.createElement("div"))
 	infoElm.innerHTML = ""
 	for (var i = 0; i < info.effects.length; i++) {
+		player_rules = info.rulesets[i]
 		infoElm.appendChild(createUserElm(i != 0 ? info.playerDatas[i - 1] : null, info.playerDatas[i]))
 		var c = document.createElement("div")
 		c.setAttribute("class", "effect")
@@ -337,7 +339,6 @@ function showResults(info) {
 			"module-add": "<b style='color: purple;'>Added: </b>",
 			"module-remove": "<b style='color: magenta;'>Removed: </b>"
 		}[info.effectTypes[i]]) + info.effects[i]
-		player_rules = info.rulesets[i]
 		infoElm.appendChild(c)
 	}
 	player_rules = info.rules
