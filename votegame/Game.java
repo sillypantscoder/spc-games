@@ -133,6 +133,10 @@ public class Game {
 			return new HttpResponse()
 				.setStatus(200)
 				.setBody(thisPlayer.name);
+		} else if (path.equals("/game.js")) {
+			return new HttpResponse()
+				.addHeader("Content-Type", "text/html")
+				.setBody(Utils.readFile("assets/game.js"));
 		} else if (path.startsWith("/game")) {
 			if (options.length == 0 && players.size() > 1) newVote();
 			// Main game
