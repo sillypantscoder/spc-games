@@ -27,7 +27,7 @@ public class JsonEncoder {
 	public static class StringValue extends Value {
 		public String v;
 		public StringValue(String v) { this.v = v; }
-		public String encode() { return "\"" + v + "\""; }
+		public String encode() { return "\"" + v.replaceAll("\n", "\\\\n") + "\""; }
 	}
 	public static class IntValue extends Value {
 		public float v;

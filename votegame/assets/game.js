@@ -201,7 +201,6 @@ function ready(e) {
  * @param {string[]} info The list of rules.
  */
 function updateRules(info) {
-	console.log(info)
 	var ruleElm = document.querySelector("#rules")
 	ruleElm.innerHTML = ""
 	for (var i = 0; i < info.length; i++) {

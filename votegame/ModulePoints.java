@@ -40,17 +40,8 @@ public class ModulePoints extends Module {
 		list.accept(RequireLowestPoints.create(game));
 		list.accept(RepeatedSingleVoteBonus.create(game));
 	}
-	public Option[] getAllOptions() {
-		return new Option[] {
-			// Actions
-			new GivePoints(null, null, 0, false),
-			new MultiplyPoints(null, 0),
-			new MovePoints(null, null, null, 0),
-			new InvertAllScores(null),
-			new LowestBonus(null),
-			new HighestPenalty(null),
-			new SingleVoteBonus(null),
-			// Rules
+	public Option.Rule[] getAllRules() {
+		return new Option.Rule[] {
 			new InvertPointChanges(null),
 			new MultiplyPointChanges(null),
 			new RepeatedLowestBonus(null),

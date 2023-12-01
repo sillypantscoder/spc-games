@@ -29,26 +29,22 @@ public class ModuleStars extends Module {
 		list.accept(TakeStar.create(game));
 		list.accept(ToggleAllStars.create(game));
 		list.accept(RandomizeAllStars.create(game));
-		list.accept(RequireStar.create(game));
 		// Actions with Points
 		if (game.hasRule(ModulePoints.class)) {
 			list.accept(StarToPoints.create(game));
 			list.accept(StarToPointMultiplier.create(game));
 		}
+		// Rules
+		list.accept(RequireStar.create(game));
 		// Rules with Points
 		if (game.hasRule(ModulePoints.class)) {
 			list.accept(RepeatedStarToPoints.create(game));
 		}
 	}
-	public Option[] getAllOptions() {
-		return new Option[] {
-			new GiveStar(null, null),
-			new TakeStar(null, null),
-			new ToggleAllStars(null),
-			new RandomizeAllStars(null),
-			new StarToPoints(null, 0),
-			new StarToPointMultiplier(null),
-			new RepeatedStarToPoints(null)
+	public Option.Rule[] getAllRules() {
+		return new Option.Rule[] {
+			new RepeatedStarToPoints(null),
+			new RequireStar(null)
 		};
 	}
 	// === ACTIONS ===
