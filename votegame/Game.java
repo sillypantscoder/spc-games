@@ -186,6 +186,18 @@ public class Game {
 			return new HttpResponse()
 				.addHeader("Content-Type", "text/html")
 				.setBody(thisPlayer.getMessagesString());
+		} else if (path.equals("/status")) {
+			return new HttpResponse()
+				.addHeader("Content-Type", "text/html")
+				.setBody(this.winner != null ? "Finished" : "In progress");
+		} else if (path.equals("/status_mod")) {
+			String playerString = "";
+			for (int i = 0; i < players.size(); i++) {
+				playerString += "\n- <button onclick='var x = new XMLHttpRequest(); x.open(\"POST\", `../../game/${game_id}/leave`); x.send(" + players.get(i).hashCode() + ")'>Remove</button> " + players.get(i).name;
+			}
+			return new HttpResponse()
+				.addHeader("Content-Type", "text/html")
+				.setBody("\nPlayers:" + playerString);
 		} else {
 			// 404!
 			return new HttpResponse()
@@ -226,12 +238,7 @@ public class Game {
 						}
 					)).encode());
 				}
-				// - Check whether we are all done voting
-				for (int i = 0; i < players.size(); i++) {
-					if (players.get(i).vote == -1) return new HttpResponse();
-				}
-				// - We are done voting if we get to this point!
-				finishVote();
+				checkForStateChange();
 				return new HttpResponse();
 			} else if (message.equals("r")) {
 				if (! voteFinished) return new HttpResponse().setStatus(400).setBody("Voting has not finished yet!");
@@ -245,12 +252,7 @@ public class Game {
 						}
 					)).encode());
 				}
-				// - Check whether we are all done looking at the results
-				for (int i = 0; i < players.size(); i++) {
-					if (players.get(i).vote == -1) return new HttpResponse();
-				}
-				// - We are done if we get to this point!
-				newVote();
+				checkForStateChange();
 				return new HttpResponse();
 			}
 			// Finish
@@ -265,11 +267,7 @@ public class Game {
 			// Remove the player
 			this.players.remove(thisPlayer);
 			// Check if everyone is ready now
-			for (int i = 0; i < players.size(); i++) {
-				if (players.get(i).vote == -1) return new HttpResponse();
-			}
-			if (voteFinished) newVote();
-			else finishVote();
+			checkForStateChange();
 			return new HttpResponse();
 		} else {
 			// 404!
@@ -277,6 +275,15 @@ public class Game {
 				.setStatus(404)
 				.setBody("404");
 		}
+	}
+	public void checkForStateChange() {
+		// - Check whether we are all done voting
+		for (int i = 0; i < players.size(); i++) {
+			if (players.get(i).vote == -1) return;
+		}
+		// - Everyone is ready if we get to this point!
+		if (voteFinished) newVote();
+		else finishVote();
 	}
 	public void newVote() {
 		voteFinished = false;
