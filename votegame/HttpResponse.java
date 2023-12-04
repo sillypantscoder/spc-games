@@ -31,19 +31,6 @@ public class HttpResponse {
 		return this;
 	}
 	public void send() {
-	// 	s: list[bytes] = [
-	// 		str(res["status"]).encode("UTF-8"),
-	// 		",".join([f"{a}:{b}" for a, b in res["headers"].items()]).encode("UTF-8"),
-	// 		res["content"]
-	// 	]
-	// 	for data in s:
-	// 		self.send_packet(data)
-	// 		# time.sleep(0.3)
-	// def send_packet(self, info: bytes):
-	// 	sys.stdout.buffer.write(str(len(info)).encode("UTF-8"))
-	// 	sys.stdout.buffer.write(b".")
-	// 	sys.stdout.buffer.write(info)
-	// 	sys.stdout.buffer.flush()
 		send_packet(String.valueOf(status));
 		String[] finalHeaders = new String[headerNames.size()];
 		for (int i = 0; i < headerNames.size(); i++) {

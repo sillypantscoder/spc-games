@@ -17,7 +17,16 @@ public abstract class Option {
 		public abstract String execute();
 	}
 	// Rules
+	/**
+	 * A rule which can be toggled on and off.
+	 */
 	public static abstract class Rule extends Option {
+		/**
+		 * If the rule is already present in the game, return that instance so it can be repealed properly.
+		 * @param game
+		 * @param type
+		 * @return
+		 */
 		public static Rule checkFor(Game game, Rule type) {
 			Class<? extends Rule> ruleType = type.getClass();
 			for (int i = 0; i < game.rules.size(); i++) {
@@ -29,6 +38,9 @@ public abstract class Option {
 		}
 		public abstract void accept();
 		public abstract void repeal();
+		/**
+		 * A special rule that consists of doing something once each round.
+		 */
 		public static abstract class RepeatRule extends Rule {
 			public Game target;
 			public Action action;
@@ -43,6 +55,9 @@ public abstract class Option {
 			public void accept() {}
 			public void repeal() {}
 		}
+		/**
+		 * A special rule that adds a condition for winning.
+		 */
 		public static abstract class WinCondition extends Rule {
 			public Game game;
 			public WinCondition(Game target) {
@@ -71,6 +86,11 @@ public abstract class Option {
 		Option[] ol = list.toArray(new Option[0]);
 		return ol;
 	}
+	/**
+	 * Return a random option, or null.
+	 * @param game
+	 * @return
+	 */
 	public static Option create(Game game) {
 		Option[] optionList = new Option[] {};
 		for (Rule rule : game.rules) {

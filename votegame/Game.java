@@ -2,11 +2,29 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 public class Game {
+	/**
+	 * The list of players in the game.
+	 */
 	public ArrayList<Player> players;
+	/**
+	 * The list of options in this voting round.
+	 */
 	public Option[] options;
+	/**
+	 * Whether the voting has finished this round.
+	 */
 	public boolean voteFinished;
+	/**
+	 * The list of rules which are currently present.
+	 */
 	public ArrayList<Option.Rule> rules;
+	/**
+	 * The event that should be sent to a player when they join.
+	 */
 	public JsonEncoder.Value joinEvent;
+	/**
+	 * The current winner of the game. May be null.
+	 */
 	public Player winner;
 	public Game() {
 		players = new ArrayList<Player>();
@@ -21,6 +39,11 @@ public class Game {
 		joinEvent = null;
 		winner = null;
 	}
+	/**
+	 * Find a player based on a hash code.
+	 * @param hashCode
+	 * @return
+	 */
 	public Player findPlayer(int hashCode) {
 		for (int i = 0; i < players.size(); i++) {
 			if (players.get(i).hashCode() == hashCode) {
@@ -29,6 +52,9 @@ public class Game {
 		}
 		return null;
 	}
+	/**
+	 * Create the options to be voted on this round.
+	 */
 	public void createOptions() {
 		int n = random.choice(new Integer[] { 2, 3, 4, 5 });
 		ArrayList<Option> oa = new ArrayList<Option>();
@@ -49,6 +75,10 @@ public class Game {
 		for (int i = 0; i < options.length; i++) options[i] = oa.get(i);
 		if (options.length == 1) createOptions();
 	}
+	/**
+	 * Get the "player data".
+	 * @return
+	 */
 	public JsonEncoder.ArrayValue getPlayerData() {
 		JsonEncoder.Value[] datas = new JsonEncoder.Value[players.size()];
 		for (int i = 0; i < players.size(); i++) {
@@ -65,6 +95,10 @@ public class Game {
 		}
 		return new JsonEncoder.ArrayValue(datas);
 	}
+	/**
+	 * Get the types for the options this round.
+	 * @return
+	 */
 	public JsonEncoder.ArrayValue getChoiceTypes() {
 		JsonEncoder.Value[] datas = new JsonEncoder.Value[options.length];
 		for (int i = 0; i < options.length; i++) {
@@ -84,6 +118,11 @@ public class Game {
 		}
 		return new JsonEncoder.ArrayValue(datas);
 	}
+	/**
+	 * Check whether this game has a rule of the specified type.
+	 * @param mod
+	 * @return
+	 */
 	public boolean hasRule(Class<? extends Option.Rule> mod) {
 		for (int i = 0; i < rules.size(); i++) {
 			if (rules.get(i).getClass().equals(mod)) {
@@ -98,6 +137,11 @@ public class Game {
 		if (hasRule(ModulePoints.InvertPointChanges.class)) result *= -1;
 		return result;
 	}
+	/**
+	 * Go through the list of rules to find a rule that prevents this player from winning.
+	 * @param p
+	 * @return
+	 */
 	public Optional<Option.Rule.WinCondition> findWinInvalidations(Player p) {
 		for (int i = 0; i < rules.size(); i++) {
 			if (rules.get(i) instanceof Option.Rule.WinCondition condition) {
@@ -276,6 +320,9 @@ public class Game {
 				.setBody("404");
 		}
 	}
+	/**
+	 * Check whether everyone is ready, and go to the next scene if so.
+	 */
 	public void checkForStateChange() {
 		// - Check whether we are all done voting
 		for (int i = 0; i < players.size(); i++) {
@@ -285,6 +332,9 @@ public class Game {
 		if (voteFinished) newVote();
 		else finishVote();
 	}
+	/**
+	 * Called at the beginning of each round. Start the round by creating the options and informing the players.
+	 */
 	public void newVote() {
 		voteFinished = false;
 		createOptions();
@@ -309,6 +359,9 @@ public class Game {
 			)).encode());
 		}
 	}
+	/**
+	 * Called when everyone has finished voting.
+	 */
 	public void finishVote() {
 		// 1. Figure out how many votes there were for each option
 		int[] votes = new int[options.length];
@@ -316,6 +369,7 @@ public class Game {
 			votes[players.get(i).vote] += 1;
 		}
 		// 2. Figure out what options got accepted
+		//		Effect sources: How did this option get accepted?
 		ArrayList<String> effectSources = new ArrayList<String>();
 		ArrayList<Option> accepted = new ArrayList<Option>();
 		int maxVotes = 0;
@@ -338,21 +392,19 @@ public class Game {
 				}
 			}
 		}
-		// if (ruleRandomOption) {
-		// 	accepted.add(random.choice(options));
-		// 	effectSources.add("random");
-		// }
 		// 3. Execute all the accepted options
 		ArrayList<String> effects = new ArrayList<String>();
 		//		Effect types: The bold text to display before the effect. One of "rule" "rule-accept" "rule-repeal" "module-add" "module-remove"
 		ArrayList<String> effectTypes = new ArrayList<String>();
+		// `playerDatas` and `rulesets` are there to help with displaying how the game changed.
 		ArrayList<JsonEncoder.ArrayValue> playerDatas = new ArrayList<JsonEncoder.ArrayValue>();
 		playerDatas.add(getPlayerData());
 		ArrayList<JsonEncoder.ArrayValue> rulesets = new ArrayList<JsonEncoder.ArrayValue>();
 		rulesets.add(JsonEncoder.stringList(rules));
+		// Go through the options
 		for (int i = 0; i < accepted.size(); i++) {
-			// Execute the option
 			Option item = accepted.get(i);
+			// Execute the option
 			if (item instanceof Option.Action actionItem) {
 				effectTypes.add("action");
 				effects.add(actionItem.execute());

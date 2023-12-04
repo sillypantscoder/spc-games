@@ -10,6 +10,9 @@ import com.sillypantscoder.spcgames.games.VotingGame;
 import com.sillypantscoder.spcgames.http.HttpResponse;
 import com.sillypantscoder.spcgames.http.RequestHandler;
 
+/**
+ * The main HTTP handler used for the server.
+ */
 public class GameHandler extends RequestHandler {
 	public ArrayList<Game> games;
 	public GameHandler() {

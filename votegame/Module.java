@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 import java.util.function.Consumer;
 
+/**
+ * A Module is a special type of Rule which contains a list of Options and Rules to add to the game.
+ */
 public abstract class Module extends Option.Rule {
 	public Game game;
 	public Module(Game game) {
@@ -9,6 +12,10 @@ public abstract class Module extends Option.Rule {
 	public String getName() {
 		return "Add " + getModuleName() + " to the game";
 	}
+	/**
+	 * The name of the module.
+	 * @return
+	 */
 	public abstract String getModuleName();
 	public void accept() {}
 	public void repeal() {
@@ -31,6 +38,11 @@ public abstract class Module extends Option.Rule {
 		for (int i = 0; i < result.length; i++) result[i] = options.get(i);
 		return result;
 	}
+	/**
+	 * Get a list of all the options this module provides.
+	 * @param game
+	 * @param list Register all of the options using this consumer.
+	 */
 	public abstract void getOptions(Game game, Consumer<Option> list);
 	/**
 	 * Get a list of all the rules this module contains, initialized with null.
