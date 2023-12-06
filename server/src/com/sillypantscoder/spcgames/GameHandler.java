@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import com.sillypantscoder.spcgames.games.ColtSuperExpress;
+import com.sillypantscoder.spcgames.games.TheForeheadGame;
 import com.sillypantscoder.spcgames.games.VotingGame;
 import com.sillypantscoder.spcgames.http.HttpResponse;
 import com.sillypantscoder.spcgames.http.RequestHandler;
@@ -15,8 +16,11 @@ import com.sillypantscoder.spcgames.http.RequestHandler;
  */
 public class GameHandler extends RequestHandler {
 	public ArrayList<Game> games;
+	public ArrayList<WebProcess.StaticGame> staticGames;
 	public GameHandler() {
 		this.games = new ArrayList<Game>();
+		this.staticGames = new ArrayList<WebProcess.StaticGame>();
+		this.staticGames.add(new WebProcess.StaticGame(new TheForeheadGame()));
 	}
 	public HttpResponse get(String path) {
 		for (int i = 0; i < games.size(); i++) {
@@ -39,6 +43,21 @@ public class GameHandler extends RequestHandler {
 					g.id,
 					g.getStatus(),
 					String.valueOf(g.deletionTime)
+				});
+			}
+			String body = "";
+			for (int i = 0; i < info.size(); i++) {
+				if (i != 0) body += "\n";
+				body += String.join("|||", info.get(i));
+			}
+			return new HttpResponse().setStatus(200).addHeader("Content-Type", "text/plain").setBody(body);
+		} else if (path.equals("/gamelist_static")) {
+			ArrayList<String[]> info = new ArrayList<String[]>();
+			for (int i = 0; i < staticGames.size(); i++) {
+				WebProcess.StaticGame g = staticGames.get(i);
+				info.add(new String[] {
+					g.type.getName(),
+					g.type.getID()
 				});
 			}
 			String body = "";
@@ -85,10 +104,18 @@ public class GameHandler extends RequestHandler {
 			}
 		} else if (path.startsWith("/game/")) {
 			String name = path.split("/")[2];
-			String gamePath = path.substring(6 + name.length());
+			String gamePath = path.substring("/game/".length() + name.length());
 			for (int i = 0; i < games.size(); i++) {
 				if (games.get(i).id.equals(name)) {
 					return games.get(i).get(gamePath);
+				}
+			}
+		} else if (path.startsWith("/game_static/")) {
+			String name = path.split("/")[2];
+			String gamePath = path.substring("/game_static/".length() + name.length());
+			for (int i = 0; i < staticGames.size(); i++) {
+				if (staticGames.get(i).type.getID().equals(name)) {
+					return staticGames.get(i).get(gamePath);
 				}
 			}
 		} else if (path.startsWith("/create_game/")) {

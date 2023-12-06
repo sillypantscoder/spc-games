@@ -11,36 +11,65 @@ a {
 		<h3>SPC Games</h3>
 		<h5>Running games:</h5>
 		<ul id="games"></ul>
-		<h5><a href="./create">New game...</a></h5>
+		<p><a href="./create">New game...</a></p>
+		<h5>Static games:</h5>
+		<ul id="games_static"></ul>
 		<script>
-var x = new XMLHttpRequest()
-x.open("GET", "/gamelist")
-x.addEventListener("loadend", (e) => {
-	/** @type {string} */
-	var t = e.target.responseText;
-	if (t.length == 0) {
-		var elm = document.createElement("li")
-		elm.innerText = "There are no games currently in progress!"
-		document.querySelector("#games").appendChild(elm)
-		return
-	}
-	var games = t.split("\n").map((v) => v.split("|||"))
-	for (var info of games) {
-		var elm = document.createElement("li")
-		elm.innerHTML = "<a></a><span></span> <span></span><button>Mark for deletion</button>"
-		elm.children[0].innerText = info[0] + " - " + info[1]
-		elm.children[0].setAttribute("href", "game/" + info[2] + "/")
-		elm.children[1].innerHTML = " (Status: " + info[3] + ")"
-		if (info[4] != 0) {
-			var date = new Date(Number(info[4]))
-			elm.children[2].innerText = "Will be deleted at " + (date.getHours()>12 ? date.getHours() - 12 : date.getHours()) + ":" + date.getMinutes().toString().padStart(2, "0") + ":" + date.getSeconds().toString().padStart(2, "0") + " " + (date.getHours()>12 ? "P" : "A") + "M "
-			elm.children[3].innerText = "Cancel"
+(() => {
+	var x = new XMLHttpRequest()
+	x.open("GET", "/gamelist")
+	x.addEventListener("loadend", (e) => {
+		/** @type {string} */
+		var t = e.target.responseText;
+		if (t.length == 0) {
+			var elm = document.createElement("li")
+			elm.innerText = "There are no games currently in progress!"
+			document.querySelector("#games").appendChild(elm)
+			return
 		}
-		elm.children[3].setAttribute("onclick", `(() => { var x = new XMLHttpRequest(); x.open("POST", "/mark_delete"); x.addEventListener("loadend", () => location.reload()); x.send("${info[2]}"); })();`)
-		document.querySelector("#games").appendChild(elm)
-	}
-})
-x.send()
+		var games = t.split("\n").map((v) => v.split("|||"))
+		// games is: [game type name, game name, game id, short status, deletion time]
+		for (var info of games) {
+			var elm = document.createElement("li")
+			elm.innerHTML = "<a></a><span></span> <span></span><button>Mark for deletion</button>"
+			elm.children[0].innerText = info[0] + " - " + info[1]
+			elm.children[0].setAttribute("href", "game/" + info[2] + "/")
+			elm.children[1].innerHTML = " (Status: " + info[3] + ")"
+			if (info[4] != 0) {
+				var date = new Date(Number(info[4]))
+				elm.children[2].innerText = "Will be deleted at " + (date.getHours()>12 ? date.getHours() - 12 : date.getHours()) + ":" + date.getMinutes().toString().padStart(2, "0") + ":" + date.getSeconds().toString().padStart(2, "0") + " " + (date.getHours()>12 ? "P" : "A") + "M "
+				elm.children[3].innerText = "Cancel"
+			}
+			elm.children[3].setAttribute("onclick", `(() => { var x = new XMLHttpRequest(); x.open("POST", "/mark_delete"); x.addEventListener("loadend", () => location.reload()); x.send("${info[2]}"); })();`)
+			document.querySelector("#games").appendChild(elm)
+		}
+	})
+	x.send()
+})();
+(() => {
+	var x = new XMLHttpRequest()
+	x.open("GET", "/gamelist_static")
+	x.addEventListener("loadend", (e) => {
+		/** @type {string} */
+		var t = e.target.responseText;
+		if (t.length == 0) {
+			var elm = document.createElement("li")
+			elm.innerText = "There are no static games currently in progress!"
+			document.querySelector("#games_static").appendChild(elm)
+			return
+		}
+		var games = t.split("\n").map((v) => v.split("|||"))
+		// games is: [game type name, game id]
+		for (var info of games) {
+			var elm = document.createElement("li")
+			elm.innerHTML = "<a></a>"
+			elm.children[0].innerText = info[0]
+			elm.children[0].setAttribute("href", "game_static/" + info[1] + "/")
+			document.querySelector("#games_static").appendChild(elm)
+		}
+	})
+	x.send()
+})();
 		</script>
 	</body>
 </html>

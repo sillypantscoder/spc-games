@@ -33,4 +33,8 @@ public abstract class GameType {
 	 * @return
 	 */
 	public abstract String getModStatus(Game game);
+	public static abstract class StaticGameType extends GameType {
+		public String getStatus(Game game) { return ""; }
+		public String getModStatus(Game game) { return ""; }
+	}
 }
