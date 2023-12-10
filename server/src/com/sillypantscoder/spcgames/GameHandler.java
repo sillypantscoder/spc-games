@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import com.sillypantscoder.spcgames.games.ColtSuperExpress;
+import com.sillypantscoder.spcgames.games.SwapGame;
 import com.sillypantscoder.spcgames.games.TheForeheadGame;
 import com.sillypantscoder.spcgames.games.VotingGame;
 import com.sillypantscoder.spcgames.http.HttpResponse;
@@ -21,6 +22,7 @@ public class GameHandler extends RequestHandler {
 		this.games = new ArrayList<Game>();
 		this.staticGames = new ArrayList<WebProcess.StaticGame>();
 		this.staticGames.add(new WebProcess.StaticGame(new TheForeheadGame()));
+		this.staticGames.add(new WebProcess.StaticGame(new SwapGame()));
 	}
 	public HttpResponse get(String path) {
 		for (int i = 0; i < games.size(); i++) {
@@ -136,13 +138,15 @@ public class GameHandler extends RequestHandler {
 			String type = path.split("/")[2];
 			for (GameType info : new GameType[] {
 				new ColtSuperExpress(),
-				new VotingGame()
+				new VotingGame(),
+				new TheForeheadGame(),
+				new SwapGame()
 			}) {
 				if (info.getID().equals(type)) {
 					return new HttpResponse()
 						.setStatus(200)
 						.addHeader("Content-Type", "text/html")
-						.setBody("<!DOCTYPE html><html><head><style>a{color:rgb(0,0,200);}</style></head><body><a href=\"/\">Back Home</a><h3>" + info.getName() + "</h3><p>" + info.getDescription().replaceAll("<", "&lt;") + "</p></body></html>");
+						.setBody("<!DOCTYPE html><html><head><style>a{color:rgb(0,0,200);}</style></head><body><a href=\"/\">Back Home</a><h3>" + info.getName() + "</h3><p>" + info.getDescription().replaceAll("<", "&lt;").replaceAll("\n", "</p><p>") + "</p></body></html>");
 				}
 			}
 		}

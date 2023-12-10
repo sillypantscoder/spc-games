@@ -1,0 +1,375 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+	<style><![CDATA[
+.cell {
+	transform: translate(calc(var(--x) * 1px), calc(var(--y) * 1px));
+	width: 1px;
+	height: 1px;
+	fill: none;
+	transition: transform 0.1s linear;
+}
+.cell.empty {
+	stroke: 0.2px solid #AAA;
+}
+.cell.filled {
+	fill: black;
+}
+.cell.target {
+	fill: lime;
+	clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+}
+.cell.player {
+	fill: white;
+}
+.cell.water {
+	fill: blue;
+}
+.chunk.active {
+	stroke-width: 0.1;
+}
+.hidden {
+	display: none;
+}
+	]]></style>
+	<g onclick="location.replace('/')">
+		<rect x="0" y="-1" width="0.5" height="0.5" fill="#AAA" />
+		<path d="M 0.1 -0.9 L 0.4 -0.6 M 0.4 -0.9 L 0.1 -0.6" fill="none" stroke="#555" stroke-width="0.1" />
+	</g>
+	<g onclick="this.nextElementSibling.nextElementSibling.classList.toggle('hidden')">
+		<rect x="0.5" y="-1" width="0.5" height="0.5" fill="#AFA" />
+		<path d="M 0.75 -1 C 0.6638 -1 0.5938 -0.9299 0.5938 -0.8438 h 0.0625 c 0 -0.0517 0.0421 -0.0938 0.0938 -0.0938 s 0.0938 0.0421 0.0938 0.0938 c 0 0.0334 -0.0142 0.0458 -0.0463 0.0705 c -0.0119 0.0092 -0.0254 0.0196 -0.0383 0.0324 C 0.7182 -0.6999 0.7186 -0.6595 0.7188 -0.6563 v 0.0625 h 0.0625 v -0.0628 c 0 -0.0008 0.0007 -0.0188 0.0221 -0.0401 c 0.01 -0.01 0.0213 -0.0187 0.0322 -0.0271 C 0.8687 -0.7492 0.9063 -0.7781 0.9063 -0.8438 c 0 -0.0862 -0.0701 -0.1563 -0.1563 -0.1563 z m -0.0313 0.4375 h 0.0625 v 0.0625 h -0.0625 z" fill="#0A0" />
+	</g>
+	<g id="content"></g>
+	<foreignObject x="0" y="0" transform="scale(0.1)" class="hidden">
+		<div xmlns="http://www.w3.org/1999/xhtml" style="font-size: 1px; background: white; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+			<!-- <div>Check it out I got the XHTML renderer inside an SVG document</div> -->
+			<h3>Instructions</h3>
+			<p>There is a grid of squares, each of which is either "filled" or "empty". You are <b>the blue triangle</b> and you're trying to get to the goal, which is <b>the green triangle</b>. You can use the arrow keys to move left and right, and jump. You can only jump 1 block high. Use the down arrow key to fall.</p>
+			<p>In addition, if you divide the world into 2x2 chunks, you can swap any two chunks at any time. (Even when you are in mid-air!) However, you can't move the chunk you're in, or the chunk the goal is in.</p>
+			<p>Use the arrow keys to move the player. Click (or tap) on two chunks to swap them. On mobile, you can move the player by swiping on the player.</p>
+			<p>Press the X button in the corner to exit. Press the question mark button again to go back to the game.</p>
+		</div>
+	</foreignObject>
+	<script>window.addEventListener("error",(e)=>alert(`${e.message} :${e.lineno}`));</script>
+	<script src="/confetti.js"></script>
+	<script><![CDATA[
+var u = "PAAXRXXXXRGAAXRXXAX"
+u = location.search.substr(1)
+var board = u.replaceAll("P", "^").replaceAll("A", " ").replaceAll("G", "+").replaceAll("W", "#").split("R")
+
+var chunkSize = [2, 2]
+if (board[0][0] == "T") {
+	let n = Number(board[0][1])
+	chunkSize = [n, n]
+	board[0] = board[0].substr(2)
+}
+var ns = "http://www.w3.org/2000/svg"
+
+function createCellElm(x, y, cell) {
+	if (cell == "^" || cell == "*") {
+		var elm = document.createElementNS(ns, "path")
+		elm.classList.add("cell")
+		elm.classList.add("player")
+		elm.setAttribute("d", "M 0.5 0.05 L 0.95 0.95 L 0.05 0.95 Z")
+		elm.setAttribute("fill", "none")
+		elm.setAttribute("stroke", "blue")
+		elm.setAttribute("stroke-width", "0.1")
+		elm.setAttribute("stroke-linejoin", "round")
+		elm.setAttribute("style", `--x: ${x}; --y: ${y};`)
+		elm.dataset.x = x
+		elm.dataset.y = y
+	} else {
+		var elm = document.createElementNS(ns, "rect")
+		elm.classList.add("cell")
+		elm.setAttribute("style", `--x: ${x}; --y: ${y};`)
+		elm.dataset.x = x
+		elm.dataset.y = y
+		if (cell == " ") elm.classList.add("empty")
+		if (cell == "X") elm.classList.add("filled")
+		if (cell == "+") elm.classList.add("target")
+		if (cell == "#") elm.classList.add("water")
+		if (cell == "!") elm.classList.add("water")
+	}
+	return elm
+}
+function createBoardElms() {
+	// Create rows
+	for (var y = 0; y < board.length; y++) {
+		var row = board[y]
+		// Create cells
+		for (var x = 0; x < row.length; x++) {
+			var cell = row[x]
+			var cell_elm = createCellElm(x, y, cell)
+			document.querySelector("#content").appendChild(cell_elm)
+		}
+	}
+}
+function createChunkElms() {
+	for (var y = 0; y < board.length; y += chunkSize[1]) {
+		for (var x = 0; x < board[y].length; x += chunkSize[0]) {
+			var elm = document.createElementNS(ns, "rect")
+			elm.setAttribute("x", x)
+			elm.setAttribute("y", y)
+			elm.setAttribute("width", chunkSize[0])
+			elm.setAttribute("height", chunkSize[1])
+			elm.setAttribute("fill", "#FFF0")
+			elm.setAttribute("stroke", "red")
+			elm.setAttribute("stroke-width", "0.01")
+			elm.setAttribute("onclick", `chunkClicked(${x}, ${y}, event)`)
+			elm.setAttribute("class", "chunk")
+			document.querySelector("#content").appendChild(elm)
+		}
+	}
+}
+function setupPlayerDrag() {
+	var e = document.querySelector("#content .player")
+	e.parentNode.appendChild(e)
+	function touchstart(x, y) {
+		e._TouchPos = [x, y]
+		e._TouchEndPos = [x, y]
+	}
+	function touchmove(x, y) {
+		e._TouchEndPos = [x, y]
+	}
+	function touchend() {
+		function send(d) {
+			keypress({
+				key: "Arrow" + d,
+				preventDefault: () => {}
+			})
+		}
+		var amt = e._TouchEndPos
+		var old = e._TouchPos
+		var up = old[1] - amt[1]
+		var left = old[0] - amt[0]
+		if (Math.abs(up) > Math.abs(left)) {
+			if (up > 0) send("Up")
+			if (up < 0) send("Down")
+		} else {
+			if (left > 0) send("Left")
+			if (left < 0) send("Right")
+		}
+	}
+	e.addEventListener("touchstart", (v) => {
+		v.preventDefault()
+		touchstart(v.touches[0].clientX, v.touches[0].clientY)
+	})
+	e.addEventListener("touchmove", (v) => {
+		v.preventDefault()
+		touchmove(v.touches[0].clientX, v.touches[0].clientY)
+	})
+	e.addEventListener("touchend", (v) => {
+		touchend()
+	})
+}
+function getTotalBlockSize() {
+	return [
+		board[0].length,
+		board.length
+	]
+}
+function getCell(x, y) {
+	if (x < 0) return "=";
+	if (y < 0) return "=";
+	if (y >= board.length) return " ";
+	return board[y][x];
+}
+function setCell(x, y, s) {
+	board[y] = board[y].substring(0, x) + s + board[y].substring(x + 1)
+}
+function getCellElm(x, y) {
+	var elms = [...document.querySelectorAll("#content .cell")]
+	for (var i = 0; i < elms.length; i++) {
+		if (elms[i].dataset.x == x) {
+			if (elms[i].dataset.y == y) {
+				return elms[i]
+			}
+		}
+	}
+}
+function moveCellElm(elm, newX, newY) {
+	elm.setAttribute("style", `--x: ${newX}; --y: ${newY};`)
+	elm.dataset.x = newX
+	elm.dataset.y = newY
+}
+function swapCells(x1, y1, x2, y2) {
+	var c1 = getCell(x1, y1)
+	var c2 = getCell(x2, y2)
+	if (c2 == undefined) debugger;
+	setCell(x1, y1, c2)
+	setCell(x2, y2, c1)
+	var e1 = getCellElm(x1, y1)
+	var e2 = getCellElm(x2, y2)
+	moveCellElm(e1, x2, y2)
+	moveCellElm(e2, x1, y1)
+}
+function swapChunks(x1, y1, x2, y2) {
+	for (var x = 0; x < chunkSize[0]; x++) {
+		for (var y = 0; y < chunkSize[1]; y++) {
+			swapCells(x1 + x, y1 + y, x2 + x, y2 + y)
+		}
+	}
+}
+function getPlayerPos() {
+	var elm = document.querySelector("#content .cell.player")
+	if (elm == null) return null
+	return [
+		Number(elm.dataset.x),
+		Number(elm.dataset.y)
+	]
+}
+function setPlayerPos(x, y) {
+	var oldPos = getPlayerPos()
+	swapCells(...oldPos, x, y)
+}
+function canMoveChunk(cx, cy) {
+	for (var x = 0; x < chunkSize[0]; x++) {
+		for (var y = 0; y < chunkSize[1]; y++) {
+			var c = getCell(cx + x, cy + y)
+			if ("^+".includes(c)) {
+				return false
+			}
+		}
+	}
+	return true
+}
+function chunkClicked(x, y, evt) {
+	if (evt.target.classList.contains("active")) evt.target.classList.remove("active")
+	else evt.target.classList.add("active")
+	if (! canMoveChunk(x, y)) evt.target.classList.remove("active")
+	var active = [...document.querySelectorAll(".chunk.active")]
+	if (active.length >= 2) {
+		var first = active[0]
+		var second = active[1]
+		first.classList.remove("active")
+		second.classList.remove("active")
+		var firstPos = [
+			Number(first.getAttribute("x")),
+			Number(first.getAttribute("y"))
+		]
+		var secondPos = [
+			Number(second.getAttribute("x")),
+			Number(second.getAttribute("y"))
+		]
+		if (canMoveChunk(...firstPos) && canMoveChunk(...secondPos)) {
+			swapChunks(...firstPos, ...secondPos)
+		}
+	}
+}
+function keypress(e) {
+	if (getPlayerPos() == null) return
+	var key = e.key
+	if (key.startsWith("Arrow")) {
+		e.preventDefault()
+		var canFall = (() => {
+			var pos = getPlayerPos()
+			pos[1] += 1
+			if (pos[1] >= getTotalBlockSize()[1]) return true
+			return " +".includes(getCell(...pos))
+		})();
+		if (key == "ArrowRight") {
+			var pos = getPlayerPos()
+			pos[0] += 1
+			if (getCell(...pos) == " ") {
+				setPlayerPos(...pos)
+			}
+			if (canFall) key = "ArrowDown"
+			if (getCell(...pos) == "+") {
+				win()
+				setPlayerPos(...pos)
+			}
+		}
+		if (key == "ArrowLeft") {
+			var pos = getPlayerPos()
+			pos[0] -= 1
+			if (getCell(...pos) == " ") {
+				setPlayerPos(...pos)
+			}
+			if (canFall) key = "ArrowDown"
+			if (getCell(...pos) == "+") {
+				win()
+				setPlayerPos(...pos)
+			}
+		}
+		if (key == "ArrowDown") {
+			var pos = getPlayerPos()
+			if (pos == null) return
+			pos[1] += 1
+			if (pos[1] >= getTotalBlockSize()[1]) lose()
+			else if (getCell(...pos) == " ") {
+				setPlayerPos(...pos)
+			} else if (getCell(...pos) == "+") {
+				win()
+				setPlayerPos(...pos)
+			}
+		}
+		if (key == "ArrowUp") {
+			var pos = getPlayerPos()
+			pos[1] += 1
+			if (getCell(...pos) == "X") {
+				pos[1] -= 2
+				if (getCell(...pos) == " ") {
+					setPlayerPos(...pos)
+				}
+				if (getCell(...pos) == "+") {
+					win()
+					setPlayerPos(...pos)
+				}
+			}
+		}
+	}
+}
+function end(n, b) {
+	var elms = [...document.querySelectorAll(`#content .${n}`)]
+	for (var i = 0; i < elms.length; i++) {
+		elms[i].remove()
+	}
+	for (var y = 0; y < board.length; y++) {
+		for (var x = 0; x < board[y].length; x++) {
+			if (board[y][x] == b) {
+				setCell(x, y, " ")
+			}
+		}
+	}
+}
+function win() {
+	end("t", "+")
+	// alert("You win!")
+	// document.querySelector("#completion").setAttribute("style", `opacity: 1;`)
+	// remove the target
+	var elms = [...document.querySelectorAll(`#content .target`)]
+	for (var i = 0; i < elms.length; i++) {
+		elms[i].classList.remove("target")
+		elms[i].classList.add("empty")
+	}
+	// yaaaaaaaaaaaaaaaay
+	requestAnimationFrame(() => {
+		var p = getPlayerPos()
+		window.confetti(p[0] + 0.5, p[1] + 0.5)
+	})
+}
+function lose() {
+	end("player", "^")
+	// alert("You lose.")
+	location.reload()
+}
+function setup() {
+	createBoardElms()
+	createChunkElms()
+	var size = getTotalBlockSize()
+	document.rootElement.setAttribute("viewBox", `-1 -1 ${size[0] + 2} ${size[1] + 2}`)
+	document.querySelector("foreignObject").setAttribute("width", size[0] * 10)
+	document.querySelector("foreignObject").setAttribute("height", size[1] * 10)
+	window.addEventListener("keydown", keypress)
+	setupPlayerDrag()
+	// wheeeeeeeeeeeeeeeeeeeeeeeeeeee
+	import("./confetti_mod.js").then((e) => {
+		window.confetti = (x, y) => {
+			for (var i = 0; i < 100; i++) {
+				new e.confetti(x, y)
+			}
+		}
+	})
+}
+setup()
+	]]></script>
+</svg>

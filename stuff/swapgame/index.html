@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width">
+		<title>Swap game</title>
+		<link href="style.css" rel="stylesheet" type="text/css" />
+	</head>
+	<body>
+		<h3>Swap game</h3>
+		<h5>Easy</h5>
+		<ul>
+			<li><a href="game2.xml?PAAXRXXXXRGAAXRXXAX">Intro</a></li>
+			<li><a href="game2.xml?AAXAXXRAAXXXXRPAXGXARXXXXXA">Castle</a></li>
+			<!-- <li><a href="game2.xml?AAXXXXRAXXAAXRGAXAPXRXXXXXX">I need to think of a new name for this one</a></li> -->
+			<li><a href="game2.xml?XPXAXAXAAAAXAXGXRAXAXAXAXXAXAXAXA">Moving sidewalks</a></li>
+			<li><a href="game2.xml?XXXAAGRAXXAXXRPAAXAARXXAXXA">Clutter</a></li>
+			<li><a href="game2.xml?AGXXAARXXXAAPRAXAAXXRAXXXXA">Chorus</a></li>
+			<li><a href="game2.xml?XXXXXXXXXXXXXXXXRAAXAXAAAAXXAXAAARPXXAXXAXXXXAXXAARXXAAAXAAXXAAAXXARAAXAAXAAAAXAAXGXRAXAAAAXAAXAAAXXX">Underhang</a></li>
+			<li><a href="game2.xml?XPAARXXAXRAXXXRXXXXRXGAXRXXAX">Collapsed Floor</a></li>
+			<li><a href="game2.xml?AXPXRAXXXRAGXARXXXX">Treehouse</a></li>
+			<li><a href="game2.xml?AXPXXXRXXXXXXRAGXAAXRXXXXAA">Extended Treehouse</a></li>
+			<li><a href="game2.xml?GAXARXXXPRAAAXRXXAX">Mouse holes</a></li>
+			<li><a href="game2.xml?GAAARXXAXRXXAXRXXXXRXPAXRXXXX">Collapsed Roof</a></li>
+			<li><a href="game2.xml?XXXXXXRAXXAAARPXXAXGRXXXXXX">Columns</a></li>
+			<li><a href="game2.xml?XXXXAGRXXXXAXRPXAAXXRXXXXAX">Jigsaw</a></li>
+		</ul>
+		<h5>Hard</h5>
+		<ul>
+			<li><a href="game2.xml?AAAAAAAAAAAAAPRAAAAAAAAAAAAAXRAAAAAAAAAAAAAXRAAAAAAAAAAAAAXRGAAAAAAAAAAAAXRXAAAAAAAAAAAAX">Bridge the Gap</a></li>
+			<li><a href="game2.xml?XXXXXXXXRXXAAXXGARAAXAAXXARAAAXXAAXRAXXAAXXARXAAXXAAXRAXXAAXXARXAAXXAAXRPXXAAXXXRXAAXXAXX">Grid</a></li>
+			<li><a href="game2.xml?GAAARXXAXRXXAXRXXAXRXXPXRXXXX">Stuck in a Well</a></li>
+			<li><a href="game2.xml?XAAAAAAGRAAAAAAAXRPAAAAAAARXAAAAAAA">Wait, what? Are you sure this is possible?</a></li>
+			<li><a href="game2.xml?AXAXAARXXXXXXRXPXGXARXXXXXA">Jailbreak</a></li>
+			<li><a href="game2.xml?AXXAGXRXXXXXXRAXPXAARXXXXXA">Mineshaft</a></li>
+			<li><a href="game2.xml?GAAXXARXXXAXXRXXAPXXRXXAXXA">Life</a></li>
+			<li><a href="game2.xml?XXAAXXRXXAXXXRXXXPXXRXXXXXXRXXXXXXRXXAAXXRXXGAXXRXXXXXX">Ivy Towers</a></li>
+			<li><a href="game2.xml?AAAGRAAXXRAXXARAAAARPAAXRXAAA">Stepladder</a></li>
+			<li><a href="game2.xml?AXXAAPRXAXXXXRAAAAAXRXXXXAXRGXAXXARXXAAAX">Minus</a></li>
+			<li><a href="game2.xml?AAXAXARXXXXXARAXGXXXRXXXPXARAXXXXXRAXAXAA">Ring</a></li>
+			<li><a href="game2.xml?AAAXAAAXRAXAXAXAXRPXAAAXAGRXXXXXXXX">Who comes up with these levels anyways</a></li>
+			<li><a href="game2.xml?XXPARAXXXRAAAXRAXXXRXXAARAAXXRXXXARXAAARXXXGRAAXX">Inverted</a></li>
+			<li><a href="game2.xml?AGXXRXXXARXAAARXXXARAAXXRXXAARAXXXRAAAXRPXXXRXXAA">Really Inverted</a></li>
+			<li><a href="game2.xml?AXXXXXRAXAXPARGAXAXARXXXXAX">Industrial Complex</a></li>
+			<li><a href="game2.xml?AGXXRXXAARAAAARAAXARXPXARXAXA">Deep Dark</a></li>
+			<li><a href="game2.xml?AAXGXARAPXXXXRAXXXAARAAXAXX">Terrain</a></li>
+		</ul>
+		<p><button onclick="random()">Random</button> <a href="editor.html">Make your own!</a></p>
+		<h3>Instructions</h3>
+		<p>There is a grid of squares, each of which is either "filled" or "empty". You are <b>the blue triangle</b> and you're trying to get to the goal, which is <b>the green triangle</b>. You can use the arrow keys to move left and right, and jump. You can only jump 1 block high. Use the down arrow key to fall.</p>
+		<p>In addition, if you divide the world into 2x2 chunks, you can swap any two chunks at any time. (Even when you are in mid-air!) However, you can't move the chunk you're in, or the chunk the goal is in.</p>
+		<p>Use the arrow keys to move the player. Click (or tap) on two chunks to swap them. On mobile, you can move the player by swiping on the player.</p>
+		<p>Select a level to begin.</p>
+		<script src="script.js"></script>
+	</body>
+</html>

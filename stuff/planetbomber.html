@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+html, body {
+	height: 100%;
+}
+body {
+	margin: 0;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+}
+#scene_container {
+	flex-grow: 6;
+	overflow: hidden;
+	position: relative;
+}
+#scene {
+	position: absolute;
+	overflow: visible;
+	width: 100%;
+	height: 100%;
+	top: 50%;
+	left: 50%;
+}
+#scene > * {
+	position: absolute;
+}
+.bomb {
+	--x: 0;
+	--y: 0;
+	--size: 10;
+	--color: black;
+	top: calc(var(--y) - calc(var(--size) / 2));
+	left: calc(var(--x) - calc(var(--size) / 2));
+	width: var(--size);
+	height: var(--size);
+	background: var(--color);
+	border-radius: 50%;
+}
+#info {
+	/* flex-grow: 1; */
+	padding-top: 1em;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	border-top: 1em solid black;
+	background: white;
+}
+button {
+	font-size: 1em;
+	color: white;
+	background: black;
+	padding: 0.5em;
+	margin: 0.5em;
+	border: none;
+}
+.display-bomb {
+	position: relative;
+	margin: 1em;
+	display: inline-block;
+	--size: 20px;
+	width: var(--size);
+	height: var(--size);
+	border-radius: 1em;
+	--color: black;
+	background: var(--color);
+}
+.display-bomb .number {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	font-family: sans-serif;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.display-bomb.progress.active {
+	box-shadow: 0px 7px 7px 0px black;
+}
+.display-bomb.progress::after {
+	position: absolute;
+	content: "";
+	display: inline-block;
+	width: 200%;
+	height: 50%;
+	top: calc(100% + 7px);
+	left: -50%;
+	background: linear-gradient(90deg,
+		magenta 0%,
+		magenta calc(100% * calc(var(--pc) - 5)),
+		orange  calc(100% * calc(var(--pc) - 5)),
+		orange  calc(100% * calc(var(--pc) - 4)),
+		yellow  calc(100% * calc(var(--pc) - 4)),
+		yellow  calc(100% * calc(var(--pc) - 3)),
+		purple  calc(100% * calc(var(--pc) - 3)),
+		purple  calc(100% * calc(var(--pc) - 2)),
+		blue    calc(100% * calc(var(--pc) - 2)),
+		blue    calc(100% * calc(var(--pc) - 1)),
+		green   calc(100% * calc(var(--pc) - 1)),
+		green   calc(100% * var(--pc)),
+		red     calc(100% * var(--pc)),
+		red     100%);
+}
+.display-bomb.selected::before {
+	position: absolute;
+	content: "";
+	display: block;
+	width: 2em;
+	height: 2em;
+	top: 200%;
+	background: linear-gradient(135deg, #CCC 50%, transparent 50%);
+	transform: rotate(45deg);
+	margin: 0;
+	padding: 0;
+}
+#infobar {
+	margin-top: 1.5em;
+	background: #CCC;
+	padding: 1em;
+	align-self: stretch;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.planet.animate {
+	animation: planet-scale 1s 1;
+	animation-timing-function: ease-out;
+}
+@keyframes planet-scale {
+	0% {
+		transform: scale(1);
+	}
+	100% {
+		transform: scale(0);
+	}
+}
+		</style>
+	</head>
+	<body>
+		<div id="scene_container"><div id="scene"></div></div>
+		<div id="info">
+			<div>
+				<!-- <div class="display-bomb progress auto" style="--size: 30px; --pc: 0; --color: pink;" data-countdown="0 2 paint" onclick="db(event)"></div> -->
+				<div class="display-bomb progress" style="--size: 30px; --pc: 0; --color: pink;" data-countdown="0 200 paint" onclick="db(event)"></div>
+				<div class="display-bomb progress" style="--size: 30px; --pc: 0; --color: orange;" data-countdown="0 1000 bomb2P" onclick="db(event)"></div>
+				<div class="display-bomb" style="--size: 20px;"></div>
+				<div class="display-bomb progress" style="--size: 30px; --pc: 0; --color: red;"     data-countdown="0 50 bomb2" onclick="db(event)"></div>
+				<div class="display-bomb progress" style="--size: 30px; --pc: 0; --color: blue;"    data-countdown="0 300 bomb3" onclick="db(event)"></div>
+				<div class="display-bomb progress" style="--size: 30px; --pc: 0; --color: green;"   data-countdown="0 900 bomb4" onclick="db(event)"></div>
+				<div class="display-bomb progress" style="--size: 30px; --pc: 0; --color: purple;"  data-countdown="0 1200 bomb5" onclick="db(event)"></div>
+				<div class="display-bomb progress" style="--size: 30px; --pc: 0; --color: magenta;" data-countdown="0 3600 bomb6" onclick="db(event)"></div>
+				<div class="display-bomb progress" style="--size: 30px; --pc: 0; --color: linear-gradient(90deg, red, orange, yellow, green, blue, purple, pink);" data-countdown="4000 4000 everything" onclick="db(event)"></div>
+				<!-- <div class="display-bomb progress auto" style="--size: 30px; --pc: 0; --color: magenta;" data-countdown="0 10 bomb6" onclick="check_btn_click(event)"></div> -->
+			</div>
+			<div id="infobar">
+				Stuff
+			</div>
+		</div>
+		<script>window.addEventListener("error",(e)=>alert(`${e.message} :${e.lineno}`))</script>
+		<script>
+Math.dist = (x1, y1, x2, y2) => Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
+
+var sceneWidth = window.innerWidth
+var sceneHeight = document.querySelector("#scene_container").getBoundingClientRect().height
+
+var planetSize = 1
+
+function randomCircle(radius) {
+	var pt_angle = Math.random() * 2 * Math.PI;
+	var pt_radius_sq = Math.random() * radius * radius;
+	var pt_x = Math.sqrt(pt_radius_sq) * Math.cos(pt_angle);
+	var pt_y = Math.sqrt(pt_radius_sq) * Math.sin(pt_angle);
+	return [pt_x, pt_y]
+}
+
+class Planet {
+	constructor() {
+		this.canvas = document.createElement("canvas")
+		this.canvas.classList.add("planet")
+		this.recalcSize()
+		document.querySelector("#scene").appendChild(this.canvas)
+		this.context = this.canvas.getContext('2d', {
+			willReadFrequently: true
+		});
+		this.rotation = 0
+		this.phase = 0
+		this.phaseTime = 0
+	}
+	recalcSize() {
+		sceneWidth = window.innerWidth
+		sceneHeight = document.querySelector("#scene_container").getBoundingClientRect().height
+		this.setCanvasSize(sceneWidth, sceneHeight)
+	}
+	setCanvasSize(width, height) {
+		this.canvas.setAttribute("width", width)
+		this.canvas.setAttribute("height", height)
+		this.canvas.setAttribute("style", `top: calc(0% - ${height / 2}px); left: calc(0% - ${width / 2}px);`)
+	}
+	createPlanet() {
+		this.context.fillStyle = "white"
+		this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
+		var sizes = [10, 20]
+		var rings = Math.floor(Math.random() * 6) + 4
+		for (var i = 0; i < rings; i++) {
+			// break;
+			sizes.push(Math.floor(Math.random() * 70) + 30)
+		}
+		var totalSize = sizes.reduce((a, b) => a + b, 0)
+		this.setCanvasSize(totalSize * 2, totalSize * 2)
+		for (var i = sizes.length - 1; i >= 0; i--) {
+			var totalSize = sizes.slice(0, i + 1).reduce((a, b) => a + b, 0)
+			this.context.fillStyle = `hsl(${Math.random() * 360}deg, 100%, 50%)`
+			if (i == 0) this.context.fillStyle = `red`
+			if (i == 1) this.context.fillStyle = `orange`
+			this.context.beginPath();
+			this.context.arc(this.canvas.width / 2, this.canvas.height / 2, totalSize, 0, 2 * Math.PI, false);
+			this.context.fill();
+		}
+	}
+	isPixelSolid(pos) {
+		var x = pos[0] + (this.canvas.width / 2)
+		var y = pos[1] + (this.canvas.height / 2)
+		var p = [...this.context.getImageData(x, y, 1, 1).data];
+		if (p[3] == 0) return false;
+		if (p[0] != 255) return true;
+		if (p[1] != 255) return true;
+		if (p[2] != 255) return true;
+		return false;
+	}
+	explode(x, y, rad) {
+		this.context.fillStyle = `white`
+		this.context.beginPath();
+		this.context.arc(x + (this.canvas.width / 2), y + (this.canvas.height / 2), rad / planetSize, 0, 2 * Math.PI, false);
+		this.context.fill();
+	}
+	erase(x, y) {
+		this.context.fillStyle = `white`
+		this.context.fillRect((x - 1) + (this.canvas.width / 2), (y - 1) + (this.canvas.height / 2), 2, 2)
+	}
+	tick() {
+		this.rotation = (this.rotation + 1) % 3600
+		document.querySelector("#scene").setAttribute("style", `transform: rotate(${this.rotation / 10}deg) scale(0.5); transform-origin: 0px 0px;`)
+		if (this.phase == 0) {
+			if (! this.isPixelSolid([0, 0])) {
+				this.phase = 1
+				this.phaseTime += 1
+			}
+		}
+		if (this.phase == 1) {
+			this.phaseTime += 1
+			if (this.phaseTime >= 20) {
+				this.phaseTime = 0
+				this.phase = 2
+			}
+		}
+		if (this.phase == 2 || this.phase == 3) {
+			this.phaseTime += 1
+			var fr = this.phaseTime / 30
+			if (this.phase == 2) fr = 1 - fr
+			var scale = 1 - Math.pow(1 - fr, 3)
+			document.querySelector("#scene").setAttribute("style", `transform: rotate(${this.rotation / 10}deg) scale(${scale * 0.5}); transform-origin: 0px 0px;`)
+			if (this.phaseTime >= 30) {
+				if (this.phase == 2) {
+					this.phaseTime = 0
+					this.phase = 3
+					// Reset
+					this.createPlanet()
+					// for (; bombs.length > 0; ) bombs[0].destroy();
+					var _b = [...bombs]
+					for (var i = 0; i < _b.length; i++) {
+						// ((bomb) => {
+						// 	bombs.splice(bombs.indexOf(bomb), 1)
+						// 	bomb.elm.remove()
+						// 	setTimeout(() => {
+						// 		bombs.push(bomb)
+						// 		var pos = Bomb.createPos()
+						// 		bomb.pos = pos;
+						// 		document.querySelector("#scene").appendChild(bomb.elm)
+						// 		bomb.v = [0, 0]
+						// 	}, 1000)
+						// })(_b[i]);
+						_b[i].destroy()
+						Bomb.recycle(_b[i])
+					}
+					planetSize += 0.1;
+					planetno += 1
+				} else {
+					this.phaseTime = 0
+					this.phase = 0
+				}
+			}
+		}
+	}
+	time() {
+		if (this.phase == 1) return 0.1
+		if (this.phase == 2) return 0.4
+		if (this.phase == 3) return 0.4
+		return 1
+	}
+}
+class Bomb {
+	constructor(x, y) {
+		this.pos = [x, y]
+		this.v = [0, 0]
+		this.elm = document.createElement("div")
+		this.elm.classList.add("bomb")
+		document.querySelector("#scene").appendChild(this.elm)
+	}
+	tickGravity() {
+		var totalDist = Math.dist(...this.pos, 0, 0)
+		this.v[0] += this.pos[0] * -0.15 * (1 / totalDist) * planet.time()
+		this.v[1] += this.pos[1] * -0.15 * (1 / totalDist) * planet.time()
+	}
+	tickMove() {
+		this.pos[0] += this.v[0] * planet.time()
+		this.pos[1] += this.v[1] * planet.time()
+	}
+	tickCheckForDeath() {
+		if (planet.isPixelSolid(this.pos)) {
+			this.hitGround()
+			this.destroy()
+		}
+	}
+	tickUpdateScreen() {
+		this.elm.setAttribute("style", `--x: ${this.pos[0]}px; --y: ${this.pos[1]}px; --size: 20px; --color: black;`)
+	}
+	hitGround() {
+		planet.explode(...this.pos, 20)
+	}
+	tick() {
+		this.tickGravity()
+		this.tickMove()
+		this.tickCheckForDeath()
+		this.tickUpdateScreen()
+	}
+	destroy() {
+		bombs.splice(bombs.indexOf(this), 1)
+		this.elm.remove()
+	}
+	static recycle(b) {
+		var type = "bomb"
+		if (b instanceof Bomb2) type = "bomb2"
+		if (b instanceof Bomb2P) type = "bomb2P"
+		if (b instanceof Bomb3) type = "bomb3"
+		if (b instanceof Bomb4) type = "bomb4"
+		if (b instanceof Bomb5) type = "bomb5"
+		if (b instanceof Bomb6) type = "bomb6"
+		if (b instanceof PaintBall) type = "paint"
+		if (b instanceof EverythingBall) type = "everything"
+		// Increase value
+		var e = document.querySelector(`[data-countdown$="${type=="bomb"?"bomb2":type}"]`)
+		var data = e.dataset.countdown.split(" ")
+		data[0] = Number(data[0]);
+		data[1] = Number(data[1]);
+		data[0] += (type=="bomb" ? 0.1 : 0.5) * data[1];
+		e.dataset.countdown = data.join(" ")
+	}
+	static createPos() {
+		var angle = (Math.random() * 360) + 180
+		angle *= Math.PI
+		var dist = Math.dist(sceneWidth / 2, sceneHeight / 2, 0, 0) * 2
+		return [dist * Math.cos(angle), dist * Math.sin(angle)]
+	}
+	static create(type) {
+		var pos = Bomb.createPos()
+		var bomb = new type(...pos)
+		bombs.push(bomb)
+	}
+}
+class Bomb2 extends Bomb {
+	hitGround() {
+		planet.explode(...this.pos, 20)
+		for (var i = 0; i < 3; i++) {
+			var b = new Bomb(...this.pos)
+			var newV = randomCircle(2)
+			b.v[0] = newV[0] + (this.v[0] * -0.5)
+			b.v[1] = newV[1] + (this.v[1] * -0.5)
+			bombs.push(b)
+		}
+	}
+	tickUpdateScreen() {
+		this.elm.setAttribute("style", `--x: ${this.pos[0]}px; --y: ${this.pos[1]}px; --size: 30px; --color: red;`)
+	}
+}
+class Bomb2P extends Bomb {
+	hitGround() {
+		planet.explode(...this.pos, 20)
+		for (var i = 0; i < 70; i++) {
+			var b = new Bomb(...this.pos)
+			var newV = randomCircle(2)
+			b.v[0] = newV[0] + (this.v[0] * -0.5)
+			b.v[1] = newV[1] + (this.v[1] * -0.5)
+			bombs.push(b)
+		}
+	}
+	tickUpdateScreen() {
+		this.elm.setAttribute("style", `--x: ${this.pos[0]}px; --y: ${this.pos[1]}px; --size: 30px; --color: orange;`)
+	}
+}
+class Bomb3 extends Bomb {
+	hitGround() {
+		planet.explode(...this.pos, 20)
+		for (var i = 0; i < 3; i++) {
+			var b = new Bomb2(...this.pos)
+			var newV = randomCircle(2)
+			b.v[0] = newV[0] + (this.v[0] * -0.5)
+			b.v[1] = newV[1] + (this.v[1] * -0.5)
+			bombs.push(b)
+		}
+	}
+	tickUpdateScreen() {
+		this.elm.setAttribute("style", `--x: ${this.pos[0]}px; --y: ${this.pos[1]}px; --size: 30px; --color: blue;`)
+	}
+}
+class Bomb4 extends Bomb {
+	hitGround() {
+		planet.explode(...this.pos, 20)
+		for (var i = 0; i < 3; i++) {
+			var b = new Bomb3(...this.pos)
+			var newV = randomCircle(2)
+			b.v[0] = newV[0] + (this.v[0] * -0.5)
+			b.v[1] = newV[1] + (this.v[1] * -0.5)
+			bombs.push(b)
+		}
+	}
+	tickUpdateScreen() {
+		this.elm.setAttribute("style", `--x: ${this.pos[0]}px; --y: ${this.pos[1]}px; --size: 30px; --color: green;`)
+	}
+}
+class Bomb5 extends Bomb {
+	hitGround() {
+		planet.explode(...this.pos, 20)
+		for (var i = 0; i < 3; i++) {
+			var b = new Bomb4(...this.pos)
+			var newV = randomCircle(2)
+			b.v[0] = newV[0] + (this.v[0] * -0.5)
+			b.v[1] = newV[1] + (this.v[1] * -0.5)
+			bombs.push(b)
+		}
+	}
+	tickUpdateScreen() {
+		this.elm.setAttribute("style", `--x: ${this.pos[0]}px; --y: ${this.pos[1]}px; --size: 30px; --color: purple;`)
+	}
+}
+class Bomb6 extends Bomb {
+	hitGround() {
+		planet.explode(...this.pos, 20)
+		for (var i = 0; i < 3; i++) {
+			var b = new Bomb5(...this.pos)
+			var newV = randomCircle(2)
+			b.v[0] = newV[0] + (this.v[0] * -0.5)
+			b.v[1] = newV[1] + (this.v[1] * -0.5)
+			bombs.push(b)
+		}
+	}
+	tickUpdateScreen() {
+		this.elm.setAttribute("style", `--x: ${this.pos[0]}px; --y: ${this.pos[1]}px; --size: 30px; --color: magenta;`)
+	}
+}
+class PaintBall extends Bomb {
+	hitGround() {
+		var size = 250 / planetSize
+		for (var x = -size; x < size; x++) {
+			for (var y = -size; y < size; y++) {
+				var pb = 1 - (Math.dist(x, y, 0, 0) / Math.dist(size, 0, 0, 0))
+				if (Math.random() < pb) {
+					planet.erase(x + this.pos[0], y + this.pos[1]);
+				}
+			}
+		}
+	}
+	tickUpdateScreen() {
+		this.elm.setAttribute("style", `--x: ${this.pos[0]}px; --y: ${this.pos[1]}px; --size: 30px; --color: pink;`)
+	}
+}
+class EverythingBall extends Bomb {
+	hitGround() {
+		planet.explode(...this.pos, 20)
+		for (var type of [
+			Bomb,
+			Bomb2,
+			Bomb2P,
+			Bomb3,
+			Bomb4,
+			Bomb5,
+			Bomb6,
+			PaintBall
+		]) {
+			var b = new type(...this.pos)
+			var newV = randomCircle(5)
+			b.v[0] = newV[0] + (this.v[0] * -0.5)
+			b.v[1] = newV[1] + (this.v[1] * -0.5)
+			bombs.push(b)
+		}
+	}
+	tickUpdateScreen() {
+		this.elm.setAttribute("style", `--x: ${this.pos[0]}px; --y: ${this.pos[1]}px; --size: 40px; --color: linear-gradient(90deg, red, orange, yellow, green, blue, purple, pink);`)
+	}
+}
+
+var planet = new Planet()
+planet.createPlanet()
+var ticks = 0
+var bombs = []
+var planetno = 1
+var infopanel = "bomb2"
+function tick() {
+	ticks += 1
+	if (ticks % 5 == 0) show_info_screen(infopanel)
+	// if (planet.phase == 1 && ticks % 2 == 0) return id = requestAnimationFrame(tick)
+	var elms = [...document.querySelectorAll("[data-countdown]")]
+	for (var i = 0; i < elms.length; i++) {
+		var data = elms[i].dataset.countdown.split(" ")
+		data[0] = Number(data[0]) + 1;
+		data[1] = Number(data[1]);
+		if (data[0] >= data[1]) {
+			// spawnable!
+			elms[i].classList.add("active")
+			elms[i].innerHTML = `<div class="number"><span>${Math.floor(data[0] / data[1])}</span></div>`
+		} else {
+			elms[i].classList.remove("active")
+			elms[i].innerText = ""
+		}
+		elms[i].dataset.countdown = data.join(" ")
+		elms[i].setAttribute("style", elms[i].getAttribute("style").replaceAll(/\-\-pc: [\d\.]+;/ig, `--pc: ${data[0] / data[1]};`))
+		// auto
+		if (elms[i].classList.contains("active") && (elms[i].classList.contains("auto") || false)) {
+			check_btn_click({target:elms[i]})
+		}
+	}
+	for (var i = 0; i < bombs.length; i++) {
+		var b = bombs[i]
+		b.tick()
+		if (bombs.indexOf(b) == -1) i -= 1;
+	}
+	// planet
+	planet.tick()
+	// loop
+	id = requestAnimationFrame(tick)
+	return
+	if (ticks % 5 == 0) id = requestAnimationFrame(tick)
+	else tick()
+}
+var id = requestAnimationFrame(tick)
+function check_btn_click(evt) {
+	var data = evt.target.dataset.countdown.split(" ")
+	show_info_screen(data[2])
+	if (planet.phase != 0) return
+	data[0] = Number(data[0]);
+	data[1] = Number(data[1]);
+	if (data[0] >= data[1]) {
+		// spawn!
+		var bombType = {
+			"bomb2": Bomb2,
+			"bomb3": Bomb3,
+			"bomb4": Bomb4,
+			"bomb5": Bomb5,
+			"bomb6": Bomb6,
+			"bomb2P": Bomb2P,
+			"paint": PaintBall,
+			"everything": EverythingBall
+		}[data[2]]
+		Bomb.create(bombType)
+		data[0] -= data[1];
+	}
+	evt.target.dataset.countdown = data.join(" ")
+}
+function set_info_screen(type) {
+	infopanel = type
+	show_info_screen(type)
+}
+function show_info_screen(type) {
+	var q = document.querySelector(`[data-countdown$='${type}']`)
+	if (q == null) return
+	[...document.querySelectorAll("[data-countdown].selected")].forEach((e) => e.classList.remove("selected"))
+	q.classList.add("selected")
+	// Contents
+	var data = q.dataset.countdown.split(" ")
+	data[0] = Number(data[0])
+	data[1] = Number(data[1])
+	var e = document.querySelector("#infobar")
+	e.innerHTML = `<div>Planet #<b>${planetno}</b></div><div><b></b></div><div></div><div><span>Charge: </span><b></b></div><div><button onmouseup='action_use(event, 1)'>Use one</button><button onmouseup='action_use(event, 1000)'>Use all</button></div>`
+	var ballType = {
+		"bomb2": "Frag Bomb/Splits into 3 black bombs",
+		"bomb3": "Frag Bomb 2/Splits into 3 red bombs",
+		"bomb4": "Frag Bomb 3/Splits into 3 blue bombs",
+		"bomb5": "Frag Bomb 4/Splits into 3 green bombs",
+		"bomb6": "Frag Bomb 5/Splits into 3 purple bombs",
+		"bomb2P": "Big Frag Bomb/Splits into 70 black bombs",
+		"paint": "Paint Ball/Spray paint",
+		"everything": "Everything Ball/Splits into one of everything"
+	}[data[2]]
+	e.children[1].children[0].innerText = ballType.split("/")[0]
+	e.children[2].innerText = ballType.split("/")[1]
+	e.children[3].children[1].innerText = Math.floor((data[0] / data[1]) * 100) + "%"
+	e.children[4]._TargetElm = q
+}
+set_info_screen("bomb2")
+function action_use(event, no) {
+	var q = event.target.parentNode._TargetElm
+	if (planet.phase != 0) return
+	var data = q.dataset.countdown.split(" ")
+	data[0] = Number(data[0]);
+	data[1] = Number(data[1]);
+	for (var i = 0; i < no && data[0] >= data[1]; i++) {
+		// spawn!
+		var bombType = {
+			"bomb2": Bomb2,
+			"bomb3": Bomb3,
+			"bomb4": Bomb4,
+			"bomb5": Bomb5,
+			"bomb6": Bomb6,
+			"bomb2P": Bomb2P,
+			"paint": PaintBall,
+			"everything": EverythingBall
+		}[data[2]]
+		Bomb.create(bombType)
+		data[0] -= data[1];
+	}
+	q.dataset.countdown = data.join(" ")
+}
+function db(event) {
+	set_info_screen(event.currentTarget.dataset.countdown.split(" ")[2])
+}
+function cheat() {
+	for (var elm of [...document.querySelectorAll("[data-countdown]")]) {
+		if (planet.phase != 0) return
+		var data = elm.dataset.countdown.split(" ")
+		data[0] = Number(data[0]) + 10000;
+		data[1] = Number(data[1]);
+		elm.dataset.countdown = data.join(" ")
+	}
+}
+function cheatb(b) {
+	for (var elm of [...document.querySelectorAll(`[data-countdown$='${b}']`)]) {
+		if (planet.phase != 0) return
+		var data = elm.dataset.countdown.split(" ")
+		data[0] = Number(data[0]) + 10000;
+		data[1] = Number(data[1]);
+		elm.dataset.countdown = data.join(" ")
+	}
+}
+		</script>
+	</body>
+</html>

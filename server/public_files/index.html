@@ -12,7 +12,7 @@ a {
 		<h5>Running games:</h5>
 		<ul id="games"></ul>
 		<p><a href="./create">New game...</a></p>
-		<h5>Static games:</h5>
+		<h5>Single-player games:</h5>
 		<ul id="games_static"></ul>
 		<script>
 (() => {
@@ -54,7 +54,7 @@ a {
 		var t = e.target.responseText;
 		if (t.length == 0) {
 			var elm = document.createElement("li")
-			elm.innerText = "There are no static games currently in progress!"
+			elm.innerText = "There are no single-player games currently available!"
 			document.querySelector("#games_static").appendChild(elm)
 			return
 		}
@@ -62,9 +62,10 @@ a {
 		// games is: [game type name, game id]
 		for (var info of games) {
 			var elm = document.createElement("li")
-			elm.innerHTML = "<a></a>"
+			elm.innerHTML = "<a></a> (<a>How to play</a>)"
 			elm.children[0].innerText = info[0]
 			elm.children[0].setAttribute("href", "game_static/" + info[1] + "/")
+			elm.children[1].setAttribute("href", "info/" + info[1])
 			document.querySelector("#games_static").appendChild(elm)
 		}
 	})
