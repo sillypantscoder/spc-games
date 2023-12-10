@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import com.sillypantscoder.spcgames.games.ColtSuperExpress;
+import com.sillypantscoder.spcgames.games.PlanetBomber;
 import com.sillypantscoder.spcgames.games.SwapGame;
 import com.sillypantscoder.spcgames.games.TheForeheadGame;
 import com.sillypantscoder.spcgames.games.VotingGame;
@@ -23,6 +24,7 @@ public class GameHandler extends RequestHandler {
 		this.staticGames = new ArrayList<WebProcess.StaticGame>();
 		this.staticGames.add(new WebProcess.StaticGame(new TheForeheadGame()));
 		this.staticGames.add(new WebProcess.StaticGame(new SwapGame()));
+		this.staticGames.add(new WebProcess.StaticGame(new PlanetBomber()));
 	}
 	public HttpResponse get(String path) {
 		for (int i = 0; i < games.size(); i++) {
@@ -140,7 +142,8 @@ public class GameHandler extends RequestHandler {
 				new ColtSuperExpress(),
 				new VotingGame(),
 				new TheForeheadGame(),
-				new SwapGame()
+				new SwapGame(),
+				new PlanetBomber()
 			}) {
 				if (info.getID().equals(type)) {
 					return new HttpResponse()

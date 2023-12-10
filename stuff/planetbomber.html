@@ -547,7 +547,7 @@ function tick() {
 }
 var id = requestAnimationFrame(tick)
 function check_btn_click(evt) {
-	var data = evt.target.dataset.countdown.split(" ")
+	var data = evt.currentTarget.dataset.countdown.split(" ")
 	show_info_screen(data[2])
 	if (planet.phase != 0) return
 	data[0] = Number(data[0]);
