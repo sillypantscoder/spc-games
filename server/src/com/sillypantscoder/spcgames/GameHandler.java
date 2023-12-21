@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import com.sillypantscoder.spcgames.games.ColtSuperExpress;
+import com.sillypantscoder.spcgames.games.GeometryDash;
 import com.sillypantscoder.spcgames.games.PlanetBomber;
 import com.sillypantscoder.spcgames.games.SwapGame;
 import com.sillypantscoder.spcgames.games.TheForeheadGame;
@@ -25,6 +26,7 @@ public class GameHandler extends RequestHandler {
 		this.staticGames.add(new WebProcess.StaticGame(new TheForeheadGame()));
 		this.staticGames.add(new WebProcess.StaticGame(new SwapGame()));
 		this.staticGames.add(new WebProcess.StaticGame(new PlanetBomber()));
+		this.staticGames.add(new WebProcess.StaticGame(new GeometryDash()));
 	}
 	public HttpResponse get(String path) {
 		for (int i = 0; i < games.size(); i++) {
@@ -117,6 +119,7 @@ public class GameHandler extends RequestHandler {
 		} else if (path.startsWith("/game_static/")) {
 			String name = path.split("/")[2];
 			String gamePath = path.substring("/game_static/".length() + name.length());
+			System.out.println(gamePath);
 			for (int i = 0; i < staticGames.size(); i++) {
 				if (staticGames.get(i).type.getID().equals(name)) {
 					return staticGames.get(i).get(gamePath);
@@ -143,7 +146,8 @@ public class GameHandler extends RequestHandler {
 				new VotingGame(),
 				new TheForeheadGame(),
 				new SwapGame(),
-				new PlanetBomber()
+				new PlanetBomber(),
+				new GeometryDash()
 			}) {
 				if (info.getID().equals(type)) {
 					return new HttpResponse()

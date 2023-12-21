@@ -21,7 +21,7 @@ public class ColtSuperExpress extends GameType {
 		return new Subprocess(new String[] {"python3", "fakeserver.py"}, "../coltsuperexpress");
 	}
 	public String getStatus(Game game) {
-		String status_full = game.get("/status").body;
+		String status_full = game.get("/status").bodyString();
 		Matcher matcher = Pattern.compile("\"status\": \"([\\w]+)\"").matcher(status_full);
 		if (matcher.find()) {
 			String status = matcher.group(1);
@@ -35,6 +35,6 @@ public class ColtSuperExpress extends GameType {
 		}
 	}
 	public String getModStatus(Game game) {
-		return game.get("/status_mod").body;
+		return game.get("/status_mod").bodyString();
 	}
 }

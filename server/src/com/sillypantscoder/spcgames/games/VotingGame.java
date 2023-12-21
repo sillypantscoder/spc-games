@@ -18,9 +18,9 @@ public class VotingGame extends GameType {
 		return new Subprocess(new String[] {"python3", "compiler.py"}, "../votegame");
 	}
 	public String getStatus(Game game) {
-		return game.get("/status").body;
+		return game.get("/status").bodyString();
 	}
 	public String getModStatus(Game game) {
-		return game.get("/status_mod").body;
+		return game.get("/status_mod").bodyString();
 	}
 }

@@ -2,6 +2,9 @@ package com.sillypantscoder.spcgames;
 
 import com.sillypantscoder.spcgames.http.HttpResponse;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
 public class WebProcess {
 	public Subprocess process;
 	public WebProcess(Subprocess process) {
@@ -36,13 +39,17 @@ public class WebProcess {
 		String[] headerStrings = headerSection.split(",");
 		if (headerSection.length() == 0) headerStrings = new String[] {};
 		String content = process.readPacket();
+		byte[] contentR = content.getBytes(StandardCharsets.UTF_8);
+		if (content.charAt(0) == '$') {
+			contentR = Base64.getDecoder().decode(content.substring(1));
+		}
 		HttpResponse res = new HttpResponse();
 		res.setStatus(status);
 		for (String header : headerStrings) {
 			String[] parts = header.split(":");
 			res.addHeader(parts[0], parts[1]);
 		}
-		res.setBody(content);
+		res.setBody(contentR);
 		return res;
 	}
 	/**

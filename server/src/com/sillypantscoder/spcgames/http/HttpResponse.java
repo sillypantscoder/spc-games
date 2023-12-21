@@ -1,6 +1,7 @@
 package com.sillypantscoder.spcgames.http;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 import com.sun.net.httpserver.Headers;
@@ -8,12 +9,12 @@ import com.sun.net.httpserver.HttpExchange;
 
 public class HttpResponse {
 	public int status;
-	public String body;
+	public byte[] body;
 	public ArrayList<String> headerNames;
 	public ArrayList<String> headerValues;
 	public HttpResponse() {
 		status = 200;
-		body = "";
+		body = new byte[] {};
 		headerNames = new ArrayList<String>();
 		headerValues = new ArrayList<String>();
 	}
@@ -21,9 +22,16 @@ public class HttpResponse {
 		status = newStatus;
 		return this;
 	}
-	public HttpResponse setBody(String newBody) {
+	public HttpResponse setBody(byte[] newBody) {
 		body = newBody;
 		return this;
+	}
+	public HttpResponse setBody(String newBody) {
+		body = newBody.getBytes(StandardCharsets.UTF_8);
+		return this;
+	}
+	public String bodyString() {
+		return new String(body, StandardCharsets.UTF_8);
 	}
 	public HttpResponse addHeader(String name, String value) {
 		for (int i = 0; i < headerNames.size(); i++) {
@@ -44,18 +52,17 @@ public class HttpResponse {
 			h.add(headerNames.get(i), headerValues.get(i));
 		}
 		// Send headers then data
-		byte[] bytes = body.getBytes();
-		exchange.sendResponseHeaders(status, bytes.length);
-		outputStream.write(bytes);
+		exchange.sendResponseHeaders(status, body.length);
+		outputStream.write(body);
 		// Finish
 		outputStream.flush();
 		outputStream.close();
 	}
 	public void printInfo() {
-		System.out.println("[HTTP RESPONSE : " + status + "]\n(" + body.length() + ")>>>" + body + "<<<");
+		System.out.println("[HTTP RESPONSE : " + status + "]\n(" + body.length + ")>>>" + body + "<<<");
 	}
 	@Override
 	public String toString() {
-		return "[HTTP RESPONSE : " + status + "]\n(" + body.length() + ")>>>" + body + "<<<";
+		return "[HTTP RESPONSE : " + status + "]\n(" + body.length + ")>>>" + body + "<<<";
 	}
 }
