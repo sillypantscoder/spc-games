@@ -14,6 +14,6 @@ public class GeometryDash extends GameType.StaticGameType {
 		return "geometrydash";
 	}
 	public Subprocess getProcess() {
-		return new Subprocess(new String[] {"python3", "server.py"}, "../geometrydash");
+		return new Subprocess(new String[] {"python3", "fakeserver.py"}, "../geometrydash");
 	}
 }

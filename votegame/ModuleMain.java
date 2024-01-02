@@ -11,15 +11,15 @@ public class ModuleMain extends Module {
 	}
 	public void getOptions(Game game, Consumer<Option> list) {
 		// Actions
-		if (random.randint(0, 10) < 1) list.accept(Victory.create(game));
-		if (random.randint(0, 6) < 1) list.accept(AloneVictory.create(game));
-		// list.accept(SelectRule.create(game));
+		if (random.randint(0, 5) < 1) list.accept(Victory.create(game));
+		if (random.randint(0, 3) < 1) list.accept(AloneVictory.create(game));
+		list.accept(SelectRule.create(game));
 		// Rules
 		if (game.players.size() >= 3) list.accept(AcceptZeroVotes.create(game));
 	}
-	public Option.Rule[] getAllRules() {
+	public Option.Rule[] getAllRules(Game game) {
 		return new Option.Rule[] {
-			new AcceptZeroVotes(null)
+			new AcceptZeroVotes(game)
 		};
 	}
 	// === ACTIONS ===
@@ -84,9 +84,8 @@ public class ModuleMain extends Module {
 			for (int i = 0; i < activeRules.size(); i++) {
 				if (activeRules.get(i) instanceof Module mod) {
 					// For each one...
-					// System.err.println(mod.getModuleName());
 					// Get the list of rules it provides
-					Option.Rule[] newOptions = mod.getAllRules();
+					Option.Rule[] newOptions = mod.getAllRules(game);
 					// Go through the list
 					for (Option.Rule newRule : newOptions) {
 						// Don't include rules we already have
@@ -94,7 +93,6 @@ public class ModuleMain extends Module {
 							// Remember this rule
 							possibleRules.add(newRule);
 						}
-						// System.err.println(mod.getModuleName() + newRule.getName() + possibleRules.size());
 					}
 				}
 			}
@@ -106,8 +104,9 @@ public class ModuleMain extends Module {
 		}
 		public String getName() { return "Randomly add one of these two rules:\n- " + this.rule1.getName() + "\n- " + this.rule2.getName(); }
 		public String execute() {
-			// Option.Rule selected = random.choice(new Option.Rule[] { rule1, rule2 });
-			return "Not Implemented";
+			Option.Rule selected = random.choice(new Option.Rule[] { rule1, rule2 });
+			game.rules.add(selected);
+			return "Added the rule: " + selected.getName();
 		}
 	}
 	// === RULES ===

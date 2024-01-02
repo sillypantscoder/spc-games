@@ -40,7 +40,7 @@ public class WebProcess {
 		if (headerSection.length() == 0) headerStrings = new String[] {};
 		String content = process.readPacket();
 		byte[] contentR = content.getBytes(StandardCharsets.UTF_8);
-		if (content.charAt(0) == '$') {
+		if (content.length() > 0 && content.charAt(0) == '$') {
 			contentR = Base64.getDecoder().decode(content.substring(1));
 		}
 		HttpResponse res = new HttpResponse();

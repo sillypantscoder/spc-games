@@ -1,17 +1,19 @@
 import java.util.ArrayList;
 
 public class Player {
+	// basic things
 	public String name;
-	public float score;
-	public boolean hasStar;
 	public ArrayList<String> events;
 	public int vote;
+	// module info
+	public float score;
+	public boolean hasStar;
 	public Player(String name) {
 		this.name = name;
-		this.score = 0;
-		this.hasStar = false;
 		this.events = new ArrayList<String>();
 		this.vote = -1;
+		this.score = 0;
+		this.hasStar = false;
 	}
 	public void fire(String event) {
 		events.add(event);

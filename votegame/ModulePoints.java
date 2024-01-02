@@ -40,16 +40,16 @@ public class ModulePoints extends Module {
 		list.accept(RequireLowestPoints.create(game));
 		list.accept(RepeatedSingleVoteBonus.create(game));
 	}
-	public Option.Rule[] getAllRules() {
+	public Option.Rule[] getAllRules(Game game) {
 		return new Option.Rule[] {
-			new InvertPointChanges(null),
-			new MultiplyPointChanges(null),
-			new RepeatedLowestBonus(null),
-			new RepeatedHighestPenalty(null),
-			new RepeatedScoreWrap(null, 0),
-			new RequireHighestPoints(null),
-			new RequireLowestPoints(null),
-			new RepeatedSingleVoteBonus(null)
+			new InvertPointChanges(game),
+			new MultiplyPointChanges(game),
+			new RepeatedLowestBonus(game),
+			new RepeatedHighestPenalty(game),
+			new RepeatedScoreWrap(game, 16),
+			new RequireHighestPoints(game),
+			new RequireLowestPoints(game),
+			new RepeatedSingleVoteBonus(game)
 		};
 	}
 	// === ACTIONS ===

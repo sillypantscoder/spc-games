@@ -22,29 +22,32 @@ public class ModuleStars extends Module {
 		}
 	}
 	public void getOptions(Game game, Consumer<Option> list) {
-		// Actions
-		list.accept(GiveStar.create(game));
-		list.accept(GiveStar.create(game));
-		list.accept(GiveStar.create(game));
-		list.accept(TakeStar.create(game));
-		list.accept(ToggleAllStars.create(game));
-		list.accept(RandomizeAllStars.create(game));
-		// Actions with Points
-		if (game.hasRule(ModulePoints.class)) {
-			list.accept(StarToPoints.create(game));
-			list.accept(StarToPointMultiplier.create(game));
-		}
-		// Rules
-		list.accept(RequireStar.create(game));
-		// Rules with Points
-		if (game.hasRule(ModulePoints.class)) {
-			list.accept(RepeatedStarToPoints.create(game));
+		for (var i = 0; i < 3; i++) {
+			// Actions
+			list.accept(GiveStar.create(game));
+			list.accept(GiveStar.create(game));
+			list.accept(GiveStar.create(game));
+			list.accept(GiveStar.create(game));
+			list.accept(TakeStar.create(game));
+			list.accept(ToggleAllStars.create(game));
+			// Actions with Points
+			if (game.hasRule(ModulePoints.class)) {
+				list.accept(StarToPoints.create(game));
+				list.accept(StarToPointMultiplier.create(game));
+				list.accept(PrimeNumberStars.create(game));
+			}
+			// Rules
+			list.accept(RequireStar.create(game));
+			// Rules with Points
+			if (game.hasRule(ModulePoints.class)) {
+				list.accept(RepeatedStarToPoints.create(game));
+			}
 		}
 	}
-	public Option.Rule[] getAllRules() {
+	public Option.Rule[] getAllRules(Game game) {
 		return new Option.Rule[] {
-			new RepeatedStarToPoints(null),
-			new RequireStar(null)
+			new RepeatedStarToPoints(game),
+			new RequireStar(game)
 		};
 	}
 	// === ACTIONS ===
@@ -109,25 +112,6 @@ public class ModuleStars extends Module {
 			return "Inverted everybody's stars!";
 		}
 	}
-	public static class RandomizeAllStars extends Option.Action {
-		public Game game;
-		public RandomizeAllStars(Game game) {
-			this.game = game;
-		}
-		public static RandomizeAllStars create(Game game) {
-			return new RandomizeAllStars(game);
-		}
-		public String getName() {
-			return "Randomize everybody's stars!";
-		}
-		public String execute() {
-			for (int i = 0; i < game.players.size(); i++) {
-				Player p = game.players.get(i);
-				p.hasStar = random.choice(new Boolean[] { true, false });
-			}
-			return "Randomized everybody's stars!";
-		}
-	}
 	public static class StarToPoints extends Option.Action {
 		public int amount;
 		public Game game;
@@ -180,6 +164,43 @@ public class ModuleStars extends Module {
 			if (targets.size() == 0) return "Gave no one points for their stars";
 			if (targets.size() == 1) return "Gave " + targets.get(0) + " x2 points for their star";
 			return "Gave " + Utils.humanJoinList(targets) + " x2 points each for their stars";
+		}
+	}
+	public static class PrimeNumberStars extends Option.Action {
+		public Game game;
+		public PrimeNumberStars(Game game) {
+			this.game = game;
+		}
+		public static StarToPointMultiplier create(Game game) {
+			return new StarToPointMultiplier(game);
+		}
+		public String getName() {
+			return "Everyone with prime-numbered points gets a star, everyone else loses a star";
+		}
+		public String execute() {
+			ArrayList<String> targets = new ArrayList<String>();
+			for (int i = 0; i < game.players.size(); i++) {
+				Player p = game.players.get(i);
+				int a = Math.round(p.score);
+				if (a == p.score && isPrime(a)) {
+					p.hasStar = true;
+					targets.add(p.name);
+				} else {
+					p.hasStar = false;
+				}
+			}
+			if (targets.size() == 0) return "Gave no one stars for their points";
+			if (targets.size() == 1) return "Gave " + targets.get(0) + " a star for their points";
+			return "Gave " + Utils.humanJoinList(targets) + " a star each for their points";
+		}
+		public boolean isPrime(int number) {
+			for (int i = 2; i <= number / 2; ++i) {
+				// condition for nonprime number
+				if (number % i == 0) {
+					return false;
+				}
+			}
+			return true;
 		}
 	}
 	// === RULES ===
