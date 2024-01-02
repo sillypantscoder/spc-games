@@ -35,6 +35,7 @@ public class Game {
 		rules.add(new ModuleMain(this));
 		rules.add(new ModulePoints(this));
 		rules.add(new ModulePoints.RequireHighestPoints(this));
+		rules.add(new ModuleColors(this));
 		// Init
 		joinEvent = null;
 		winner = null;
@@ -83,11 +84,12 @@ public class Game {
 		JsonEncoder.Value[] datas = new JsonEncoder.Value[players.size()];
 		for (int i = 0; i < players.size(); i++) {
 			datas[i] = new JsonEncoder.ObjectValue(
-				new String[] { "name", "score", "hasStar", "hasVoted", "winner" },
+				new String[] { "name", "score", "hasStar", "color", "hasVoted", "winner" },
 				new JsonEncoder.Value[] {
 					new JsonEncoder.StringValue(players.get(i).name),
 					new JsonEncoder.IntValue(players.get(i).score),
 					new JsonEncoder.BooleanValue(players.get(i).hasStar),
+					new JsonEncoder.StringValue(players.get(i).color.name()),
 					new JsonEncoder.BooleanValue(players.get(i).vote != -1),
 					new JsonEncoder.BooleanValue(players.get(i) == winner)
 				}

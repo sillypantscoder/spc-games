@@ -1,6 +1,6 @@
 /**
  * Data about a user's status.
- * @typedef {{name: string, score: number, hasStar: boolean, hasVoted: boolean, winner: boolean}} User
+ * @typedef {{name: string, score: number, hasStar: boolean, color: string, hasVoted: boolean, winner: boolean}} User
  */
 
 var is_message_checker_broken = false
@@ -262,6 +262,19 @@ function createUserElm(prev, info) {
 			if (info[i].hasStar) e.children[1].appendChild(document.createElement("span")).innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" style="width: 1em; height: 1em;" viewBox="0 0 48 45"><path d="M 24 0 L 30 17 H 48 L 34 28 L 39 45 L 24 35 L 9 45 L 14 28 L 0 17 H 18 Z" stroke="red" fill="yellow" /></svg>`
 							else e.children[1].appendChild(document.createElement("span")).innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" style="width: 1em; height: 1em;" viewBox="0 0 48 45"><path d="M 24 0 L 30 17 H 48 L 34 28 L 39 45 L 24 35 L 9 45 L 14 28 L 0 17 H 18 Z" stroke="black" fill="none" /></svg>`
 			if (player_rules.includes("Add Points to the game")) e.children[1].children[1].setAttribute("style", `width: 1em; height: 1em; margin-left: 0.5em;`)
+		}
+		// Color code
+		if (player_rules.includes("Add Colors to the game")) {
+			var c = e.children[1].appendChild(document.createElement("span"))
+			c.innerHTML = `<div style="display: inline-block; border-radius: 1em; width: 1em; height: 1em; background: ${{
+				"Red": "red",
+				"Orange": "orange",
+				"Yellow": "yellow",
+				"Green": "lime",
+				"Blue": "#55F",
+				"Purple": "#80F"
+			}[info[i].color]}"></div>`
+			if (player_rules.includes("Add Points to the game") || player_rules.includes("Add Stars to the game")) c.setAttribute("style", `margin-left: 0.5em;`)
 		}
 		// Finish
 		t.appendChild(e)
