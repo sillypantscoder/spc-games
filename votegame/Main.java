@@ -1,29 +1,31 @@
 import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.nio.charset.StandardCharsets;
 
 public class Main {
 	public static void main(String[] args) throws IOException {
 		VoteHttpHandler handler = new VoteHttpHandler(new Game());
 		System.err.println("Fake server (voting game) started");
 		while (true) {
-			String in = "";
-			char lastChar = 0;
-			while (lastChar != '\n') {
-				lastChar = (char)(System.in.read());
-				in += lastChar;
-			}
-			String regex = "\\{\"method\":\"([A-Z]+)\",\"path\":\"([a-zA-Z0-9\\/\\?\\=%\\._!]*)\",\"body\":\"([a-zA-Z0-9\\n_ ]*)\"}\\n";
-			Matcher matcher = Pattern.compile(regex).matcher(in);
-			if (matcher.find()) {
-				String method = matcher.group(1);
-				String path = matcher.group(2);
-				String body = matcher.group(3);
-				// Use the extracted variables as needed
-				handler.handle(method, path, body);
-			} else {
-				System.err.println("=== ERROR IN === " + in);
-			}
+			// Get data from STDIN
+			String method = readPacket();
+			String path = readPacket();
+			String body = readPacket();
+			// Use the extracted variables as needed
+			handler.handle(method, path, body);
 		}
+	}
+	public static String readPacket() throws IOException {
+		String headers = "";
+		String newChar = "";
+		while (! newChar.equals(".")) {
+			headers += newChar;
+			newChar = new String(new byte[] { (byte)(System.in.read()) }, StandardCharsets.UTF_8);
+		}
+		int length = Integer.parseInt(headers);
+		String result = "";
+		for (int i = 0; i < length; i++) {
+			result += new String(new byte[] { (byte)(System.in.read()) }, StandardCharsets.UTF_8);
+		}
+		return result;
 	}
 }

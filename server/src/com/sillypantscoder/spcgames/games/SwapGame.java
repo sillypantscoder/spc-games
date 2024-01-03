@@ -16,6 +16,8 @@ public class SwapGame extends GameType.StaticGameType {
 	public Subprocess getProcess() {
 		String[] files = new String[] {
 			"{\"url\":\"/\",\"filepath\":\"stuff/swapgame/index.html\",\"type\":\"text/html\"}",
+			"{\"url\":\"/style.css\",\"filepath\":\"stuff/swapgame/style.css\",\"type\":\"text/css\"}",
+			"{\"url\":\"/script.js\",\"filepath\":\"stuff/swapgame/script.js\",\"type\":\"text/javascript\"}",
 			"{\"url\":\"/game2.xml\",\"filepath\":\"stuff/swapgame/game2.xml\",\"type\":\"image/svg+xml\"}",
 			"{\"url\":\"/confetti_mod.js\",\"filepath\":\"stuff/swapgame/confetti_mod.js\",\"type\":\"text/javascript\"}"
 		};

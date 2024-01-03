@@ -28,10 +28,13 @@ public class Subprocess {
 			return;
 		}
 	}
-	public void writeStdin(String input) {
+	public void writePacket(String input) {
 		try {
+			byte[] toSend = input.getBytes();
+			byte[] headers = (String.valueOf(toSend.length) + ".").getBytes();
 			OutputStream stream = process.getOutputStream();
-			stream.write(input.getBytes());
+			stream.write(headers);
+			stream.write(toSend);
 			stream.flush();
 		} catch (IOException e) {
 			e.printStackTrace();

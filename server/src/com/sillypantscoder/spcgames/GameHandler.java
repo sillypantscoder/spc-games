@@ -26,7 +26,7 @@ public class GameHandler extends RequestHandler {
 		this.staticGames.add(new WebProcess.StaticGame(new TheForeheadGame()));
 		this.staticGames.add(new WebProcess.StaticGame(new SwapGame()));
 		this.staticGames.add(new WebProcess.StaticGame(new PlanetBomber()));
-		// this.staticGames.add(new WebProcess.StaticGame(new GeometryDash()));
+		this.staticGames.add(new WebProcess.StaticGame(new GeometryDash()));
 	}
 	public HttpResponse get(String path) {
 		for (int i = 0; i < games.size(); i++) {

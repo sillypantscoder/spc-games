@@ -32,8 +32,10 @@ public class WebProcess {
 	 * @param message
 	 * @return
 	 */
-	public HttpResponse communicate(String message) {
-		process.writeStdin(message);
+	public HttpResponse communicate(String method, String path, String body) {
+		process.writePacket(method);
+		process.writePacket(path);
+		process.writePacket(body);
 		int status = Integer.parseInt(process.readPacket());
 		String headerSection = process.readPacket();
 		String[] headerStrings = headerSection.split(",");
@@ -58,7 +60,7 @@ public class WebProcess {
 	 * @return
 	 */
 	public HttpResponse get(String path) {
-		return communicate("{\"method\":\"GET\",\"path\":\"" + path + "\",\"body\":\"\"}\n");
+		return communicate("GET", path, "");
 	}
 	/**
 	 * Send a POST request.
@@ -67,7 +69,7 @@ public class WebProcess {
 	 * @return
 	 */
 	public HttpResponse post(String path, String body) {
-		return communicate("{\"method\":\"POST\",\"path\":\"" + path + "\",\"body\":\"" + body + "\"}\n");
+		return communicate("POST", path, body);
 	}
 	// STATIC GAMES
 	public static class StaticGame extends WebProcess {
