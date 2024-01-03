@@ -29,27 +29,29 @@ public class ModuleColors extends Module {
 			p.color = random.choice(Color.values());
 		}
 	}
-	public void getOptions(Game game, Consumer<Option> list) {
-		for (var i = 0; i < 3; i++) {
-			// Actions
-			list.accept(ChangeColor.create(game));
-			list.accept(ChangeColor.create(game));
-			list.accept(ChangeColor.create(game));
-			list.accept(ChangeColor.create(game));
-			list.accept(RandomizeAllColors.create(game));
-			list.accept(InvertAllColors.create(game));
-			// Actions with Points
-			if (game.hasRule(ModulePoints.class)) {
-				list.accept(ColorToPoints.create(game));
-				list.accept(ColorTypeToPoints.create(game));
-				list.accept(ColorTypeToPoints.create(game));
-				list.accept(ColorTypeToPoints.create(game));
-			}
-			// Rules
-			list.accept(RequireColorType.create(game));
+	public void getOptions(Consumer<Option> list) {
+		// Actions
+		list.accept(ChangeColor.create(game));
+		list.accept(ChangeColor.create(game));
+		list.accept(ChangeColor.create(game));
+		list.accept(ChangeColor.create(game));
+		list.accept(RandomizeAllColors.create(game));
+		list.accept(InvertAllColors.create(game));
+		// Actions with Points
+		if (game.hasRule(ModulePoints.class)) {
+			list.accept(ColorToPoints.create(game));
+			list.accept(ColorToPoints.create(game));
+			list.accept(ColorToPoints.create(game));
+			list.accept(ColorTypeToPoints.create(game));
+			list.accept(ColorTypeToPoints.create(game));
+			list.accept(ColorTypeToPoints.create(game));
+			list.accept(ColorTypeToPoints.create(game));
+			list.accept(ColorTypeToPoints.create(game));
 		}
+		// Rules
+		list.accept(RequireColorType.create(game));
 	}
-	public Option.Rule[] getAllRules(Game game) {
+	public Option.Rule[] getAllRules() {
 		return new Option.Rule[] {
 			new RequireColorType(game, random.choice(new Boolean[] { true, false }))
 		};

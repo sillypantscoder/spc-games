@@ -9,7 +9,7 @@ public class ModuleMain extends Module {
 	public String getModuleName() {
 		return "Basic Actions";
 	}
-	public void getOptions(Game game, Consumer<Option> list) {
+	public void getOptions(Consumer<Option> list) {
 		// Actions
 		list.accept(Victory.create(game));
 		list.accept(AloneVictory.create(game));
@@ -18,7 +18,7 @@ public class ModuleMain extends Module {
 		if (game.players.size() >= 3) list.accept(AcceptZeroVotes.create(game));
 		list.accept(RepeatedAloneVictory.create(game));
 	}
-	public Option.Rule[] getAllRules(Game game) {
+	public Option.Rule[] getAllRules() {
 		return new Option.Rule[] {
 			new AcceptZeroVotes(game)
 		};
@@ -92,7 +92,7 @@ public class ModuleMain extends Module {
 				if (activeRules.get(i) instanceof Module mod) {
 					// For each one...
 					// Get the list of rules it provides
-					Option.Rule[] newOptions = mod.getAllRules(game);
+					Option.Rule[] newOptions = mod.getAllRules();
 					// Go through the list
 					for (Option.Rule newRule : newOptions) {
 						// Don't include rules we already have

@@ -22,7 +22,7 @@ public class ModulePoints extends Module {
 			p.score = 0;
 		}
 	}
-	public void getOptions(Game game, Consumer<Option> list) {
+	public void getOptions(Consumer<Option> list) {
 		// Actions
 		list.accept(GivePoints.create(game));
 		list.accept(MultiplyPoints.create(game));
@@ -41,7 +41,7 @@ public class ModulePoints extends Module {
 		list.accept(RequireLowestPoints.create(game));
 		list.accept(RepeatedSingleVoteBonus.create(game));
 	}
-	public Option.Rule[] getAllRules(Game game) {
+	public Option.Rule[] getAllRules() {
 		return new Option.Rule[] {
 			new InvertPointChanges(game),
 			new MultiplyPointChanges(game),
@@ -179,7 +179,7 @@ public class ModulePoints extends Module {
 		public static HighestPenalty create(Game game) {
 			return new HighestPenalty(game);
 		}
-		public String getName() { return "Take 6 points from the player in first place"; }
+		public String getName() { return "Take 6 points from the player(s) in first place"; }
 		public String execute() {
 			ArrayList<Player> max = new ArrayList<Player>();
 			float m = -100;

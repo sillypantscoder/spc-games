@@ -95,7 +95,7 @@ public abstract class Option {
 		Option[] optionList = new Option[] {};
 		for (Rule rule : game.rules) {
 			if (rule instanceof Module mod) {
-				optionList = combineOptionLists(optionList, mod.getOptions(game));
+				optionList = combineOptionLists(optionList, mod.getOptions());
 			}
 		}
 		// Add in the modules

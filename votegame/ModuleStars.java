@@ -21,7 +21,7 @@ public class ModuleStars extends Module {
 			p.hasStar = false;
 		}
 	}
-	public void getOptions(Game game, Consumer<Option> list) {
+	public void getOptions(Consumer<Option> list) {
 		for (var i = 0; i < 3; i++) {
 			// Actions
 			list.accept(GiveStar.create(game));
@@ -45,7 +45,7 @@ public class ModuleStars extends Module {
 			}
 		}
 	}
-	public Option.Rule[] getAllRules(Game game) {
+	public Option.Rule[] getAllRules() {
 		return new Option.Rule[] {
 			new RepeatedStarToPoints(game),
 			new RequireStar(game)
