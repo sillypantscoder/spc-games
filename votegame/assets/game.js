@@ -155,11 +155,13 @@ function showResults(info) {
 			"zero-votes": "<div class='icon' style='background: cyan; color: black;'>&#x1F6AB; Zero votes</div>",
 			"random": "<div class='icon' style='background: purple;'>&#x2684; Randomly selected</div>",
 			"last-place-bonus": "<div class='icon' style='background: blue;'>&#x2913; Lowest score bonus</div>",
-			"first-place-penalty": "<div class='icon' style='background: red;'>&#x21A5; Highest score penalty</div>",
+			"first-place-penalty": "<div class='icon' style='background: #F55;'>&#x21A5; Highest score penalty</div>",
 			"random-penalty": "<div class='icon' style='background: bisque;'>&#x21BB; Random penalty</div>",
 			"star-to-points": "<div class='icon' style='background: orange;'>&#9734; Star to points</div>",
 			"score-wrap": "<div class='icon' style='background: teal;'><svg style='width: 1em; height: 1em;' viewBox='0 0 24 24'><path d='M 20 8 H 17.19 C 16.74 7.22 16.12 6.55 15.37 6.04 L 17 4.41 L 15.59 3 L 13.42 5.17 C 12.96 5.06 12.49 5 12 5 C 11.51 5 11.04 5.06 10.59 5.17 L 8.41 3 L 7 4.41 L 8.62 6.04 C 7.88 6.55 7.26 7.22 6.81 8 H 4 V 10 H 6.09 C 6.04 10.33 6 10.66 6 11 V 12 H 4 V 14 H 6 V 15 C 6 15.34 6.04 15.67 6.09 16 H 4 V 18 H 6.81 C 7.85 19.79 9.78 21 12 21 S 16.15 19.79 17.19 18 H 20 V 16 H 17.91 C 17.96 15.67 18 15.34 18 15 V 14 H 20 V 12 H 18 V 11 C 18 10.66 17.96 10.33 17.91 10 H 20 V 8 Z M 14 16 H 10 V 14 H 14 V 16 Z M 14 12 H 10 V 10 H 14 V 12 Z' fill='white' /></svg> Integer overflow</div>",
-			"single-vote-bonus": "<div class='icon' style='background: aqua; color: black;'>&#128579; Creativity bonus</div>"
+			"single-vote-bonus": "<div class='icon' style='background: aqua; color: black;'>&#128579; Creativity bonus</div>",
+			"color-to-points": "<div class='icon' style='background: magenta; color: black;'>&#9734; Color to points</div>",
+			"alone-victory": "<div class='icon' style='background: red; font-weight: bold;'>&#9888; Sudden Death</div>"
 		}[info.effectSources[i]];
 		c.innerHTML = effectSource + ({
 			"action": "",
@@ -206,7 +208,7 @@ function updateRules(info) {
 	for (var i = 0; i < info.length; i++) {
 		if (info[i] == "Add Basic Actions to the game") continue
 		var c = document.createElement("li")
-		c.innerText = info[i]
+		c.innerHTML = info[i]
 		ruleElm.appendChild(c)
 	}
 }
@@ -230,12 +232,16 @@ function createUserElm(prev, info) {
 	var t = document.createElement("div")
 	t.classList.add("users")
 	if (player_rules == undefined) return t
+	var hasMe = prev != null
 	for (var i = 0; i < info.length; i++) {
 		var e = document.createElement("div")
 		// Skeleton structure
 		e.innerHTML = `<div>${info[i].name}</div><div></div>`
 		// (You) marker
-		if (thisPlayerName == info[i].name) e.children[0].appendChild(document.createElement("b")).innerText = " (You)"
+		if (thisPlayerName == info[i].name) {
+			e.children[0].appendChild(document.createElement("b")).innerText = " (You)"
+			hasMe = true;
+		}
 		// Checkmark finished icon + winner icon
 		if (info[i].hasVoted) e.classList.add("finished")
 		if (info[i].winner) e.classList.add("finishicon-winner")
@@ -278,6 +284,16 @@ function createUserElm(prev, info) {
 		}
 		// Finish
 		t.appendChild(e)
+	}
+	if (!hasMe) {
+		(() => {
+			var x = new XMLHttpRequest()
+			x.open("GET", "./whoami" + location.search)
+			x.addEventListener("loadend", (e) => {
+				window.thisPlayerName = x.responseText
+			})
+			x.send()
+		})();
 	}
 	return t
 }

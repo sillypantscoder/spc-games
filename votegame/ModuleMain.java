@@ -11,11 +11,12 @@ public class ModuleMain extends Module {
 	}
 	public void getOptions(Game game, Consumer<Option> list) {
 		// Actions
-		if (random.randint(0, 5) < 1) list.accept(Victory.create(game));
-		if (random.randint(0, 3) < 1) list.accept(AloneVictory.create(game));
-		list.accept(SelectRule.create(game));
+		list.accept(Victory.create(game));
+		list.accept(AloneVictory.create(game));
+		// list.accept(SelectRule.create(game));
 		// Rules
 		if (game.players.size() >= 3) list.accept(AcceptZeroVotes.create(game));
+		list.accept(RepeatedAloneVictory.create(game));
 	}
 	public Option.Rule[] getAllRules(Game game) {
 		return new Option.Rule[] {
@@ -65,7 +66,13 @@ public class ModuleMain extends Module {
 				game.winner = target;
 				return target.name + " wins!";
 			} else if (validWinners.size() == 0) return "No one can win!";
-			else return "More than one player can win!";
+			else {
+				String r = "More than one player can win:";
+				for (Player w : validWinners) {
+					r += "<br>- " + w.name;
+				}
+				return r;
+			}
 		}
 	}
 	public static class SelectRule extends Option.Action {
@@ -123,5 +130,19 @@ public class ModuleMain extends Module {
 		}
 		public void accept() {}
 		public void repeal() {}
+	}
+	public static class RepeatedAloneVictory extends Option.Rule.RepeatRule {
+		public RepeatedAloneVictory(Game game) {
+			super(game, new AloneVictory(game));
+		}
+		public static RepeatedAloneVictory create(Game game) {
+			return new RepeatedAloneVictory(game);
+		}
+		public String getName() {
+			return "<span style='color: #200;'>At the end of every round, if there is exactly one player who can win, then they win</span>";
+		}
+		public String getSource() {
+			return "alone-victory";
+		}
 	}
 }

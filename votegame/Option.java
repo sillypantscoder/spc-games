@@ -101,8 +101,10 @@ public abstract class Option {
 		// Add in the modules
 		optionList = combineOptionLists(optionList, new Module[] {
 			new ModulePoints(game),
+			new ModulePoints(game),
 			new ModuleStars(game),
 			new ModuleStars(game),
+			new ModuleColors(game),
 			new ModuleColors(game)
 		});
 		// Choose an option

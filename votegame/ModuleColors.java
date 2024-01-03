@@ -29,17 +29,9 @@ public class ModuleColors extends Module {
 			p.color = random.choice(Color.values());
 		}
 	}
-	public void repeal() {
-		super.repeal();
-		for (int i = 0; i < game.players.size(); i++) {
-			Player p = game.players.get(i);
-			p.color = random.choice(Color.values());
-		}
-	}
 	public void getOptions(Game game, Consumer<Option> list) {
 		for (var i = 0; i < 3; i++) {
 			// Actions
-			list.accept(ChangeColor.create(game));
 			list.accept(ChangeColor.create(game));
 			list.accept(ChangeColor.create(game));
 			list.accept(ChangeColor.create(game));
@@ -49,6 +41,8 @@ public class ModuleColors extends Module {
 			// Actions with Points
 			if (game.hasRule(ModulePoints.class)) {
 				list.accept(ColorToPoints.create(game));
+				list.accept(ColorTypeToPoints.create(game));
+				list.accept(ColorTypeToPoints.create(game));
 				list.accept(ColorTypeToPoints.create(game));
 			}
 			// Rules
@@ -189,6 +183,24 @@ public class ModuleColors extends Module {
 		}
 	}
 	// === RULES ===
+	public static class RepeatedColorToPoints extends Option.Rule.RepeatRule {
+		public RepeatedColorToPoints(Game game) {
+			super(game, ColorToPoints.create(game));
+		}
+		public static RepeatedColorToPoints create(Game game) {
+			return new RepeatedColorToPoints(game);
+		}
+		public String getSource() { return "color-to-points"; }
+	}
+	public static class RepeatedColorToPoints2 extends Option.Rule.RepeatRule {
+		public RepeatedColorToPoints2(Game game) {
+			super(game, ColorToPoints.create(game));
+		}
+		public static RepeatedColorToPoints2 create(Game game) {
+			return new RepeatedColorToPoints2(game);
+		}
+		public String getSource() { return "color-to-points"; }
+	}
 	public static class RequireColorType extends Option.Rule.WinCondition {
 		public boolean type;
 		public RequireColorType(Game game, boolean type) {
@@ -201,7 +213,7 @@ public class ModuleColors extends Module {
 		}
 		public String getName() { return "Require having a " + (type ? "warm" : "cool") + " color to win"; }
 		public boolean isPlayerValid(Player target) {
-			return target.hasStar;
+			return target.color.type() == this.type;
 		}
 	}
 }

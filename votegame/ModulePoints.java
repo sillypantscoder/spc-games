@@ -13,6 +13,7 @@ public class ModulePoints extends Module {
 			Player p = game.players.get(i);
 			p.score = 0;
 		}
+		game.rules.add(RequireHighestPoints.create(game));
 	}
 	public void repeal() {
 		super.repeal();

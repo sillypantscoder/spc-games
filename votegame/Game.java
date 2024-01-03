@@ -35,7 +35,6 @@ public class Game {
 		rules.add(new ModuleMain(this));
 		rules.add(new ModulePoints(this));
 		rules.add(new ModulePoints.RequireHighestPoints(this));
-		rules.add(new ModuleColors(this));
 		// Init
 		joinEvent = null;
 		winner = null;
@@ -238,12 +237,16 @@ public class Game {
 				.setBody(this.winner != null ? "Finished" : "In progress");
 		} else if (path.equals("/status_mod")) {
 			String playerString = "";
+			if (this.winner != null) {
+				playerString += "<button onclick='var x = new XMLHttpRequest(); x.open(\"POST\", `../../game/${game_id}/continue`); x.send()'>Continue Playing</button>\n";
+			}
+			playerString += "\nPlayers:";
 			for (int i = 0; i < players.size(); i++) {
-				playerString += "\n- <button onclick='var x = new XMLHttpRequest(); x.open(\"POST\", `../../game/${game_id}/leave`); x.send(" + players.get(i).hashCode() + ")'>Remove</button> " + players.get(i).name;
+				playerString += "\n- <button onclick='var x = new XMLHttpRequest(); x.open(\"POST\", `../../game/${game_id}/leave`); x.send(" + players.get(i).hashCode() + ")'>Remove</button><button onclick='var x = new XMLHttpRequest(); x.open(\"POST\", `../../game/${game_id}/rename`); x.send(" + players.get(i).hashCode() + " + \"___separator___\" + prompt(\"Enter the new name:\"))'>Rename</button> " + players.get(i).name;
 			}
 			return new HttpResponse()
 				.addHeader("Content-Type", "text/html")
-				.setBody("\nPlayers:" + playerString);
+				.setBody(playerString);
 		} else {
 			// 404!
 			return new HttpResponse()
@@ -314,6 +317,24 @@ public class Game {
 			this.players.remove(thisPlayer);
 			// Check if everyone is ready now
 			checkForStateChange();
+			return new HttpResponse();
+		} else if (path.equals("/rename")) {
+			String[] parts = body.split("___separator___");
+			// Figure out which player is sending it
+			int hashCode = Integer.parseInt(parts[0]);
+			Player thisPlayer = findPlayer(hashCode);
+			if (thisPlayer == null) return new HttpResponse()
+				.setStatus(404)
+				.setBody("404");
+			// Rename the player
+			thisPlayer.name = parts[1];
+			return new HttpResponse();
+		} else if (path.equals("/continue")) {
+			if (winner == null) return new HttpResponse()
+				.setStatus(404)
+				.setBody("404");
+			winner = null;
+			newVote();
 			return new HttpResponse();
 		} else {
 			// 404!

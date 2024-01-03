@@ -28,6 +28,7 @@ public class ModuleStars extends Module {
 			list.accept(GiveStar.create(game));
 			list.accept(GiveStar.create(game));
 			list.accept(GiveStar.create(game));
+			list.accept(GiveStar.create(game));
 			list.accept(TakeStar.create(game));
 			list.accept(ToggleAllStars.create(game));
 			// Actions with Points
