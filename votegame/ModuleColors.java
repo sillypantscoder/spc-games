@@ -28,6 +28,7 @@ public class ModuleColors extends Module {
 			Player p = game.players.get(i);
 			p.color = random.choice(Color.values());
 		}
+		game.rules.add(RequireColor.create(game));
 	}
 	public void getOptions(Consumer<Option> list) {
 		// Actions
@@ -49,6 +50,9 @@ public class ModuleColors extends Module {
 			list.accept(ColorTypeToPoints.create(game));
 		}
 		// Rules
+		list.accept(RepeatedColorToPoints.create(game));
+		list.accept(RepeatedColorToPoints2.create(game));
+		list.accept(RequireColor.create(game));
 		list.accept(RequireColorType.create(game));
 	}
 	public Option.Rule[] getAllRules() {
@@ -202,6 +206,21 @@ public class ModuleColors extends Module {
 			return new RepeatedColorToPoints2(game);
 		}
 		public String getSource() { return "color-to-points"; }
+	}
+	public static class RequireColor extends Option.Rule.WinCondition {
+		public Color type;
+		public RequireColor(Game game, Color type) {
+			super(game);
+			this.type = type;
+		}
+		public static RequireColor create(Game game) {
+			Color type = random.choice(Color.values());
+			return new RequireColor(game, type);
+		}
+		public String getName() { return "Require having a " + type.name() + " color to win"; }
+		public boolean isPlayerValid(Player target) {
+			return target.color == this.type;
+		}
 	}
 	public static class RequireColorType extends Option.Rule.WinCondition {
 		public boolean type;

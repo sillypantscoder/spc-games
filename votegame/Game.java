@@ -243,6 +243,26 @@ public class Game {
 			playerString += "\nPlayers:";
 			for (int i = 0; i < players.size(); i++) {
 				playerString += "\n- <button onclick='var x = new XMLHttpRequest(); x.open(\"POST\", `../../game/${game_id}/leave`); x.send(" + players.get(i).hashCode() + ")'>Remove</button><button onclick='var x = new XMLHttpRequest(); x.open(\"POST\", `../../game/${game_id}/rename`); x.send(" + players.get(i).hashCode() + " + \"___separator___\" + prompt(\"Enter the new name:\"))'>Rename</button> " + players.get(i).name;
+				if (this.voteFinished) {
+					if (this.players.get(i).vote == -1) {
+						playerString += " <button onclick='var x = new XMLHttpRequest(); x.open(\"POST\", `../../game/${game_id}/sendmessage`); x.send(\"" + players.get(i).hashCode() + "MESSAGESEPARATORr\")'>Ready</button>";
+					}
+				} else {
+					if (this.players.get(i).vote == -1) {
+						playerString += " ";
+						for (int o = 0; o < options.length; o++) {
+							playerString += "<button onclick='var x = new XMLHttpRequest(); x.open(\"POST\", `../../game/${game_id}/sendmessage`); x.send(\"" + players.get(i).hashCode() + "MESSAGESEPARATORv" + o + "\")'>Vote " + o + "</button>";
+						}
+					} else {
+						playerString += " v:" + this.players.get(i).vote;
+					}
+				}
+			}
+			if (! this.voteFinished) {
+				playerString += "\n\nVoting:";
+				for (int o = 0; o < options.length; o++) {
+					playerString += "\n" + o + " - " + options[o].getName();
+				}
 			}
 			return new HttpResponse()
 				.addHeader("Content-Type", "text/html")
@@ -433,13 +453,13 @@ public class Game {
 				effects.add(actionItem.execute());
 			} else if (item instanceof Option.Rule ruleItem) {
 				if (rules.contains(ruleItem)) {
-					ruleItem.repeal();
 					rules.remove(ruleItem);
+					ruleItem.repeal();
 					if (item instanceof Module) effectTypes.add("module-remove");
 					else effectTypes.add("rule-repeal");
 				} else {
-					ruleItem.accept();
 					rules.add(ruleItem);
+					ruleItem.accept();
 					if (item instanceof Module) effectTypes.add("module-add");
 					else effectTypes.add("rule-accept");
 				}

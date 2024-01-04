@@ -168,6 +168,14 @@ public class GameHandler extends RequestHandler {
 					return games.get(i).post(gamePath, body);
 				}
 			}
+		} else if (path.startsWith("/game_static/")) {
+			String name = path.split("/")[2];
+			String gamePath = path.substring("/game_static/".length() + name.length());
+			for (int i = 0; i < staticGames.size(); i++) {
+				if (staticGames.get(i).type.getID().equals(name)) {
+					return staticGames.get(i).post(gamePath, body);
+				}
+			}
 		} else if (path.equals("/mark_delete")) {
 			for (int i = 0; i < games.size(); i++) {
 				Game game = games.get(i);

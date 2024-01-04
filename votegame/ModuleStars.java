@@ -13,6 +13,7 @@ public class ModuleStars extends Module {
 			Player p = game.players.get(i);
 			p.hasStar = false;
 		}
+		game.rules.add(RequireStar.create(game));
 	}
 	public void repeal() {
 		super.repeal();

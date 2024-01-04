@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 public class ModuleMain extends Module {
@@ -55,24 +56,26 @@ public class ModuleMain extends Module {
 		}
 		public String getName() { return "If there is exactly one player who can win, they win"; }
 		public String execute() {
+			AtomicReference<String> results = new AtomicReference<String>("");
 			ArrayList<Player> validWinners = new ArrayList<Player>();
 			for (Player target : game.players) {
-				if (game.findWinInvalidations(target).isEmpty()) {
+				Optional<Option.Rule.WinCondition> inv = game.findWinInvalidations(target);
+				inv.ifPresentOrElse((w) -> {
+					// Not a valid winner
+					results.set(results.get() + "- " + target.name + " cannot win because: " + w.getName() + "<br>");
+				}, () -> {
+					// Valid winner
 					validWinners.add(target);
-				}
+					results.set(results.get() + "- " + target.name + " can win!<br>");
+				});
 			}
 			if (validWinners.size() == 1) {
 				Player target = validWinners.get(0);
 				game.winner = target;
-				return target.name + " wins!";
-			} else if (validWinners.size() == 0) return "No one can win!";
-			else {
-				String r = "More than one player can win:";
-				for (Player w : validWinners) {
-					r += "<br>- " + w.name;
-				}
-				return r;
-			}
+				results.set(results.get() + target.name + " wins!");
+			} else if (validWinners.size() == 0) results.set(results.get() + "No one can win!");
+			else results.set(results.get() + "More than one player can win!");
+			return results.get();
 		}
 	}
 	public static class SelectRule extends Option.Action {
