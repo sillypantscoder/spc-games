@@ -21,6 +21,6 @@ public class SwapGame extends GameType.StaticGameType {
 			"{\"url\":\"/game2.xml\",\"filepath\":\"stuff/swapgame/game2.xml\",\"type\":\"image/svg+xml\"}",
 			"{\"url\":\"/confetti_mod.js\",\"filepath\":\"stuff/swapgame/confetti_mod.js\",\"type\":\"text/javascript\"}"
 		};
-		return new Subprocess(new String[] {"python3", "fileserver.py", "{\"name\":\"swapgame\",\"files\":[" + String.join(",", files) + "]}"}, "..");
+		return new Subprocess(new String[] {"python3", "fileserver.py", "{\"name\":\"swapgame\",\"files\":[" + String.join(",", files) + "],\"folders\":[]}"}, "..");
 	}
 }

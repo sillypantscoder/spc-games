@@ -63,6 +63,23 @@ def get(path: str, query: URLQuery) -> HttpResponse:
 				},
 				"content": file
 			}
+	for entry in server_data["folders"]:
+		if path.startswith(entry["url"]):
+			# Folder path MUST end with a slash.
+			realpath = entry["filepath"] + path[len(entry["url"]):]
+			if os.path.exists(realpath):
+				file = read_file(realpath)
+				return {
+					"status": 200,
+					"headers": {
+						"Content-Type": {
+							"html": "text/html",
+							"json": "application/json",
+							"js": "text/javascript"
+						}[path.split(".")[-1]]
+					},
+					"content": file
+				}
 	print(f"{server_data['name']} - 404 GET {path}", file=sys.stderr)
 	return {
 		"status": 404,

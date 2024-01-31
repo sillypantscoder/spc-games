@@ -356,7 +356,7 @@ class Bomb {
 		var data = e.dataset.countdown.split(" ")
 		data[0] = Number(data[0]);
 		data[1] = Number(data[1]);
-		data[0] += (type=="bomb" ? 0.1 : 0.5) * data[1];
+		data[0] += 0.8 * data[1];
 		e.dataset.countdown = data.join(" ")
 	}
 	static createPos() {

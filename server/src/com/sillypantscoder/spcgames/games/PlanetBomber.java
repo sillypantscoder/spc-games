@@ -17,6 +17,6 @@ public class PlanetBomber extends GameType.StaticGameType {
 		String[] files = new String[] {
 			"{\"url\":\"/\",\"filepath\":\"stuff/planetbomber.html\",\"type\":\"text/html\"}"
 		};
-		return new Subprocess(new String[] {"python3", "fileserver.py", "{\"name\":\"planetbomber\",\"files\":[" + String.join(",", files) + "]}"}, "..");
+		return new Subprocess(new String[] {"python3", "fileserver.py", "{\"name\":\"planetbomber\",\"files\":[" + String.join(",", files) + "],\"folders\":[]}"}, "..");
 	}
 }
