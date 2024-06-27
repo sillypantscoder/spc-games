@@ -140,6 +140,19 @@ public class GameHandler extends RequestHandler {
 					return new HttpResponse().setStatus(200).addHeader("Content-Type", "text/plain").setBody(newGame.id);
 				}
 			}
+		} else if (path.startsWith("/info/active/")) {
+			String type = path.split("/")[3];
+			for (GameType info : new GameType[] {
+				new ColtSuperExpress(),
+				new VotingGame()
+			}) {
+				if (info.getID().equals(type)) {
+					return new HttpResponse()
+						.setStatus(200)
+						.addHeader("Content-Type", "text/html")
+						.setBody("<!DOCTYPE html><html><head><style>a{color:rgb(0,0,200);}</style></head><body><a href=\"/\">Back Home</a><h3>" + info.getName() + "</h3><p>" + info.getDescription().replaceAll("<", "&lt;").replaceAll("\n", "</p><p>") + "</p></body></html>");
+				}
+			}
 		} else if (path.startsWith("/info/")) {
 			String type = path.split("/")[2];
 			for (WebProcess.StaticGame game : staticGames) {
