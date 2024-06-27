@@ -466,7 +466,11 @@ public class Game {
 					if (item instanceof Module moduleItem) {
 						ArrayList<String> removed = moduleItem.repealAndGetRemovedRules();
 						effectTypes.add("module-remove");
-						effects.add(ruleItem.getName() + String.join("", removed));
+						if (removed.size() > 0) {
+							effects.add(ruleItem.getName() + "<br>Removed rules:<ul>" + String.join("", removed) + "</ul>");
+						} else {
+							effects.add(ruleItem.getName());
+						}
 					} else {
 						ruleItem.repeal();
 						effectTypes.add("rule-repeal");

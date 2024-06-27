@@ -254,7 +254,7 @@ public class ModulePoints extends Module {
 		}
 		public String getName() { return "If there is exactly one player who has at least 25 points then they win"; }
 		public String execute() {
-			AtomicReference<String> results = new AtomicReference<String>("");
+			AtomicReference<String> results = new AtomicReference<String>("<span style='opacity: 0.2; font-style: italic;'>");
 			ArrayList<Player> validWinners = new ArrayList<Player>();
 			for (Player target : game.players) {
 				if (target.score < 25) {
@@ -272,6 +272,7 @@ public class ModulePoints extends Module {
 					});
 				}
 			}
+			results.set(results.get() + "</span>");
 			if (validWinners.size() == 1) {
 				Player target = validWinners.get(0);
 				game.winner = target;

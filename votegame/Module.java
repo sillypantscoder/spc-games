@@ -27,7 +27,7 @@ public abstract class Module extends Option.Rule {
 		for (int i = 0; i < game.rules.size(); i++) {
 			for (int a = 0; a < rules.length; a++) {
 				if (game.rules.get(i).getClass().equals(rules[a].getClass())) {
-					removed.add("<br>Removed rule: " + game.rules.get(i).getName());
+					removed.add("<li>" + game.rules.get(i).getName() + "</li>");
 					game.rules.get(i).repeal();
 					game.rules.remove(i);
 					i -= 1;
@@ -35,7 +35,6 @@ public abstract class Module extends Option.Rule {
 				}
 			}
 		}
-		if (removed.size() == 0) removed.add("<br>(No rules were removed)");
 		return removed;
 	}
 	public Option[] getOptions() {

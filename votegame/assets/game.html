@@ -97,13 +97,15 @@ button {
 	padding-left: 0;
 	flex-wrap: wrap;
 }
-.users > div {
+.users > div:not(.spacer) {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	border-right: 1px solid black;
 	position: relative;
 	padding: 0 1em;
+}
+.users > div.spacer {
+	border-right: 1px solid black;
 }
 .users > div > div + div {
 	flex-grow: 1;

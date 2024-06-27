@@ -1,6 +1,6 @@
 /**
  * Data about a user's status.
- * @typedef {{name: string, score: number, hasStar: boolean, color: string, hasVoted: boolean, winner: boolean}} User
+ * @typedef {{name: string, score: number, hasStar: boolean, color: "Red" | "Orange" | "Yellow" | "Green" | "Blue" | "Purple", hasVoted: boolean, winner: boolean}} User
  */
 
 var is_message_checker_broken = false
@@ -237,6 +237,7 @@ function createUserElm(prev, info) {
 	var hasMe = prev != null
 	for (var i = 0; i < info.length; i++) {
 		var e = document.createElement("div")
+		var changes = false
 		// Skeleton structure
 		e.innerHTML = `<div>${info[i].name}</div><div></div>`
 		// (You) marker
@@ -263,6 +264,7 @@ function createUserElm(prev, info) {
 					x.setAttribute("style", "color: red;")
 				}
 				e.appendChild(x)
+				changes = true
 			}
 		}
 		// Star code
@@ -270,6 +272,7 @@ function createUserElm(prev, info) {
 			if (info[i].hasStar) e.children[1].appendChild(document.createElement("span")).innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" style="width: 1em; height: 1em;" viewBox="0 0 48 45"><path d="M 24 0 L 30 17 H 48 L 34 28 L 39 45 L 24 35 L 9 45 L 14 28 L 0 17 H 18 Z" stroke="red" fill="yellow" /></svg>`
 							else e.children[1].appendChild(document.createElement("span")).innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" style="width: 1em; height: 1em;" viewBox="0 0 48 45"><path d="M 24 0 L 30 17 H 48 L 34 28 L 39 45 L 24 35 L 9 45 L 14 28 L 0 17 H 18 Z" stroke="black" fill="none" /></svg>`
 			if (player_rules.includes("Add Points to the game")) e.children[1].children[1].setAttribute("style", `width: 1em; height: 1em; margin-left: 0.5em;`)
+			if (prev != null && info[i].hasStar != prev[i].hasStar) changes = true
 		}
 		// Color code
 		if (player_rules.includes("Add Colors to the game")) {
@@ -283,9 +286,13 @@ function createUserElm(prev, info) {
 				"Purple": "#80F"
 			}[info[i].color]}"></div>`
 			if (player_rules.includes("Add Points to the game") || player_rules.includes("Add Stars to the game")) c.setAttribute("style", `margin-left: 0.5em;`)
+			if (prev != null && info[i].color != prev[i].color) changes = true
 		}
 		// Finish
+		var important = prev == null || changes
+		if (!important) e.setAttribute("style", "opacity: 0.2;")
 		t.appendChild(e)
+		t.appendChild(document.createElement("div")).classList.add("spacer")
 	}
 	if (!hasMe) {
 		(() => {
