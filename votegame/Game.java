@@ -166,11 +166,21 @@ public class Game {
 				.addHeader("Content-Type", "text/html")
 				.setBody(Utils.readFile("assets/login.html"));
 		} else if (path.startsWith("/createuser")) {
-			// Create a new player
+			// Find the player's name
 			String name = Utils.decodeURIComponent(path.substring("/createuser?name=".length()));
 			if (name.length() >= 20) return new HttpResponse()
 				.addHeader("Content-Type", "text/html")
 				.setBody("<body><h3>Nice try!!!</h3><a href='/'>Back Home</a></body>");
+			// Check if the player already exists
+			for (int i = 0; i < this.players.size(); i++) {
+				if (this.players.get(i).name.equals(name)) {
+					System.err.println("[voting-game] Re-login old player - " + name);
+					return new HttpResponse()
+						.addHeader("Content-Type", "text/html")
+						.setBody("<script>location.replace('./game?user=" + this.players.get(i).hashCode() + "')</script>");
+				}
+			}
+			// Create a new player
 			Player newPlayer = new Player(name);
 			players.add(newPlayer);
 			System.err.println("[voting-game] Added new player - " + name);
