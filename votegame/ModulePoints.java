@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 public class ModulePoints extends Module {
@@ -13,7 +15,7 @@ public class ModulePoints extends Module {
 			Player p = game.players.get(i);
 			p.score = 0;
 		}
-		game.rules.add(RequireHighestPoints.create(game));
+		game.rules.add(WinOver25.create(game));
 	}
 	public void repeal() {
 		super.repeal();
@@ -24,7 +26,8 @@ public class ModulePoints extends Module {
 	}
 	public void getOptions(Consumer<Option> list) {
 		// Actions
-		list.accept(GivePoints.create(game));
+		for (int i = game.roundNumber; i < 50; i += 2) list.accept(GivePoints.create(game));
+		for (int i = 0; i < 7; i++) list.accept(GivePoints.create(game));
 		list.accept(MultiplyPoints.create(game));
 		list.accept(MovePoints.create(game));
 		list.accept(InvertAllScores.create(game));
@@ -32,6 +35,7 @@ public class ModulePoints extends Module {
 		list.accept(HighestPenalty.create(game));
 		list.accept(SingleVoteBonus.create(game));
 		// Rules
+		list.accept(WinOver25.create(game));
 		list.accept(InvertPointChanges.create(game));
 		list.accept(MultiplyPointChanges.create(game));
 		list.accept(RepeatedLowestBonus.create(game));
@@ -39,10 +43,12 @@ public class ModulePoints extends Module {
 		list.accept(RepeatedScoreWrap.create(game));
 		list.accept(RequireHighestPoints.create(game));
 		list.accept(RequireLowestPoints.create(game));
+		list.accept(RequireLowestPoints.create(game));
 		list.accept(RepeatedSingleVoteBonus.create(game));
 	}
 	public Option.Rule[] getAllRules() {
 		return new Option.Rule[] {
+			new WinOver25(game),
 			new InvertPointChanges(game),
 			new MultiplyPointChanges(game),
 			new RepeatedLowestBonus(game),
@@ -50,7 +56,10 @@ public class ModulePoints extends Module {
 			new RepeatedScoreWrap(game, 16),
 			new RequireHighestPoints(game),
 			new RequireLowestPoints(game),
-			new RepeatedSingleVoteBonus(game)
+			new RepeatedSingleVoteBonus(game),
+			// Colors
+			new ModuleColors.RepeatedColorToPoints(game),
+			new ModuleColors.RepeatedColorToPoints2(game)
 		};
 	}
 	// === ACTIONS ===
@@ -235,7 +244,58 @@ public class ModulePoints extends Module {
 			else return Utils.humanJoinList(results) + " got " + realAmt + " points each for creativity";
 		}
 	}
+	public static class AloneOver25Victory extends Option.Action {
+		public Game game;
+		public AloneOver25Victory(Game game) {
+			this.game = game;
+		}
+		public static AloneOver25Victory create(Game game) {
+			return new AloneOver25Victory(game);
+		}
+		public String getName() { return "If there is exactly one player who has at least 25 points then they win"; }
+		public String execute() {
+			AtomicReference<String> results = new AtomicReference<String>("");
+			ArrayList<Player> validWinners = new ArrayList<Player>();
+			for (Player target : game.players) {
+				if (target.score < 25) {
+					// Not a valid winner
+					results.set(results.get() + "- " + target.name + " cannot win because they have less than 25 points<br>");
+				} else {
+					Optional<Option.Rule.WinCondition> inv = game.findWinInvalidations(target);
+					inv.ifPresentOrElse((w) -> {
+						// Not a valid winner
+						results.set(results.get() + "- " + target.name + " cannot win because: " + w.getName() + "<br>");
+					}, () -> {
+						// Valid winner
+						validWinners.add(target);
+						results.set(results.get() + "- " + target.name + " can win!<br>");
+					});
+				}
+			}
+			if (validWinners.size() == 1) {
+				Player target = validWinners.get(0);
+				game.winner = target;
+				results.set(results.get() + target.name + " wins!");
+			} else if (validWinners.size() == 0) results.set(results.get() + "No one can win!");
+			else results.set(results.get() + "More than one player can win!");
+			return results.get();
+		}
+	}
 	// === RULES ===
+	public static class WinOver25 extends Option.Rule.RepeatRule {
+		public WinOver25(Game game) {
+			super(game, AloneOver25Victory.create(game));
+		}
+		public static WinOver25 create(Game game) {
+			return new WinOver25(game);
+		}
+		public String getSource() {
+			return "over-25";
+		}
+		public String getName() {
+			return "You win if you are the only player over 25 points";
+		}
+	}
 	public static class InvertPointChanges extends Option.Rule {
 		public Game target;
 		public InvertPointChanges(Game game) {

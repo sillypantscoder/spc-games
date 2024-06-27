@@ -16,6 +16,7 @@ var is_message_checker_broken = false
 				switch (info.type) {
 					case "votingscreen":
 						showVotingScreen(info.voteinfo)
+						scrollTo({ top: 0, left: 0, behavior: "smooth"})
 						break;
 					case "playerupdate":
 						updateUsers(info.users)
@@ -23,6 +24,7 @@ var is_message_checker_broken = false
 					case "votingfinished":
 						showResults(info.info)
 						updateUsers(info.users)
+						scrollTo({ top: 0, left: 0, behavior: "smooth"})
 				}
 			}
 			if (! is_message_checker_broken) setTimeout(messageChecker, 400)
@@ -149,7 +151,6 @@ function showResults(info) {
 		infoElm.appendChild(createUserElm(i != 0 ? info.playerDatas[i - 1] : null, info.playerDatas[i]))
 		var c = document.createElement("div")
 		c.setAttribute("class", "effect")
-		// @ts-ignore
 		var effectSource = {
 			"voted-for": "<div class='icon' style='background: darkgreen;'>&#x2714; Voted for</div>",
 			"zero-votes": "<div class='icon' style='background: cyan; color: black;'>&#x1F6AB; Zero votes</div>",
@@ -161,7 +162,8 @@ function showResults(info) {
 			"score-wrap": "<div class='icon' style='background: teal;'><svg style='width: 1em; height: 1em;' viewBox='0 0 24 24'><path d='M 20 8 H 17.19 C 16.74 7.22 16.12 6.55 15.37 6.04 L 17 4.41 L 15.59 3 L 13.42 5.17 C 12.96 5.06 12.49 5 12 5 C 11.51 5 11.04 5.06 10.59 5.17 L 8.41 3 L 7 4.41 L 8.62 6.04 C 7.88 6.55 7.26 7.22 6.81 8 H 4 V 10 H 6.09 C 6.04 10.33 6 10.66 6 11 V 12 H 4 V 14 H 6 V 15 C 6 15.34 6.04 15.67 6.09 16 H 4 V 18 H 6.81 C 7.85 19.79 9.78 21 12 21 S 16.15 19.79 17.19 18 H 20 V 16 H 17.91 C 17.96 15.67 18 15.34 18 15 V 14 H 20 V 12 H 18 V 11 C 18 10.66 17.96 10.33 17.91 10 H 20 V 8 Z M 14 16 H 10 V 14 H 14 V 16 Z M 14 12 H 10 V 10 H 14 V 12 Z' fill='white' /></svg> Integer overflow</div>",
 			"single-vote-bonus": "<div class='icon' style='background: aqua; color: black;'>&#128579; Creativity bonus</div>",
 			"color-to-points": "<div class='icon' style='background: magenta; color: black;'>&#9734; Color to points</div>",
-			"alone-victory": "<div class='icon' style='background: red; font-weight: bold;'>&#9888; Sudden Death</div>"
+			"alone-victory": "<div class='icon' style='background: red; font-weight: bold;'>&#9888; Sudden Death</div>",
+			"over-25": "<div class='icon' style='background: yellow; color: black;'>&#127919; Objective</div>"
 		}[info.effectSources[i]];
 		c.innerHTML = effectSource + ({
 			"action": "",

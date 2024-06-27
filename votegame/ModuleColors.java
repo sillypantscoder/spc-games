@@ -28,7 +28,6 @@ public class ModuleColors extends Module {
 			Player p = game.players.get(i);
 			p.color = random.choice(Color.values());
 		}
-		game.rules.add(RequireColor.create(game));
 	}
 	public void getOptions(Consumer<Option> list) {
 		// Actions
@@ -57,6 +56,9 @@ public class ModuleColors extends Module {
 	}
 	public Option.Rule[] getAllRules() {
 		return new Option.Rule[] {
+			new RepeatedColorToPoints(game),
+			new RepeatedColorToPoints2(game),
+			new RequireColor(game, Color.Red),
 			new RequireColorType(game, random.choice(new Boolean[] { true, false }))
 		};
 	}

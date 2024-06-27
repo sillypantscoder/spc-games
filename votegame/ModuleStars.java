@@ -23,14 +23,9 @@ public class ModuleStars extends Module {
 		}
 	}
 	public void getOptions(Consumer<Option> list) {
-		for (var i = 0; i < 3; i++) {
+		for (int i = 0; i < 3; i++) {
 			// Actions
-			list.accept(GiveStar.create(game));
-			list.accept(GiveStar.create(game));
-			list.accept(GiveStar.create(game));
-			list.accept(GiveStar.create(game));
-			list.accept(GiveStar.create(game));
-			list.accept(TakeStar.create(game));
+			for (int n = 0; n < 9; n++) list.accept(GiveStar.create(game));
 			list.accept(ToggleAllStars.create(game));
 			// Actions with Points
 			if (game.hasRule(ModulePoints.class)) {

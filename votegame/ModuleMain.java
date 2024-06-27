@@ -12,12 +12,18 @@ public class ModuleMain extends Module {
 	}
 	public void getOptions(Consumer<Option> list) {
 		// Actions
-		list.accept(Victory.create(game));
+		for (int i = 15; i < game.roundNumber; i++) list.accept(Victory.create(game));
 		list.accept(AloneVictory.create(game));
+		list.accept(AloneVictory.create(game));
+		for (int i = 10; i < game.roundNumber; i += 2) {
+			list.accept(AloneVictory.create(game));
+		}
 		// list.accept(SelectRule.create(game));
 		// Rules
 		if (game.players.size() >= 3) list.accept(AcceptZeroVotes.create(game));
 		list.accept(RepeatedAloneVictory.create(game));
+		if (game.roundNumber >= 10) list.accept(RepeatedAloneVictory.create(game));
+		for (int i = 15; i < game.roundNumber; i++) list.accept(RepeatedAloneVictory.create(game));
 	}
 	public Option.Rule[] getAllRules() {
 		return new Option.Rule[] {

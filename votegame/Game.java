@@ -26,6 +26,10 @@ public class Game {
 	 * The current winner of the game. May be null.
 	 */
 	public Player winner;
+	/**
+	 * The current round number.
+	 */
+	public int roundNumber;
 	public Game() {
 		players = new ArrayList<Player>();
 		options = new Option[] {};
@@ -34,10 +38,11 @@ public class Game {
 		// The three basic rules:
 		rules.add(new ModuleMain(this));
 		rules.add(new ModulePoints(this));
-		rules.add(new ModulePoints.RequireHighestPoints(this));
+		rules.add(new ModulePoints.WinOver25(this));
 		// Init
 		joinEvent = null;
 		winner = null;
+		roundNumber = 0;
 	}
 	/**
 	 * Find a player based on a hash code.
@@ -56,23 +61,26 @@ public class Game {
 	 * Create the options to be voted on this round.
 	 */
 	public void createOptions() {
-		int n = random.choice(new Integer[] { 2, 3, 4, 5 });
-		ArrayList<Option> oa = new ArrayList<Option>();
-		for (int i = 0; i < n; i++) {
-			Option r = Option.create(this);
+		int numberOfOptions = random.choice(new Integer[] { 2, 3, 4, 5 });
+		ArrayList<Option> selectedOptions = new ArrayList<Option>();
+		for (int i = 0; i < numberOfOptions; i++) {
+			Option option = Option.create(this);
 			// not null
-			if (r == null) continue;
-			// names are different
-			boolean hn = false;
-			for (int x = 0; x < oa.size(); x++) {
-				if (oa.get(x).getName().equals(r.getName())) hn = true;
+			if (option == null) continue;
+			if (option instanceof Option.Rule.RepeatRule rrule) {
+				if (rrule.action == null) continue;
 			}
-			if (hn) continue;
+			// names are different
+			boolean isDuplicate = false;
+			for (int x = 0; x < selectedOptions.size(); x++) {
+				if (selectedOptions.get(x).getName().equals(option.getName())) isDuplicate = true;
+			}
+			if (isDuplicate) continue;
 			// finish
-			oa.add(r);
+			selectedOptions.add(option);
 		}
-		options = new Option[oa.size()];
-		for (int i = 0; i < options.length; i++) options[i] = oa.get(i);
+		options = new Option[selectedOptions.size()];
+		for (int i = 0; i < options.length; i++) options[i] = selectedOptions.get(i);
 		if (options.length == 1) createOptions();
 	}
 	/**
@@ -380,6 +388,7 @@ public class Game {
 	 */
 	public void newVote() {
 		voteFinished = false;
+		roundNumber += 1;
 		createOptions();
 		for (int i = 0; i < players.size(); i++) {
 			players.get(i).vote = -1;
@@ -454,16 +463,22 @@ public class Game {
 			} else if (item instanceof Option.Rule ruleItem) {
 				if (rules.contains(ruleItem)) {
 					rules.remove(ruleItem);
-					ruleItem.repeal();
-					if (item instanceof Module) effectTypes.add("module-remove");
-					else effectTypes.add("rule-repeal");
+					if (item instanceof Module moduleItem) {
+						ArrayList<String> removed = moduleItem.repealAndGetRemovedRules();
+						effectTypes.add("module-remove");
+						effects.add(ruleItem.getName() + String.join("", removed));
+					} else {
+						ruleItem.repeal();
+						effectTypes.add("rule-repeal");
+						effects.add(ruleItem.getName());
+					}
 				} else {
 					rules.add(ruleItem);
 					ruleItem.accept();
 					if (item instanceof Module) effectTypes.add("module-add");
 					else effectTypes.add("rule-accept");
+					effects.add(ruleItem.getName());
 				}
-				effects.add(ruleItem.getName());
 			}
 			playerDatas.add(getPlayerData());
 			rulesets.add(JsonEncoder.stringList(rules));
