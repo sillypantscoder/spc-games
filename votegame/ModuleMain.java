@@ -154,5 +154,8 @@ public class ModuleMain extends Module {
 		public String getSource() {
 			return "alone-victory";
 		}
+		public boolean isDelayed() {
+			return true;
+		}
 	}
 }

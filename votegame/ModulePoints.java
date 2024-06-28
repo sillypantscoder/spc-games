@@ -296,6 +296,9 @@ public class ModulePoints extends Module {
 		public String getName() {
 			return "You win if you are the only player over 35 points";
 		}
+		public boolean isDelayed() {
+			return true;
+		}
 	}
 	public static class InvertPointChanges extends Option.Rule {
 		public Game target;

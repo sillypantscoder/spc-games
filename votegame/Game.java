@@ -526,11 +526,31 @@ public class Game {
 			}
 			// Execute the repeat rule
 			if (rules.get(i) instanceof Option.Rule.RepeatRule r) {
-				effects.add(r.action.execute());
-				effectSources.add(r.getSource());
-				effectTypes.add("action");
-				playerDatas.add(getPlayerData());
-				rulesets.add(JsonEncoder.stringList(rules));
+				if (! r.isDelayed()) {
+					effects.add(r.action.execute());
+					effectSources.add(r.getSource());
+					effectTypes.add("action");
+					playerDatas.add(getPlayerData());
+					rulesets.add(JsonEncoder.stringList(rules));
+				}
+			}
+		}
+		// Later repeat rules
+		for (int i = 0; i < rules.size(); i++) {
+			// Check if anyone won
+			if (winner != null) {
+				// Aaaaaaa!
+				break;
+			}
+			// Execute the repeat rule
+			if (rules.get(i) instanceof Option.Rule.RepeatRule r) {
+				if (r.isDelayed()) {
+					effects.add(r.action.execute());
+					effectSources.add(r.getSource());
+					effectTypes.add("action");
+					playerDatas.add(getPlayerData());
+					rulesets.add(JsonEncoder.stringList(rules));
+				}
 			}
 		}
 		// 4. Reset everyone's votes

@@ -54,6 +54,12 @@ public abstract class Option {
 			public abstract String getSource();
 			public void accept() {}
 			public void repeal() {}
+			/**
+			 * Indicates whether the action specified by this rule should be run at a later time than other RepeatRule actions.
+			 */
+            public boolean isDelayed() {
+				return false;
+            }
 		}
 		/**
 		 * A special rule that adds a condition for winning.
