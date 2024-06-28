@@ -62,7 +62,7 @@ public class ModuleMain extends Module {
 		}
 		public String getName() { return "If there is exactly one player who can win, they win"; }
 		public String execute() {
-			AtomicReference<String> results = new AtomicReference<String>("");
+			AtomicReference<String> results = new AtomicReference<String>("<span style='opacity: 0.3;'>");
 			ArrayList<Player> validWinners = new ArrayList<Player>();
 			for (Player target : game.players) {
 				Optional<Option.Rule.WinCondition> inv = game.findWinInvalidations(target);
@@ -75,6 +75,7 @@ public class ModuleMain extends Module {
 					results.set(results.get() + "- " + target.name + " can win!<br>");
 				});
 			}
+			results.set(results.get() + "</span>");
 			if (validWinners.size() == 1) {
 				Player target = validWinners.get(0);
 				game.winner = target;

@@ -77,8 +77,8 @@ public class ModulePoints extends Module {
 		public static GivePoints create(Game game) {
 			if (game.players.size() == 0) return null;
 			Player target = random.choice(game.players);
-			float amount = random.choice(new Float[] { 1f, 2f, 5f, target.score });
-			if (target.score == 0) amount = random.choice(new Float[] { 1f, 2f, 3f, 4f, 5f });
+			float amount = random.choice(new Float[] { 1f, 2f, 5f, 10f, target.score });
+			if (amount == 0) amount = random.choice(new Float[] { 2f, 3f, 4f, 5f, 6f, 7f });
 			boolean reverse = random.choice(new Boolean[] { true, false, false });
 			if (target.score <= 0) reverse = false;
 			return new GivePoints(game, target, amount, reverse);
@@ -254,7 +254,7 @@ public class ModulePoints extends Module {
 		}
 		public String getName() { return "If there is exactly one player who has at least 25 points then they win"; }
 		public String execute() {
-			AtomicReference<String> results = new AtomicReference<String>("<span style='opacity: 0.2; font-style: italic;'>");
+			AtomicReference<String> results = new AtomicReference<String>("<span style='opacity: 0.2;'>");
 			ArrayList<Player> validWinners = new ArrayList<Player>();
 			for (Player target : game.players) {
 				if (target.score < 25) {
