@@ -2,15 +2,17 @@ import java.util.ArrayList;
 
 public class Player {
 	// basic things
-	public String name;
+	public String realName;
+	public String displayName;
 	public ArrayList<String> events;
 	public int vote;
 	// module info
 	public float score;
 	public boolean hasStar;
 	public ModuleColors.Color color;
-	public Player(String name) {
-		this.name = name;
+	public Player(String realName, String displayName) {
+		this.realName = realName;
+		this.displayName = displayName;
 		this.events = new ArrayList<String>();
 		this.vote = -1;
 		this.score = 0;

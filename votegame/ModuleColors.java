@@ -80,11 +80,11 @@ public class ModuleColors extends Module {
 			return new ChangeColor(game, target, newColor);
 		}
 		public String getName() {
-			return "Set " + target.name + "'s color to " + newColor.name();
+			return "Set " + target.displayName + "'s color to " + newColor.name();
 		}
 		public String execute() {
 			target.color = newColor;
-			return "Set " + target.name + "'s color to " + newColor.name();
+			return "Set " + target.displayName + "'s color to " + newColor.name();
 		}
 	}
 	public static class RandomizeAllColors extends Option.Action {
@@ -151,7 +151,7 @@ public class ModuleColors extends Module {
 				Player p = game.players.get(i);
 				if (p.color == color) {
 					p.score += amount * game.getPointMultiplier();
-					targets.add(p.name);
+					targets.add(p.displayName);
 				}
 			}
 			if (targets.size() == 0) return "Gave no one points";
@@ -182,7 +182,7 @@ public class ModuleColors extends Module {
 				Player p = game.players.get(i);
 				if (p.color.type() == color) {
 					p.score += amount * game.getPointMultiplier();
-					targets.add(p.name);
+					targets.add(p.displayName);
 				}
 			}
 			if (targets.size() == 0) return "Gave no one points";

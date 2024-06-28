@@ -107,7 +107,7 @@ button {
 .users > div.spacer {
 	border-right: 1px solid black;
 }
-.users > div > div + div {
+.users > div > div.score-box {
 	flex-grow: 1;
 	margin: 1em;
 	padding: 1em;
@@ -185,13 +185,12 @@ button {
 			<h1>Settings</h1>
 			<div>Text size: <input type="range" min="0.5" max="2" step="0.5" value="1" oninput="document.body.parentNode.setAttribute('style', 'font-size: ' + String(this.value) + 'em;');" id="text_size_control"></div>
 			<!-- <div>Bot mode: <input type="checkbox" oninput="window.bot_mode = this.checked"></div> -->
+			<div><button onclick='var x = new XMLHttpRequest(); x.open("POST", `./rename`); x.send(thisPlayerHashCode + "___separator___" + prompt("Enter your new name:")); document.querySelector("#settings").classList.add("inactive");'>Rename yourself</button></div>
 			<div><button style="background: red;" onclick="leave()">Leave Game</button></div>
 		</div></div>
 		<div id="broken" class="dialog inactive"><div>
 			<h1>Error</h1>
 			<div>Lost connection with the server!</div>
-			<!-- <div>Bot mode: <input type="checkbox" oninput="window.bot_mode = this.checked"></div> -->
-			<!-- <div><button onclick="location.reload()">Reload the page</button></div> -->
 			<div><button onclick="location.assign('/')">Exit the game</button></div>
 		</div></div>
 		<div id="content">

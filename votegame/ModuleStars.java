@@ -62,11 +62,11 @@ public class ModuleStars extends Module {
 			return new GiveStar(game, target);
 		}
 		public String getName() {
-			return "Give " + target.name + " a star";
+			return "Give " + target.displayName + " a star";
 		}
 		public String execute() {
 			target.hasStar = true;
-			return "Gave " + target.name + " a star";
+			return "Gave " + target.displayName + " a star";
 		}
 	}
 	public static class TakeStar extends Option.Action {
@@ -83,11 +83,11 @@ public class ModuleStars extends Module {
 			return new TakeStar(game, target);
 		}
 		public String getName() {
-			return "Take " + target.name + "'s star";
+			return "Take " + target.displayName + "'s star";
 		}
 		public String execute() {
 			target.hasStar = false;
-			return "Took " + target.name + "'s star";
+			return "Took " + target.displayName + "'s star";
 		}
 	}
 	public static class ToggleAllStars extends Option.Action {
@@ -129,7 +129,7 @@ public class ModuleStars extends Module {
 				Player p = game.players.get(i);
 				if (p.hasStar) {
 					p.score += amount;
-					targets.add(p.name);
+					targets.add(p.displayName);
 				}
 			}
 			if (targets.size() == 0) return "Gave no one points for their stars";
@@ -155,7 +155,7 @@ public class ModuleStars extends Module {
 				if (p.hasStar && p.score > 0) {
 					p.score *= 2;
 					p.hasStar = false;
-					targets.add(p.name);
+					targets.add(p.displayName);
 				}
 			}
 			if (targets.size() == 0) return "Gave no one points for their stars";
@@ -181,7 +181,7 @@ public class ModuleStars extends Module {
 				int a = Math.round(p.score);
 				if (a == p.score && isPrime(a)) {
 					p.hasStar = true;
-					targets.add(p.name);
+					targets.add(p.displayName);
 				} else {
 					p.hasStar = false;
 				}

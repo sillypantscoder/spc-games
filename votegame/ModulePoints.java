@@ -15,7 +15,7 @@ public class ModulePoints extends Module {
 			Player p = game.players.get(i);
 			p.score = 0;
 		}
-		game.rules.add(WinOver25.create(game));
+		game.rules.add(WinOver35.create(game));
 	}
 	public void repeal() {
 		super.repeal();
@@ -35,7 +35,7 @@ public class ModulePoints extends Module {
 		list.accept(HighestPenalty.create(game));
 		list.accept(SingleVoteBonus.create(game));
 		// Rules
-		list.accept(WinOver25.create(game));
+		list.accept(WinOver35.create(game));
 		list.accept(InvertPointChanges.create(game));
 		list.accept(MultiplyPointChanges.create(game));
 		list.accept(RepeatedLowestBonus.create(game));
@@ -48,7 +48,7 @@ public class ModulePoints extends Module {
 	}
 	public Option.Rule[] getAllRules() {
 		return new Option.Rule[] {
-			new WinOver25(game),
+			new WinOver35(game),
 			new InvertPointChanges(game),
 			new MultiplyPointChanges(game),
 			new RepeatedLowestBonus(game),
@@ -83,11 +83,11 @@ public class ModulePoints extends Module {
 			if (target.score <= 0) reverse = false;
 			return new GivePoints(game, target, amount, reverse);
 		}
-		public String getName() { return (reverse ? "Take" : "Give") + " " + amount + " points " + (reverse ? "from" : "to") + " " + target.name; }
+		public String getName() { return (reverse ? "Take" : "Give") + " " + amount + " points " + (reverse ? "from" : "to") + " " + target.displayName; }
 		public String execute() {
 			float realAmt = amount * game.getPointMultiplier();
 			target.score += realAmt * (reverse ? -1 : 1);
-			return (reverse ? "Took" : "Gave") + " " + realAmt + " points " + (reverse ? "from" : "to") + " " + target.name;
+			return (reverse ? "Took" : "Gave") + " " + realAmt + " points " + (reverse ? "from" : "to") + " " + target.displayName;
 		}
 	}
 	public static class MultiplyPoints extends Option.Action {
@@ -103,8 +103,8 @@ public class ModulePoints extends Module {
 			float amount = random.choice(new Float[] { 1f / 2f, 2f, 0f });
 			return new MultiplyPoints(target, amount);
 		}
-		public String getName() { return "Multiply " + target.name + "'s points by " + amount; }
-		public String execute() { target.score *= amount; return "Multiplied " + target.name + "'s points by " + amount; }
+		public String getName() { return "Multiply " + target.displayName + "'s points by " + amount; }
+		public String execute() { target.score *= amount; return "Multiplied " + target.displayName + "'s points by " + amount; }
 	}
 	public static class MovePoints extends Option.Action {
 		public Game game;
@@ -126,12 +126,12 @@ public class ModulePoints extends Module {
 			if (amount == 0) return null;
 			return new MovePoints(game, playerFrom, playerTo, amount);
 		}
-		public String getName() { return "Steal " + amount + " points from " + playerFrom.name + " and give them to " + playerTo.name; }
+		public String getName() { return "Steal " + amount + " points from " + playerFrom.displayName + " and give them to " + playerTo.displayName; }
 		public String execute() {
 			float realAmt = amount * game.getPointMultiplier();
 			playerFrom.score -= realAmt;
 			playerTo.score += realAmt;
-			return "Stole " + realAmt + " points from " + playerFrom.name + " and gave them to " + playerTo.name;
+			return "Stole " + realAmt + " points from " + playerFrom.displayName + " and gave them to " + playerTo.displayName;
 		}
 	}
 	public static class InvertAllScores extends Option.Action {
@@ -173,7 +173,7 @@ public class ModulePoints extends Module {
 				ArrayList<String> targets = new ArrayList<String>();
 				for (Player target : min) {
 					target.score += amt;
-					targets.add(target.name);
+					targets.add(target.displayName);
 				}
 				if (targets.size() == 1) return "Gave the player in last place (" + targets.get(0) + ") " + amt + " points";
 				return "Gave the players in last place (" + Utils.humanJoinList(targets) + ") " + amt + " points each";
@@ -208,7 +208,7 @@ public class ModulePoints extends Module {
 				ArrayList<String> targets = new ArrayList<String>();
 				for (Player target : max) {
 					target.score -= amt;
-					targets.add(target.name);
+					targets.add(target.displayName);
 				}
 				if (targets.size() == 1) return "Took " + amt + " points from the player in first place (" + targets.get(0) + ")";
 				return "Took " + amt + " points from the players in first place (" + Utils.humanJoinList(targets) + ")";
@@ -237,38 +237,38 @@ public class ModulePoints extends Module {
 			ArrayList<String> results = new ArrayList<String>();
 			for (int t = 0; t < all_targets.size(); t++) {
 				all_targets.get(t).score += realAmt;
-				results.add(all_targets.get(t).name);
+				results.add(all_targets.get(t).displayName);
 			}
 			if (results.size() == 0) return "No one was creative";
 			else if (results.size() == 1) return results.get(0) + " was the only different person";
 			else return Utils.humanJoinList(results) + " got " + realAmt + " points each for creativity";
 		}
 	}
-	public static class AloneOver25Victory extends Option.Action {
+	public static class AloneOver35Victory extends Option.Action {
 		public Game game;
-		public AloneOver25Victory(Game game) {
+		public AloneOver35Victory(Game game) {
 			this.game = game;
 		}
-		public static AloneOver25Victory create(Game game) {
-			return new AloneOver25Victory(game);
+		public static AloneOver35Victory create(Game game) {
+			return new AloneOver35Victory(game);
 		}
-		public String getName() { return "If there is exactly one player who has at least 25 points then they win"; }
+		public String getName() { return "If there is exactly one player who has at least 35 points then they win"; }
 		public String execute() {
 			AtomicReference<String> results = new AtomicReference<String>("<span style='opacity: 0.2;'>");
 			ArrayList<Player> validWinners = new ArrayList<Player>();
 			for (Player target : game.players) {
-				if (target.score < 25) {
+				if (target.score < 35) {
 					// Not a valid winner
-					results.set(results.get() + "- " + target.name + " cannot win because they have less than 25 points<br>");
+					results.set(results.get() + "- " + target.displayName + " cannot win because they have less than 35 points<br>");
 				} else {
 					Optional<Option.Rule.WinCondition> inv = game.findWinInvalidations(target);
 					inv.ifPresentOrElse((w) -> {
 						// Not a valid winner
-						results.set(results.get() + "- " + target.name + " cannot win because: " + w.getName() + "<br>");
+						results.set(results.get() + "- " + target.displayName + " cannot win because: " + w.getName() + "<br>");
 					}, () -> {
 						// Valid winner
 						validWinners.add(target);
-						results.set(results.get() + "- " + target.name + " can win!<br>");
+						results.set(results.get() + "- " + target.displayName + " can win!<br>");
 					});
 				}
 			}
@@ -276,25 +276,25 @@ public class ModulePoints extends Module {
 			if (validWinners.size() == 1) {
 				Player target = validWinners.get(0);
 				game.winner = target;
-				results.set(results.get() + target.name + " wins!");
+				results.set(results.get() + target.displayName + " wins!");
 			} else if (validWinners.size() == 0) results.set(results.get() + "No one can win!");
 			else results.set(results.get() + "More than one player can win!");
 			return results.get();
 		}
 	}
 	// === RULES ===
-	public static class WinOver25 extends Option.Rule.RepeatRule {
-		public WinOver25(Game game) {
-			super(game, AloneOver25Victory.create(game));
+	public static class WinOver35 extends Option.Rule.RepeatRule {
+		public WinOver35(Game game) {
+			super(game, AloneOver35Victory.create(game));
 		}
-		public static WinOver25 create(Game game) {
-			return new WinOver25(game);
+		public static WinOver35 create(Game game) {
+			return new WinOver35(game);
 		}
 		public String getSource() {
-			return "over-25";
+			return "over-35";
 		}
 		public String getName() {
-			return "You win if you are the only player over 25 points";
+			return "You win if you are the only player over 35 points";
 		}
 	}
 	public static class InvertPointChanges extends Option.Rule {

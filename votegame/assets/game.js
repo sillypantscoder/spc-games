@@ -1,6 +1,6 @@
 /**
  * Data about a user's status.
- * @typedef {{name: string, score: number, hasStar: boolean, color: "Red" | "Orange" | "Yellow" | "Green" | "Blue" | "Purple", hasVoted: boolean, winner: boolean}} User
+ * @typedef {{realName: string, displayName: string, score: number, hasStar: boolean, color: "Red" | "Orange" | "Yellow" | "Green" | "Blue" | "Purple", hasVoted: boolean, winner: boolean}} User
  */
 
 var is_message_checker_broken = false
@@ -60,14 +60,15 @@ function sendMessage(msg) {
 		document.querySelector("#text_size_control").value = value
 	}
 })();
-var thisPlayerName = ""
+var thisPlayerRealName = ""
+var thisPlayerHashCode = Number(location.search.substring(6))
 /** @type {string[]} */
 var player_rules = []
 ;(() => {
 	var x = new XMLHttpRequest()
 	x.open("GET", "./whoami" + location.search)
 	x.addEventListener("loadend", (e) => {
-		window.thisPlayerName = x.responseText
+		window.thisPlayerRealName = x.responseText
 	})
 	x.send()
 })();
@@ -110,8 +111,7 @@ function showVotingScreen(info) {
  */
 function vote(n) {
 	// CHANGE BUTTON TEXT TO VOTED
-	// @ts-ignore
-	document.querySelector(`#voting table tr:nth-child(${n + 1}) td[onclick]`).innerText = "Voted!"
+	document.querySelector(`#voting table tr:nth-child(${n + 1}) td[onclick]`).textContent = "Voted!"
 	// SET SELECTED BUTTON
 	document.querySelector(`#voting table tr:nth-child(${n + 1}) td[onclick]`).classList.add("selected")
 	// SET NOT SELECTED BUTTONS
@@ -163,7 +163,7 @@ function showResults(info) {
 			"single-vote-bonus": "<div class='icon' style='background: aqua; color: black;'>&#128579; Creativity bonus</div>",
 			"color-to-points": "<div class='icon' style='background: magenta; color: black;'>&#9734; Color to points</div>",
 			"alone-victory": "<div class='icon' style='background: red; font-weight: bold;'>&#9888; Sudden Death</div>",
-			"over-25": "<div class='icon' style='background: yellow; color: black;'>&#127919; Objective</div>"
+			"over-35": "<div class='icon' style='background: yellow; color: black;'>&#127919; Objective</div>"
 		}[info.effectSources[i]];
 		c.innerHTML = effectSource + ({
 			"action": "",
@@ -185,8 +185,7 @@ function showResults(info) {
 		var c = document.createElement("div")
 		c.innerHTML = `<b></b><span> is the winner!</span>`
 		c.setAttribute("style", "display: inline-block; margin: 2em; border: 1em solid gold; border-radius: 2em; padding: 2em; background: #fd02; box-shadow: 0 0.5em 2em 0 black;")
-		// @ts-ignore
-		c.children[0].innerText = info.winner
+		c.children[0].textContent = info.winner
 		infoElm.appendChild(c)
 	}
 	// UPDATE THE RULE LIST
@@ -239,9 +238,9 @@ function createUserElm(prev, info) {
 		var e = document.createElement("div")
 		var changes = false
 		// Skeleton structure
-		e.innerHTML = `<div>${info[i].name}</div><div></div>`
+		e.innerHTML = `<div>${info[i].displayName}</div><i style="font-size: 0.5em; margin-top: 0.6em; margin-bottom: -0.6em;">${info[i].realName}</i><div class="score-box"></div>`
 		// (You) marker
-		if (thisPlayerName == info[i].name) {
+		if (thisPlayerRealName == info[i].realName) {
 			e.children[0].appendChild(document.createElement("b")).innerText = " (You)"
 			hasMe = true;
 		}
@@ -250,7 +249,7 @@ function createUserElm(prev, info) {
 		if (info[i].winner) e.classList.add("finishicon-winner")
 		// Score code
 		if (player_rules.includes("Add Points to the game")) {
-			e.children[1].appendChild(document.createElement("span")).innerText = info[i].score.toString()
+			e.children[2].appendChild(document.createElement("span")).innerText = info[i].score.toString()
 			// Annotation showing how scores have changed
 			if (prev != null && prev[i].score != info[i].score) {
 				var x = document.createElement("span")
@@ -269,14 +268,14 @@ function createUserElm(prev, info) {
 		}
 		// Star code
 		if (player_rules.includes("Add Stars to the game")) {
-			if (info[i].hasStar) e.children[1].appendChild(document.createElement("span")).innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" style="width: 1em; height: 1em;" viewBox="0 0 48 45"><path d="M 24 0 L 30 17 H 48 L 34 28 L 39 45 L 24 35 L 9 45 L 14 28 L 0 17 H 18 Z" stroke="red" fill="yellow" /></svg>`
-							else e.children[1].appendChild(document.createElement("span")).innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" style="width: 1em; height: 1em;" viewBox="0 0 48 45"><path d="M 24 0 L 30 17 H 48 L 34 28 L 39 45 L 24 35 L 9 45 L 14 28 L 0 17 H 18 Z" stroke="black" fill="none" /></svg>`
-			if (player_rules.includes("Add Points to the game")) e.children[1].children[1].setAttribute("style", `width: 1em; height: 1em; margin-left: 0.5em;`)
+			if (info[i].hasStar) e.children[2].appendChild(document.createElement("span")).innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" style="width: 1em; height: 1em;" viewBox="0 0 48 45"><path d="M 24 0 L 30 17 H 48 L 34 28 L 39 45 L 24 35 L 9 45 L 14 28 L 0 17 H 18 Z" stroke="red" fill="yellow" /></svg>`
+							else e.children[2].appendChild(document.createElement("span")).innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" style="width: 1em; height: 1em;" viewBox="0 0 48 45"><path d="M 24 0 L 30 17 H 48 L 34 28 L 39 45 L 24 35 L 9 45 L 14 28 L 0 17 H 18 Z" stroke="black" fill="none" /></svg>`
+			if (player_rules.includes("Add Points to the game")) e.children[2].children[1].setAttribute("style", `width: 1em; height: 1em; margin-left: 0.5em;`)
 			if (prev != null && info[i].hasStar != prev[i].hasStar) changes = true
 		}
 		// Color code
 		if (player_rules.includes("Add Colors to the game")) {
-			var c = e.children[1].appendChild(document.createElement("span"))
+			var c = e.children[2].appendChild(document.createElement("span"))
 			c.innerHTML = `<div style="display: inline-block; border-radius: 1em; width: 1em; height: 1em; background: ${{
 				"Red": "red",
 				"Orange": "orange",
@@ -299,7 +298,7 @@ function createUserElm(prev, info) {
 			var x = new XMLHttpRequest()
 			x.open("GET", "./whoami" + location.search)
 			x.addEventListener("loadend", (e) => {
-				window.thisPlayerName = x.responseText
+				window.thisPlayerRealName = x.responseText
 			})
 			x.send()
 		})();

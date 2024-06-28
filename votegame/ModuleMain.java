@@ -43,13 +43,13 @@ public class ModuleMain extends Module {
 			Player target = random.choice(game.players);
 			return new Victory(game, target);
 		}
-		public String getName() { return target.name + " wins (if valid)"; }
+		public String getName() { return target.displayName + " wins (if valid)"; }
 		public String execute() {
 			Optional<Option.Rule.WinCondition> invalidation = game.findWinInvalidations(target);
 			if (invalidation.isEmpty()) {
 				game.winner = target;
-				return target.name + " wins!";
-			} else return target.name + " cannot win because: " + invalidation.get();
+				return target.displayName + " wins!";
+			} else return target.displayName + " cannot win because: " + invalidation.get();
 		}
 	}
 	public static class AloneVictory extends Option.Action {
@@ -68,18 +68,18 @@ public class ModuleMain extends Module {
 				Optional<Option.Rule.WinCondition> inv = game.findWinInvalidations(target);
 				inv.ifPresentOrElse((w) -> {
 					// Not a valid winner
-					results.set(results.get() + "- " + target.name + " cannot win because: " + w.getName() + "<br>");
+					results.set(results.get() + "- " + target.displayName + " cannot win because: " + w.getName() + "<br>");
 				}, () -> {
 					// Valid winner
 					validWinners.add(target);
-					results.set(results.get() + "- " + target.name + " can win!<br>");
+					results.set(results.get() + "- " + target.displayName + " can win!<br>");
 				});
 			}
 			results.set(results.get() + "</span>");
 			if (validWinners.size() == 1) {
 				Player target = validWinners.get(0);
 				game.winner = target;
-				results.set(results.get() + target.name + " wins!");
+				results.set(results.get() + target.displayName + " wins!");
 			} else if (validWinners.size() == 0) results.set(results.get() + "No one can win!");
 			else results.set(results.get() + "More than one player can win!");
 			return results.get();

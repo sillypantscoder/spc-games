@@ -4,11 +4,13 @@
 	<body>
 		<h1>Voting Game</h1>
 		<h3>Login</h3>
-		<div>Enter your name: <input type="text" id="name"></div>
+		<div>Enter your <b>real</b> name: <input type="text" id="realname"></div>
+		<div>Enter your <b>more fun </b>name: <input type="text" id="displayname"></div>
 		<div><button onclick="submit()">Submit</button></div>
+		<div>If you have accidentally left the game and want to re-join, enter your real name and leave the "more fun" box blank.</div>
 		<script>
 function submit() {
-	location.replace(`./createuser?name=${document.querySelector("#name").value}`)
+	location.replace(`./createuser?name=${document.querySelector("#realname").value}_____${document.querySelector("#displayname").value}`)
 }
 		</script>
 	</body>

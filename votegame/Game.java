@@ -38,7 +38,7 @@ public class Game {
 		// The three basic rules:
 		rules.add(new ModuleMain(this));
 		rules.add(new ModulePoints(this));
-		rules.add(new ModulePoints.WinOver25(this));
+		rules.add(new ModulePoints.WinOver35(this));
 		// Init
 		joinEvent = null;
 		winner = null;
@@ -91,9 +91,10 @@ public class Game {
 		JsonEncoder.Value[] datas = new JsonEncoder.Value[players.size()];
 		for (int i = 0; i < players.size(); i++) {
 			datas[i] = new JsonEncoder.ObjectValue(
-				new String[] { "name", "score", "hasStar", "color", "hasVoted", "winner" },
+				new String[] { "realName", "displayName", "score", "hasStar", "color", "hasVoted", "winner" },
 				new JsonEncoder.Value[] {
-					new JsonEncoder.StringValue(players.get(i).name),
+					new JsonEncoder.StringValue(players.get(i).realName),
+					new JsonEncoder.StringValue(players.get(i).displayName),
 					new JsonEncoder.IntValue(players.get(i).score),
 					new JsonEncoder.BooleanValue(players.get(i).hasStar),
 					new JsonEncoder.StringValue(players.get(i).color.name()),
@@ -167,23 +168,25 @@ public class Game {
 				.setBody(Utils.readFile("assets/login.html"));
 		} else if (path.startsWith("/createuser")) {
 			// Find the player's name
-			String name = Utils.decodeURIComponent(path.substring("/createuser?name=".length()));
-			if (name.length() >= 20) return new HttpResponse()
+			String[] names = Utils.decodeURIComponent(path.substring("/createuser?name=".length())).split("_____");
+			String realName = names[0];
+			String displayName = names[1];
+			if (realName.length() >= 20 || displayName.length() >= 20) return new HttpResponse()
 				.addHeader("Content-Type", "text/html")
 				.setBody("<body><h3>Nice try!!!</h3><a href='/'>Back Home</a></body>");
 			// Check if the player already exists
 			for (int i = 0; i < this.players.size(); i++) {
-				if (this.players.get(i).name.equals(name)) {
-					System.err.println("[voting-game] Re-login old player - " + name);
+				if (this.players.get(i).realName.equals(realName)) {
+					System.err.println("[voting-game] Re-login old player - " + realName);
 					return new HttpResponse()
 						.addHeader("Content-Type", "text/html")
 						.setBody("<script>location.replace('./game?user=" + this.players.get(i).hashCode() + "')</script>");
 				}
 			}
 			// Create a new player
-			Player newPlayer = new Player(name);
+			Player newPlayer = new Player(realName, displayName);
 			players.add(newPlayer);
-			System.err.println("[voting-game] Added new player - " + name);
+			System.err.println("[voting-game] Added new player - " + realName);
 			return new HttpResponse()
 				.addHeader("Content-Type", "text/html")
 				.setBody("<script>location.replace('./game?user=" + newPlayer.hashCode() + "')</script>");
@@ -199,7 +202,7 @@ public class Game {
 			// Return the name
 			return new HttpResponse()
 				.setStatus(200)
-				.setBody(thisPlayer.name);
+				.setBody(thisPlayer.realName);
 		} else if (path.equals("/game.js")) {
 			return new HttpResponse()
 				.addHeader("Content-Type", "text/html")
@@ -260,7 +263,8 @@ public class Game {
 			}
 			playerString += "\nPlayers:";
 			for (int i = 0; i < players.size(); i++) {
-				playerString += "\n- <button onclick='var x = new XMLHttpRequest(); x.open(\"POST\", `../../game/${game_id}/leave`); x.send(" + players.get(i).hashCode() + ")'>Remove</button><button onclick='var x = new XMLHttpRequest(); x.open(\"POST\", `../../game/${game_id}/rename`); x.send(" + players.get(i).hashCode() + " + \"___separator___\" + prompt(\"Enter the new name:\"))'>Rename</button> " + players.get(i).name;
+				playerString += "\n- <button onclick='var x = new XMLHttpRequest(); x.open(\"POST\", `../../game/${game_id}/leave`); x.send(" + players.get(i).hashCode() + ")'>Remove</button><button onclick='var x = new XMLHttpRequest(); x.open(\"POST\", `../../game/${game_id}/rename`); x.send(" + players.get(i).hashCode() + " + \"___separator___\" + prompt(\"Enter the new display name:\"))'>Rename</button> " +
+					players.get(i).realName + " (" + players.get(i).displayName + ")";
 				if (this.voteFinished) {
 					if (this.players.get(i).vote == -1) {
 						playerString += " <button onclick='var x = new XMLHttpRequest(); x.open(\"POST\", `../../game/${game_id}/sendmessage`); x.send(\"" + players.get(i).hashCode() + "MESSAGESEPARATORr\")'>Ready</button>";
@@ -365,7 +369,18 @@ public class Game {
 				.setStatus(404)
 				.setBody("404");
 			// Rename the player
-			thisPlayer.name = parts[1];
+			thisPlayer.displayName = parts[1];
+			// Update player data on clients
+			for (int i = 0; i < players.size(); i++) {
+				players.get(i).fire((new JsonEncoder.ObjectValue(
+					new String[] { "type", "users" },
+					new JsonEncoder.Value[] {
+						new JsonEncoder.StringValue("playerupdate"),
+						getPlayerData()
+					}
+				)).encode());
+			}
+			// Return
 			return new HttpResponse();
 		} else if (path.equals("/continue")) {
 			if (winner == null) return new HttpResponse()
@@ -544,7 +559,7 @@ public class Game {
 								public String encode() {
 									return "null";
 								}
-							} : new JsonEncoder.StringValue(winner.name)
+							} : new JsonEncoder.StringValue(winner.realName)
 					}
 				)
 			}
