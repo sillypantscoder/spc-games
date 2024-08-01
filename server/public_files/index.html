@@ -17,7 +17,7 @@ a {
 		<script>
 (() => {
 	var x = new XMLHttpRequest()
-	x.open("GET", "/gamelist")
+	x.open("GET", "/gamelist/active")
 	x.addEventListener("loadend", (e) => {
 		/** @type {string} */
 		var t = e.target.responseText;
@@ -34,7 +34,7 @@ a {
 			elm.innerHTML = "<a></a><span></span> <span></span><button>Mark for deletion</button>"
 			elm.children[0].innerText = info[0] + " - " + info[1]
 			elm.children[0].setAttribute("href", "game/" + info[2] + "/")
-			elm.children[1].innerHTML = " (Status: " + info[3] + ")"
+			// elm.children[1].innerHTML = " (Status: " + info[3] + ")"
 			if (info[4] != 0) {
 				var date = new Date(Number(info[4]))
 				elm.children[2].innerText = "Will be deleted at " + (date.getHours()>12 ? date.getHours() - 12 : date.getHours()) + ":" + date.getMinutes().toString().padStart(2, "0") + ":" + date.getSeconds().toString().padStart(2, "0") + " " + (date.getHours()>12 ? "P" : "A") + "M "
@@ -46,31 +46,31 @@ a {
 	})
 	x.send()
 })();
-(() => {
-	var x = new XMLHttpRequest()
-	x.open("GET", "/gamelist_static")
-	x.addEventListener("loadend", (e) => {
-		/** @type {string} */
-		var t = e.target.responseText;
-		if (t.length == 0) {
-			var elm = document.createElement("li")
-			elm.innerText = "There are no single-player games currently available!"
-			document.querySelector("#games_static").appendChild(elm)
-			return
-		}
-		var games = t.split("\n").map((v) => v.split("|||"))
-		// games is: [game type name, game id]
-		for (var info of games) {
-			var elm = document.createElement("li")
-			elm.innerHTML = "<a></a> (<a>How to play</a>)"
-			elm.children[0].innerText = info[0]
-			elm.children[0].setAttribute("href", "game_static/" + info[1] + "/")
-			elm.children[1].setAttribute("href", "info/" + info[1])
-			document.querySelector("#games_static").appendChild(elm)
-		}
-	})
-	x.send()
-})();
+// (() => {
+// 	var x = new XMLHttpRequest()
+// 	x.open("GET", "/gamelist_static")
+// 	x.addEventListener("loadend", (e) => {
+// 		/** @type {string} */
+// 		var t = e.target.responseText;
+// 		if (t.length == 0) {
+// 			var elm = document.createElement("li")
+// 			elm.innerText = "There are no single-player games currently available!"
+// 			document.querySelector("#games_static").appendChild(elm)
+// 			return
+// 		}
+// 		var games = t.split("\n").map((v) => v.split("|||"))
+// 		// games is: [game type name, game id]
+// 		for (var info of games) {
+// 			var elm = document.createElement("li")
+// 			elm.innerHTML = "<a></a> (<a>How to play</a>)"
+// 			elm.children[0].innerText = info[0]
+// 			elm.children[0].setAttribute("href", "game_static/" + info[1] + "/")
+// 			elm.children[1].setAttribute("href", "info/" + info[1])
+// 			document.querySelector("#games_static").appendChild(elm)
+// 		}
+// 	})
+// 	x.send()
+// })();
 		</script>
 	</body>
 </html>

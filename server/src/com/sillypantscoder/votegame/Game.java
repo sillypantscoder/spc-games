@@ -1,5 +1,10 @@
+package com.sillypantscoder.votegame;
+
 import java.util.ArrayList;
 import java.util.Optional;
+
+import com.sillypantscoder.spcgames.Utils;
+import com.sillypantscoder.spcgames.http.HttpResponse;
 
 public class Game {
 	/**
@@ -165,7 +170,7 @@ public class Game {
 			// Login page
 			return new HttpResponse()
 				.addHeader("Content-Type", "text/html")
-				.setBody(Utils.readFile("assets/login.html"));
+				.setBody(Utils.readFile("src/com/sillypantscoder/votegame/assets/login.html"));
 		} else if (path.startsWith("/createuser")) {
 			// Find the player's name
 			String[] names = Utils.decodeURIComponent(path.substring("/createuser?name=".length())).split("_____");
@@ -206,7 +211,7 @@ public class Game {
 		} else if (path.equals("/game.js")) {
 			return new HttpResponse()
 				.addHeader("Content-Type", "text/html")
-				.setBody(Utils.readFile("assets/game.js"));
+				.setBody(Utils.readFile("src/com/sillypantscoder/votegame/assets/game.js"));
 		} else if (path.startsWith("/game")) {
 			if (options.length == 0 && players.size() > 1) newVote();
 			// Main game
@@ -219,7 +224,7 @@ public class Game {
 				.setBody("<script>location.replace('/')</script>");
 			// Determine what screen to send
 			if (! voteFinished) {
-				VoteHttpHandler.queue(3, thisPlayer, (new JsonEncoder.ObjectValue(
+				Game.queue(thisPlayer, (new JsonEncoder.ObjectValue(
 					new String[] { "type", "voteinfo" },
 					new JsonEncoder.Value[] {
 						new JsonEncoder.StringValue("votingscreen"),
@@ -235,12 +240,12 @@ public class Game {
 					}
 				)).encode());
 			} else {
-				VoteHttpHandler.queue(3, thisPlayer, joinEvent.encode());
+				Game.queue(thisPlayer, joinEvent.encode());
 			}
 			// Send the game
 			return new HttpResponse()
 				.addHeader("Content-Type", "text/html")
-				.setBody(Utils.readFile("assets/game.html"));
+				.setBody(Utils.readFile("src/com/sillypantscoder/votegame/assets/game.html"));
 		} else if (path.startsWith("/messages")) {
 			// Get new messages
 			String hashString = path.substring("/messages?user=".length());
@@ -295,6 +300,17 @@ public class Game {
 				.setStatus(404)
 				.setBody("404");
 		}
+	}
+	private static void queue(Player target, String event) {
+		Thread t = new Thread(() -> {
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace(System.err);
+			}
+			target.fire(event);
+		});
+		t.start();
 	}
 	public HttpResponse post(String path, String body) {
 		if (path.equals("/sendmessage")) {

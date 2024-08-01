@@ -1,5 +1,9 @@
+package com.sillypantscoder.votegame;
+
 import java.util.ArrayList;
 import java.util.function.Consumer;
+
+import com.sillypantscoder.spcgames.Utils;
 
 public class ModuleColors extends Module {
 	public ModuleColors(Game game) {

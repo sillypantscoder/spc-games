@@ -3,6 +3,9 @@ package com.sillypantscoder.spcgames;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
 
 public class Utils {
 	public static<T> void log(T item) {
@@ -42,5 +45,24 @@ public class Utils {
 			e.printStackTrace();
 			return "";
 		}
+	}
+	public static String decodeURIComponent(String in) {
+		try {
+			return URLDecoder.decode(in, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return in;
+		}
+	}
+	public static String humanJoinList(ArrayList<String> list) {
+		if (list.size() == 2) return list.get(0) + " and " + list.get(1);
+		String result = "";
+		for (int i = 0; i < list.size(); i++) {
+			if (i == list.size() - 1) result += ", and ";
+			else if (i == 0) result += "";
+			else result += ", ";
+			result += list.get(i);
+		}
+		return result;
 	}
 }

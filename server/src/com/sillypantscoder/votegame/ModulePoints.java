@@ -1,7 +1,11 @@
+package com.sillypantscoder.votegame;
+
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+
+import com.sillypantscoder.spcgames.Utils;
 
 public class ModulePoints extends Module {
 	public ModulePoints(Game game) {

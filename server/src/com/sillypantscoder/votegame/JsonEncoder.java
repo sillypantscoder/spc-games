@@ -1,3 +1,5 @@
+package com.sillypantscoder.votegame;
+
 import java.util.ArrayList;
 
 public class JsonEncoder {

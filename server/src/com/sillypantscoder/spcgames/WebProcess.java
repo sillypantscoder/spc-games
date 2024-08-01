@@ -71,12 +71,10 @@ public class WebProcess {
 	public HttpResponse post(String path, String body) {
 		return communicate("POST", path, body);
 	}
-	// STATIC GAMES
-	public static class StaticGame extends WebProcess {
-		public GameType.StaticGameType type;
-		public StaticGame(GameType.StaticGameType type) {
-			super(type.getProcess());
-			this.type = type;
-		}
+	/**
+	 * Kill the process.
+	 */
+	public void destroy() {
+		process.process.destroy();
 	}
 }
