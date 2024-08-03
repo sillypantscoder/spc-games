@@ -54,8 +54,11 @@ public class GameHandler extends RequestHandler {
 				ActiveGame g = games.get(i);
 				info.add(new String[] {
 					g.info.getName(),
+					g.info.getShortDescription(),
+					g.info.getID(),
 					g.name,
 					g.id,
+					g.getStatus(),
 					String.valueOf(g.deletionTime)
 				});
 			}
@@ -71,6 +74,7 @@ public class GameHandler extends RequestHandler {
 				StaticGame g = staticGames.get(i);
 				info.add(new String[] {
 					g.info.getName(),
+					g.info.getShortDescription(),
 					g.info.getID()
 				});
 			}
@@ -150,7 +154,7 @@ public class GameHandler extends RequestHandler {
 					return new HttpResponse()
 						.setStatus(200)
 						.addHeader("Content-Type", "text/html")
-						.setBody("<!DOCTYPE html><html><head><style>a{color:rgb(0,0,200);}</style></head><body><a href=\"/\">Back Home</a><h3>" + info.getName() + "</h3><p>" + info.getLongDescription().replaceAll("<", "&lt;").replaceAll("\n", "</p><p>") + "</p></body></html>");
+						.setBody("<!DOCTYPE html><html><head><style>body{font-family:sans-serif;}a{color:rgb(0,0,200);}</style></head><body><a href=\"/\">Back Home</a><h3>" + info.getName() + "</h3><p>" + info.getLongDescription().replaceAll("<", "&lt;").replaceAll("\n", "</p><p>") + "</p></body></html>");
 				}
 			}
 		} else if (path.startsWith("/info/static/")) {
@@ -161,7 +165,7 @@ public class GameHandler extends RequestHandler {
 					return new HttpResponse()
 						.setStatus(200)
 						.addHeader("Content-Type", "text/html")
-						.setBody("<!DOCTYPE html><html><head><style>a{color:rgb(0,0,200);}</style></head><body><a href=\"/\">Back Home</a><h3>" + info.getName() + "</h3><p>" + info.getLongDescription().replaceAll("<", "&lt;").replaceAll("\n", "</p><p>") + "</p></body></html>");
+						.setBody("<!DOCTYPE html><html><head><style>body{font-family:sans-serif;}a{color:rgb(0,0,200);}</style></head><body><a href=\"/\">Back Home</a><h3>" + info.getName() + "</h3><p>" + info.getLongDescription().replaceAll("<", "&lt;").replaceAll("\n", "</p><p>") + "</p></body></html>");
 				}
 			}
 		}
