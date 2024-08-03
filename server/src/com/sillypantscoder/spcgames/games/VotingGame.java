@@ -1,17 +1,17 @@
 package com.sillypantscoder.spcgames.games;
 
-import com.sillypantscoder.spcgames.Game;
 import com.sillypantscoder.spcgames.GameInfo;
+import com.sillypantscoder.spcgames.Game.ActiveGame;
 import com.sillypantscoder.spcgames.http.HttpResponse;
 
-public class VotingGame extends Game {
+public class VotingGame extends ActiveGame {
 	public com.sillypantscoder.votegame.Game game;
 	public VotingGame(String name) {
 		super(getInfo(), name);
 		this.game = new com.sillypantscoder.votegame.Game();
 	}
-	public static GameInfo getInfo() {
-		return new GameInfo() {
+	public static GameInfo.ActiveGameInfo getInfo() {
+		return new GameInfo.ActiveGameInfo() {
 			public String getName() {
 				return "The Voting Game";
 			}
@@ -36,10 +36,10 @@ public class VotingGame extends Game {
 		return game.post(path, body);
 	}
 	public void remove() {}
-	// public String getStatus(Game game) {
-	// 	return game.get("/status").bodyString();
-	// }
-	// public String getModStatus(Game game) {
-	// 	return game.get("/status_mod").bodyString();
-	// }
+	public String getStatus() {
+		return game.get("/status").bodyString();
+	}
+	public String getModStatus() {
+		return game.get("/status_mod").bodyString();
+	}
 }

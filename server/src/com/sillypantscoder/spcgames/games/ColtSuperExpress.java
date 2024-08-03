@@ -1,19 +1,22 @@
 package com.sillypantscoder.spcgames.games;
 
-import com.sillypantscoder.spcgames.Game;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.sillypantscoder.spcgames.GameInfo;
 import com.sillypantscoder.spcgames.Subprocess;
 import com.sillypantscoder.spcgames.WebProcess;
+import com.sillypantscoder.spcgames.Game.ActiveGame;
 import com.sillypantscoder.spcgames.http.HttpResponse;
 
-public class ColtSuperExpress extends Game {
+public class ColtSuperExpress extends ActiveGame {
 	public WebProcess process;
 	public ColtSuperExpress(String name) {
 		super(getInfo(), name);
 		process = new WebProcess(new Subprocess(new String[] {"python3", "fakeserver.py"}, "../coltsuperexpress"));
 	}
-	public static GameInfo getInfo() {
-		return new GameInfo() {
+	public static GameInfo.ActiveGameInfo getInfo() {
+		return new GameInfo.ActiveGameInfo() {
 			public String getName() {
 				return "Colt Super Express";
 			}
@@ -40,21 +43,21 @@ public class ColtSuperExpress extends Game {
 	public void remove() {
 		process.destroy();
 	}
-	// public String getStatus() {
-	// 	String status_full = this.get("/status").bodyString();
-	// 	Matcher matcher = Pattern.compile("\"status\": \"([\\w]+)\"").matcher(status_full);
-	// 	if (matcher.find()) {
-	// 		String status = matcher.group(1);
-	// 		if (status.equals("joining")) return "Joining!";
-	// 		else if (status.equals("schemin")) return "In progress";
-	// 		else if (status.equals("executing")) return "In progress";
-	// 		else if (status.equals("finished")) return "Finished";
-	// 		else return "<u onclick='alert(\"" + status + "\")'>???</u>";
-	// 	} else {
-	// 		return "???";
-	// 	}
-	// }
-	// public String getModStatus() {
-	// 	return this.get("/status_mod").bodyString();
-	// }
+	public String getStatus() {
+		String status_full = this.get("/status").bodyString();
+		Matcher matcher = Pattern.compile("\"status\": \"([\\w]+)\"").matcher(status_full);
+		if (matcher.find()) {
+			String status = matcher.group(1);
+			if (status.equals("joining")) return "Joining!";
+			else if (status.equals("schemin")) return "In progress";
+			else if (status.equals("executing")) return "In progress";
+			else if (status.equals("finished")) return "Finished";
+			else return "<u onclick='alert(\"" + status + "\")'>???</u>";
+		} else {
+			return "???";
+		}
+	}
+	public String getModStatus() {
+		return this.get("/status_mod").bodyString();
+	}
 }

@@ -1,6 +1,8 @@
 package com.sillypantscoder.spcgames;
 
-public abstract interface GameInfo {
+import com.sillypantscoder.spcgames.Game.ActiveGame;
+
+public interface GameInfo {
 	/**
 	 * Get the name of the game.
 	 * @return
@@ -21,8 +23,10 @@ public abstract interface GameInfo {
 	 * @return
 	 */
 	public String getID();
-	/**
-	 * Create an instance of the game.
-	 */
-	public Game create(String name);
+	public static interface ActiveGameInfo extends GameInfo {
+		/**
+		 * Create an instance of the game.
+		 */
+		public ActiveGame create(String name);
+	}
 }
