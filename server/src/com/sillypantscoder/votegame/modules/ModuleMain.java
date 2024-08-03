@@ -1,9 +1,15 @@
-package com.sillypantscoder.votegame;
+package com.sillypantscoder.votegame.modules;
 
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+
+import com.sillypantscoder.votegame.Game;
+import com.sillypantscoder.votegame.Module;
+import com.sillypantscoder.votegame.Option;
+import com.sillypantscoder.votegame.Player;
+import com.sillypantscoder.votegame.random;
 
 public class ModuleMain extends Module {
 	public ModuleMain(Game game) {

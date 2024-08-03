@@ -3,8 +3,11 @@ package com.sillypantscoder.votegame;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import com.sillypantscoder.spcgames.AssetLoader;
 import com.sillypantscoder.spcgames.Utils;
 import com.sillypantscoder.spcgames.http.HttpResponse;
+import com.sillypantscoder.votegame.modules.ModuleMain;
+import com.sillypantscoder.votegame.modules.ModulePoints;
 
 public class Game {
 	/**
@@ -170,7 +173,7 @@ public class Game {
 			// Login page
 			return new HttpResponse()
 				.addHeader("Content-Type", "text/html")
-				.setBody(Utils.readFile("src/com/sillypantscoder/votegame/assets/login.html"));
+				.setBody(AssetLoader.getResource("com/sillypantscoder/votegame/assets/login.html"));
 		} else if (path.startsWith("/createuser")) {
 			// Find the player's name
 			String[] names = Utils.decodeURIComponent(path.substring("/createuser?name=".length())).split("_____");
@@ -211,7 +214,7 @@ public class Game {
 		} else if (path.equals("/game.js")) {
 			return new HttpResponse()
 				.addHeader("Content-Type", "text/html")
-				.setBody(Utils.readFile("src/com/sillypantscoder/votegame/assets/game.js"));
+				.setBody(AssetLoader.getResource("com/sillypantscoder/votegame/assets/game.js"));
 		} else if (path.startsWith("/game")) {
 			if (options.length == 0 && players.size() > 1) newVote();
 			// Main game
@@ -245,7 +248,7 @@ public class Game {
 			// Send the game
 			return new HttpResponse()
 				.addHeader("Content-Type", "text/html")
-				.setBody(Utils.readFile("src/com/sillypantscoder/votegame/assets/game.html"));
+				.setBody(AssetLoader.getResource("com/sillypantscoder/votegame/assets/game.html"));
 		} else if (path.startsWith("/messages")) {
 			// Get new messages
 			String hashString = path.substring("/messages?user=".length());

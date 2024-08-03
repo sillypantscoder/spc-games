@@ -1,8 +1,8 @@
 package com.sillypantscoder.spcgames.games;
 
 import com.sillypantscoder.spcgames.Game.StaticGame;
+import com.sillypantscoder.spcgames.AssetLoader;
 import com.sillypantscoder.spcgames.GameInfo;
-import com.sillypantscoder.spcgames.Utils;
 import com.sillypantscoder.spcgames.http.HttpResponse;
 
 public class PlanetBomber extends StaticGame {
@@ -26,7 +26,7 @@ public class PlanetBomber extends StaticGame {
 		};
 	}
 	public HttpResponse get(String path) {
-		if (path.equals("/")) return new HttpResponse().addHeader("Content-Type", "text/html").setBody(Utils.readFile("../stuff/planetbomber.html"));
+		if (path.equals("/")) return new HttpResponse().addHeader("Content-Type", "text/html").setBody(AssetLoader.getResource("assets/planetbomber.html"));
 		return new HttpResponse().setStatus(404);
 	}
 	public HttpResponse post(String path, String body) {

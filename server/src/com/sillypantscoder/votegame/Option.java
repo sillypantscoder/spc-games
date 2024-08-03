@@ -2,6 +2,10 @@ package com.sillypantscoder.votegame;
 
 import java.util.ArrayList;
 
+import com.sillypantscoder.votegame.modules.ModuleColors;
+import com.sillypantscoder.votegame.modules.ModulePoints;
+import com.sillypantscoder.votegame.modules.ModuleStars;
+
 public abstract class Option {
 	public abstract String getName();
 	// Utils

@@ -4,13 +4,13 @@ import subprocess
 # 1. Get the files to compile
 
 files: "list[str]" = []
-def checkfolder(folder):
+def checkfolder(folder: str):
 	for file in os.listdir(folder):
 		newname = os.path.join(folder, file)
 		if os.path.isdir(newname):
 			checkfolder(newname)
 		else:
-			if newname.split(".")[-1] in ["java", "html"]:
+			if newname.split(".")[-1] in ["java", "html", "css", "js", "xml"]:
 				files.append(newname)
 checkfolder("src")
 

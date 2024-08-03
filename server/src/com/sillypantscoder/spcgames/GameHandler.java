@@ -47,7 +47,7 @@ public class GameHandler extends RequestHandler {
 			}
 		}
 		if (path.equals("/")) {
-			return new HttpResponse().setStatus(200).addHeader("Content-Type", "text/html").setBody(Utils.readFile("public_files/index.html"));
+			return new HttpResponse().setStatus(200).addHeader("Content-Type", "text/html").setBody(AssetLoader.getResource("assets/server_files/index.html"));
 		} else if (path.equals("/gamelist/active")) {
 			ArrayList<String[]> info = new ArrayList<String[]>();
 			for (int i = 0; i < games.size(); i++) {
@@ -81,7 +81,7 @@ public class GameHandler extends RequestHandler {
 			}
 			return new HttpResponse().setStatus(200).addHeader("Content-Type", "text/plain").setBody(body);
 		} else if (path.equals("/create")) {
-			return new HttpResponse().setStatus(200).addHeader("Content-Type", "text/html").setBody(Utils.readFile("public_files/create.html"));
+			return new HttpResponse().setStatus(200).addHeader("Content-Type", "text/html").setBody(AssetLoader.getResource("assets/server_files/create.html"));
 		} else if (path.startsWith("/host/main/")) {
 			String name = path.split("/")[3];
 			for (int i = 0; i < games.size(); i++) {
@@ -91,7 +91,7 @@ public class GameHandler extends RequestHandler {
 						.setStatus(200)
 						.addHeader("Content-Type", "text/html")
 						.setBody(
-							Utils.readFile("public_files/host.html")
+							AssetLoader.getResource("assets/server_files/host.html")
 								.replaceAll("XXGAMENAME", g.name)
 								.replaceAll("XXGAMETYPENAME", g.info.getName())
 						);

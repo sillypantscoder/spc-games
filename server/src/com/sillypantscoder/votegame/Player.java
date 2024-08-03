@@ -2,6 +2,8 @@ package com.sillypantscoder.votegame;
 
 import java.util.ArrayList;
 
+import com.sillypantscoder.votegame.modules.ModuleColors;
+
 public class Player {
 	// basic things
 	public String realName;

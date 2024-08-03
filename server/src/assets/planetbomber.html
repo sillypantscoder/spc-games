@@ -145,15 +145,17 @@ button {
 		<div id="info">
 			<div>
 				<!-- <div class="display-bomb progress auto" style="--size: 30px; --pc: 0; --color: pink;" data-countdown="0 2 paint" onclick="db(event)"></div> -->
-				<div class="display-bomb progress" style="--size: 30px; --pc: 0; --color: pink;" data-countdown="0 200 paint" onclick="db(event)"></div>
-				<div class="display-bomb progress" style="--size: 30px; --pc: 0; --color: orange;" data-countdown="0 1000 bomb2P" onclick="db(event)"></div>
+				<div class="display-bomb progress" style="--size: 30px; --pc: 0; --color: #b7b;" data-countdown="0 500 paint2" onclick="db(event)"></div>
+				<div class="display-bomb progress" style="--size: 30px; --pc: 0; --color: pink;" data-countdown="0 180 paint" onclick="db(event)"></div>
+				<div class="display-bomb progress" style="--size: 30px; --pc: 0; --color: yellow;" data-countdown="0 2000 bomb3P" onclick="db(event)"></div>
+				<div class="display-bomb progress" style="--size: 30px; --pc: 0; --color: orange;" data-countdown="0 800 bomb2P" onclick="db(event)"></div>
 				<div class="display-bomb" style="--size: 20px;"></div>
 				<div class="display-bomb progress" style="--size: 30px; --pc: 0; --color: red;"     data-countdown="0 50 bomb2" onclick="db(event)"></div>
 				<div class="display-bomb progress" style="--size: 30px; --pc: 0; --color: blue;"    data-countdown="0 300 bomb3" onclick="db(event)"></div>
 				<div class="display-bomb progress" style="--size: 30px; --pc: 0; --color: green;"   data-countdown="0 900 bomb4" onclick="db(event)"></div>
 				<div class="display-bomb progress" style="--size: 30px; --pc: 0; --color: purple;"  data-countdown="0 1200 bomb5" onclick="db(event)"></div>
 				<div class="display-bomb progress" style="--size: 30px; --pc: 0; --color: magenta;" data-countdown="0 3600 bomb6" onclick="db(event)"></div>
-				<div class="display-bomb progress" style="--size: 30px; --pc: 0; --color: linear-gradient(90deg, red, orange, yellow, green, blue, purple, pink);" data-countdown="4000 4000 everything" onclick="db(event)"></div>
+				<div class="display-bomb progress" style="--size: 30px; --pc: 0; --color: linear-gradient(90deg, red, orange, yellow, green, blue, purple, pink);" data-countdown="0 3000 everything" onclick="db(event)"></div>
 				<!-- <div class="display-bomb progress auto" style="--size: 30px; --pc: 0; --color: magenta;" data-countdown="0 10 bomb6" onclick="check_btn_click(event)"></div> -->
 			</div>
 			<div id="infobar">
@@ -286,7 +288,7 @@ class Planet {
 						_b[i].destroy()
 						Bomb.recycle(_b[i])
 					}
-					planetSize += 0.1;
+					planetSize += 0.02;
 					planetno += 1
 				} else {
 					this.phaseTime = 0
@@ -296,9 +298,9 @@ class Planet {
 		}
 	}
 	time() {
-		if (this.phase == 1) return 0.1
+		if (this.phase == 1) return 0.07
 		if (this.phase == 2) return 0.4
-		if (this.phase == 3) return 0.4
+		if (this.phase == 3) return 0.5
 		return 1
 	}
 }
@@ -346,17 +348,19 @@ class Bomb {
 		if (b instanceof Bomb2) type = "bomb2"
 		if (b instanceof Bomb2P) type = "bomb2P"
 		if (b instanceof Bomb3) type = "bomb3"
+		if (b instanceof Bomb3P) type = "bomb3P"
 		if (b instanceof Bomb4) type = "bomb4"
 		if (b instanceof Bomb5) type = "bomb5"
 		if (b instanceof Bomb6) type = "bomb6"
 		if (b instanceof PaintBall) type = "paint"
+		if (b instanceof PaintBall2) type = "paint2"
 		if (b instanceof EverythingBall) type = "everything"
 		// Increase value
 		var e = document.querySelector(`[data-countdown$="${type=="bomb"?"bomb2":type}"]`)
 		var data = e.dataset.countdown.split(" ")
 		data[0] = Number(data[0]);
 		data[1] = Number(data[1]);
-		data[0] += 0.8 * data[1];
+		data[0] += 0.9 * data[1];
 		e.dataset.countdown = data.join(" ")
 	}
 	static createPos() {
@@ -414,6 +418,21 @@ class Bomb3 extends Bomb {
 	}
 	tickUpdateScreen() {
 		this.elm.setAttribute("style", `--x: ${this.pos[0]}px; --y: ${this.pos[1]}px; --size: 30px; --color: blue;`)
+	}
+}
+class Bomb3P extends Bomb {
+	hitGround() {
+		planet.explode(...this.pos, 20)
+		for (var i = 0; i < 70; i++) {
+			var b = new Bomb2(...this.pos)
+			var newV = randomCircle(2)
+			b.v[0] = newV[0] + (this.v[0] * -0.5)
+			b.v[1] = newV[1] + (this.v[1] * -0.5)
+			bombs.push(b)
+		}
+	}
+	tickUpdateScreen() {
+		this.elm.setAttribute("style", `--x: ${this.pos[0]}px; --y: ${this.pos[1]}px; --size: 30px; --color: yellow;`)
 	}
 }
 class Bomb4 extends Bomb {
@@ -477,6 +496,21 @@ class PaintBall extends Bomb {
 		this.elm.setAttribute("style", `--x: ${this.pos[0]}px; --y: ${this.pos[1]}px; --size: 30px; --color: pink;`)
 	}
 }
+class PaintBall2 extends Bomb {
+	hitGround() {
+		planet.explode(...this.pos, 20)
+		for (var i = 0; i < 10; i++) {
+			var b = new PaintBall(...this.pos)
+			var newV = randomCircle(2)
+			b.v[0] = newV[0] + (this.v[0] * -0.5)
+			b.v[1] = newV[1] + (this.v[1] * -0.5)
+			bombs.push(b)
+		}
+	}
+	tickUpdateScreen() {
+		this.elm.setAttribute("style", `--x: ${this.pos[0]}px; --y: ${this.pos[1]}px; --size: 30px; --color: #b7b;`)
+	}
+}
 class EverythingBall extends Bomb {
 	hitGround() {
 		planet.explode(...this.pos, 20)
@@ -485,10 +519,12 @@ class EverythingBall extends Bomb {
 			Bomb2,
 			Bomb2P,
 			Bomb3,
+			Bomb3P,
 			Bomb4,
 			Bomb5,
 			Bomb6,
-			PaintBall
+			PaintBall,
+			PaintBall2
 		]) {
 			var b = new type(...this.pos)
 			var newV = randomCircle(5)
@@ -532,6 +568,7 @@ function tick() {
 			check_btn_click({target:elms[i]})
 		}
 	}
+	if (Math.random() < 0.1) Bomb.create(Bomb)
 	for (var i = 0; i < bombs.length; i++) {
 		var b = bombs[i]
 		b.tick()
@@ -561,7 +598,9 @@ function check_btn_click(evt) {
 			"bomb5": Bomb5,
 			"bomb6": Bomb6,
 			"bomb2P": Bomb2P,
+			"bomb3P": bomb3P,
 			"paint": PaintBall,
+			"paint2": PaintBall2,
 			"everything": EverythingBall
 		}[data[2]]
 		Bomb.create(bombType)
@@ -583,7 +622,7 @@ function show_info_screen(type) {
 	data[0] = Number(data[0])
 	data[1] = Number(data[1])
 	var e = document.querySelector("#infobar")
-	e.innerHTML = `<div>Planet #<b>${planetno}</b></div><div><b></b></div><div></div><div><span>Charge: </span><b></b></div><div><button onmouseup='action_use(event, 1)'>Use one</button><button onmouseup='action_use(event, 1000)'>Use all</button></div>`
+	e.innerHTML = `<div>Planet #<b>${planetno}</b> <small>Bomb size: ${Math.round(10000 / planetSize) / 100}%</small></div><div><b></b></div><div></div><div><span>Charge: </span><b></b></div><div><button onmouseup='action_use(event, 1)'>Use one</button><button onmouseup='action_use(event, 10)'>Use 10</button><button onmouseup='action_use(event, 100)'>Use 100</button><button onmouseup='action_use(event, 1000)'>Use 1000</button></div>`
 	var ballType = {
 		"bomb2": "Frag Bomb/Splits into 3 black bombs",
 		"bomb3": "Frag Bomb 2/Splits into 3 red bombs",
@@ -591,7 +630,9 @@ function show_info_screen(type) {
 		"bomb5": "Frag Bomb 4/Splits into 3 green bombs",
 		"bomb6": "Frag Bomb 5/Splits into 3 purple bombs",
 		"bomb2P": "Big Frag Bomb/Splits into 70 black bombs",
+		"bomb3P": "Big Frag Bomb 2/Splits into 70 red bombs",
 		"paint": "Paint Ball/Spray paint",
+		"paint2": "Paint Bomb/Splits into 10 paint balls",
 		"everything": "Everything Ball/Splits into one of everything"
 	}[data[2]]
 	e.children[1].children[0].innerText = ballType.split("/")[0]
@@ -615,7 +656,9 @@ function action_use(event, no) {
 			"bomb5": Bomb5,
 			"bomb6": Bomb6,
 			"bomb2P": Bomb2P,
+			"bomb3P": Bomb3P,
 			"paint": PaintBall,
+			"paint2": PaintBall2,
 			"everything": EverythingBall
 		}[data[2]]
 		Bomb.create(bombType)

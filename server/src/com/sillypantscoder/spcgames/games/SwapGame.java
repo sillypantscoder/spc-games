@@ -1,8 +1,8 @@
 package com.sillypantscoder.spcgames.games;
 
 import com.sillypantscoder.spcgames.Game.StaticGame;
+import com.sillypantscoder.spcgames.AssetLoader;
 import com.sillypantscoder.spcgames.GameInfo;
-import com.sillypantscoder.spcgames.Utils;
 import com.sillypantscoder.spcgames.http.HttpResponse;
 
 public class SwapGame extends StaticGame {
@@ -26,11 +26,11 @@ public class SwapGame extends StaticGame {
 		};
 	}
 	public HttpResponse get(String path) {
-		if (path.equals("/")) return new HttpResponse().addHeader("Content-Type", "text/html").setBody(Utils.readFile("../stuff/swapgame/index.html"));
-		if (path.equals("/style.css")) return new HttpResponse().addHeader("Content-Type", "text/css").setBody(Utils.readFile("../stuff/swapgame/style.css"));
-		if (path.equals("/script.js")) return new HttpResponse().addHeader("Content-Type", "text/javascript").setBody(Utils.readFile("../stuff/swapgame/script.js"));
-		if (path.equals("/game2.xml")) return new HttpResponse().addHeader("Content-Type", "image/svg+xml").setBody(Utils.readFile("../stuff/swapgame/game2.xml"));
-		if (path.equals("/confetti_mod.js")) return new HttpResponse().addHeader("Content-Type", "text/javascript").setBody(Utils.readFile("../stuff/swapgame/confetti_mod.js"));
+		if (path.equals("/")) return new HttpResponse().addHeader("Content-Type", "text/html").setBody(AssetLoader.getResource("assets/swapgame/index.html"));
+		if (path.equals("/style.css")) return new HttpResponse().addHeader("Content-Type", "text/css").setBody(AssetLoader.getResource("assets/swapgame/style.css"));
+		if (path.equals("/script.js")) return new HttpResponse().addHeader("Content-Type", "text/javascript").setBody(AssetLoader.getResource("assets/swapgame/script.js"));
+		if (path.equals("/game2.xml")) return new HttpResponse().addHeader("Content-Type", "image/svg+xml").setBody(AssetLoader.getResource("assets/swapgame/game2.xml"));
+		if (path.equals("/confetti_mod.js")) return new HttpResponse().addHeader("Content-Type", "text/javascript").setBody(AssetLoader.getResource("assets/swapgame/confetti_mod.js"));
 		return new HttpResponse().setStatus(404);
 	}
 	public HttpResponse post(String path, String body) {

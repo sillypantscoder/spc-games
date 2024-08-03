@@ -16,8 +16,9 @@ public class Subprocess {
 			process = new ProcessBuilder(args).redirectError(ProcessBuilder.Redirect.INHERIT).directory(new File(cwd)).start();
 			stdoutReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 		} catch (IOException e) {
-			System.out.println("Error starting process");
 			process = null;
+			System.out.println("Error starting process with args: " + String.join(", ", args));
+			e.printStackTrace();
 		}
 	}
 	public void waitFor() {

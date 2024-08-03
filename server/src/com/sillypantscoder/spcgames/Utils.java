@@ -1,8 +1,5 @@
 package com.sillypantscoder.spcgames;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -32,19 +29,6 @@ public class Utils {
 		}
 		result += "]";
 		return result;
-	}
-	public static String readFile(String name) {
-		try {
-			File f = new File(name);
-			byte[] bytes = new byte[(int)(f.length())];
-			FileInputStream fis = new FileInputStream(f);
-			fis.read(bytes);
-			fis.close();
-			return new String(bytes);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return "";
-		}
 	}
 	public static String decodeURIComponent(String in) {
 		try {
