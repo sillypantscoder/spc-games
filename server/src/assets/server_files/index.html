@@ -38,32 +38,30 @@ a.button {
 	var x = new XMLHttpRequest()
 	x.open("GET", "/gamelist/active")
 	x.addEventListener("loadend", (e) => {
-		/** @type {string} */
-		var t = e.target.responseText;
-		if (t.length == 0) {
+		/** @type {{ game_type_name: string, description: string, game_type_id: string, game_name: string, game_id: string, status: string, deletionTime: number }[]} */
+		var games = JSON.parse(e.target.responseText);
+		if (games.length == 0) {
 			var elm = document.createElement("div")
 			elm.innerText = "There are no games currently in progress!"
 			document.querySelector("#games").appendChild(elm)
 			return
 		}
-		var games = t.split("\n").map((v) => v.split("|||"))
-		// info is: [game type name, game type description, game type id, game name, game id, short status, deletion time]
 		for (var info of games) {
 			var elm = document.createElement("div")
 			elm.classList.add("game")
 			elm.innerHTML = "<div><span></span> - <b></b></div><p><span></span><br><a>How to play</a></p><div></div><div><span></span><button>Mark for deletion</button></div><div><a class=\"button\">Play!</a></div>"
-			elm.children[0].children[0].innerText = info[0]
-			elm.children[0].children[1].innerText = info[3]
-			elm.children[1].children[0].innerText = info[1]
-			elm.children[1].children[2].setAttribute("href", "info/active/" + info[2])
-			elm.children[2].innerHTML = "Status: " + info[5]
-			if (info[6] != 0) {
-				var date = new Date(Number(info[6]))
+			elm.children[0].children[0].innerText = info.game_type_name
+			elm.children[0].children[1].innerText = info.game_name
+			elm.children[1].children[0].innerText = info.description
+			elm.children[1].children[2].setAttribute("href", "info/active/" + info.game_type_id)
+			elm.children[2].innerHTML = "Status: " + info.status
+			if (info.deletionTime != 0) {
+				var date = new Date(Number(info.deletionTime))
 				elm.children[3].children[0].innerText = "Will be deleted at " + (date.getHours()>12 ? date.getHours() - 12 : date.getHours()) + ":" + date.getMinutes().toString().padStart(2, "0") + ":" + date.getSeconds().toString().padStart(2, "0") + " " + (date.getHours()>12 ? "P" : "A") + "M "
 				elm.children[3].children[1].innerText = "Cancel"
 			}
-			elm.children[3].children[1].setAttribute("onclick", `(() => { var x = new XMLHttpRequest(); x.open("POST", "/mark_delete"); x.addEventListener("loadend", () => location.reload()); x.send("${info[4]}"); })();`)
-			elm.children[4].children[0].setAttribute("href", "game/" + info[4] + "/")
+			elm.children[3].children[1].setAttribute("onclick", `(() => { var x = new XMLHttpRequest(); x.open("POST", "/mark_delete"); x.addEventListener("loadend", () => location.reload()); x.send("${info.game_id}"); })();`)
+			elm.children[4].children[0].setAttribute("href", "game/" + info.game_id + "/")
 			document.querySelector("#games").appendChild(elm)
 		}
 	})
@@ -73,25 +71,23 @@ a.button {
 	var x = new XMLHttpRequest()
 	x.open("GET", "/gamelist/static")
 	x.addEventListener("loadend", (e) => {
-		/** @type {string} */
-		var t = e.target.responseText;
-		if (t.length == 0) {
+		/** @type {{ name: string, description: string, id: string }[]} */
+		var games = JSON.parse(e.target.responseText);
+		if (games.length == 0) {
 			var elm = document.createElement("li")
 			elm.innerText = "There are no single-player games currently available!"
 			document.querySelector("#games_static").appendChild(elm)
 			return
 		}
-		var games = t.split("\n").map((v) => v.split("|||"))
-		// games is: [game type name, game type description, game id]
 		for (var info of games) {
 			var elm = document.createElement("div")
 			elm.classList.add("game")
 			elm.innerHTML = "<div><span></span> - <b></b></div><div></div><div><span></span><button>Mark for deletion</button></div><div><a class=\"button\">Play!</a></div>"
 			elm.innerHTML = "<div><b></b></div><div></div><div><a>How to play</a></div><div><a class=\"button\">Play!</a>"
-			elm.children[0].children[0].innerText = info[0]
-			elm.children[1].innerText = info[1]
-			elm.children[2].children[0].setAttribute("href", "info/static/" + info[2])
-			elm.children[3].children[0].setAttribute("href", "game_static/" + info[2] + "/")
+			elm.children[0].children[0].innerText = info.name
+			elm.children[1].innerText = info.description
+			elm.children[2].children[0].setAttribute("href", "info/static/" + info.id)
+			elm.children[3].children[0].setAttribute("href", "game_static/" + info.id + "/")
 			document.querySelector("#games_static").appendChild(elm)
 		}
 	})

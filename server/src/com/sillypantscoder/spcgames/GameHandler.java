@@ -49,40 +49,44 @@ public class GameHandler extends RequestHandler {
 		if (path.equals("/")) {
 			return new HttpResponse().setStatus(200).addHeader("Content-Type", "text/html").setBody(AssetLoader.getResource("assets/server_files/index.html"));
 		} else if (path.equals("/gamelist/active")) {
-			ArrayList<String[]> info = new ArrayList<String[]>();
+			ArrayList<JSON.JObject<JSON.JValue>> info = new ArrayList<JSON.JObject<JSON.JValue>>();
 			for (int i = 0; i < games.size(); i++) {
 				ActiveGame g = games.get(i);
-				info.add(new String[] {
-					g.info.getName(),
-					g.info.getShortDescription(),
-					g.info.getID(),
-					g.name,
-					g.id,
-					g.getStatus(),
-					String.valueOf(g.deletionTime)
-				});
+				info.add(JSON.JObject.create(new String[] {
+					"game_type_name",
+					"description",
+					"game_type_id",
+					"game_name",
+					"game_id",
+					"status",
+					"deletionTime"
+				}, new JSON.JValue[] {
+					new JSON.JString(g.info.getName()),
+					new JSON.JString(g.info.getShortDescription()),
+					new JSON.JString(g.info.getID()),
+					new JSON.JString(g.name),
+					new JSON.JString(g.id),
+					new JSON.JString(g.getStatus()),
+					new JSON.JNumber(g.deletionTime)
+				}));
 			}
-			String body = "";
-			for (int i = 0; i < info.size(); i++) {
-				if (i != 0) body += "\n";
-				body += String.join("|||", info.get(i));
-			}
+			String body = new JSON.JList<JSON.JObject<JSON.JValue>>(info).toString();
 			return new HttpResponse().setStatus(200).addHeader("Content-Type", "text/plain").setBody(body);
 		} else if (path.equals("/gamelist/static")) {
-			ArrayList<String[]> info = new ArrayList<String[]>();
+			ArrayList<JSON.JObject<JSON.JString>> info = new ArrayList<JSON.JObject<JSON.JString>>();
 			for (int i = 0; i < staticGames.size(); i++) {
 				StaticGame g = staticGames.get(i);
-				info.add(new String[] {
-					g.info.getName(),
-					g.info.getShortDescription(),
-					g.info.getID()
-				});
+				info.add(JSON.JObject.create(new String[] {
+					"name",
+					"description",
+					"id"
+				}, new JSON.JString[] {
+					new JSON.JString(g.info.getName()),
+					new JSON.JString(g.info.getShortDescription()),
+					new JSON.JString(g.info.getID())
+				}));
 			}
-			String body = "";
-			for (int i = 0; i < info.size(); i++) {
-				if (i != 0) body += "\n";
-				body += String.join("|||", info.get(i));
-			}
+			String body = new JSON.JList<JSON.JObject<JSON.JString>>(info).toString();
 			return new HttpResponse().setStatus(200).addHeader("Content-Type", "text/plain").setBody(body);
 		} else if (path.equals("/create")) {
 			return new HttpResponse().setStatus(200).addHeader("Content-Type", "text/html").setBody(AssetLoader.getResource("assets/server_files/create.html"));
